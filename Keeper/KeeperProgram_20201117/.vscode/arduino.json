@@ -1,0 +1,6 @@
+{
+    "port": "COM3",
+    "board": "arduino:avr:mega",
+    "configuration": "cpu=atmega2560",
+    "sketch": "KeeperProgram_20191231.ino"
+}
