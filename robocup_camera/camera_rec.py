@@ -3,11 +3,11 @@ from cv2 import data
 import numpy as np
 import math
 
-lower_green=np.array([0,100,53])
-upper_green=np.array([0,100,100])
+lower_green=np.array([210,68,65])
+upper_green=np.array([104,74,70])
 
-lower_yellow=np.array([0,100,53])
-upper_yellow=np.array([0,100,100])
+lower_yellow=np.array([43,100,65])
+upper_yellow=np.array([46,100,60])
 
 lower_ball=np.array([0,100,53])
 upper_ball=np.array([0,100,100])
