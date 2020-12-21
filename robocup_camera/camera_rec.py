@@ -27,7 +27,7 @@ while True:
     ball=[]
     min_range_green=()
     min_range_yellow=()
-    _,frame=cap.read("./9.bmp")
+    _,frame=cap.read()
     hsv = cv2.cvtColor(frame, cv2.COLOR_BGR2HSV)
     mask_green = cv2.inRange(hsv, lower_green, upper_green)
     mask_yellow = cv2.inRange(hsv, lower_yellow, upper_yellow)
