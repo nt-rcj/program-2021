@@ -1,6 +1,6 @@
 //
 // Robot main program
-//           Ver 1.0 Dece.19.2019
+//           Ver 1.0 Dec.23.2020
 //           By Hiroya Hashimoto
 //
 
