@@ -171,7 +171,7 @@ void loop() {
   float y_sig, b_sig, goal_sig;
   int b;
 
-  int ball_tof;
+  int tof_ball_front;
 
   blob_count = get_openMV_coordinate();
   x_data_ball = (openMV[5] & 0b0000000000111111) + ((openMV[6] & 0b0000000000111111) << 6);
@@ -253,8 +253,6 @@ void loop() {
   Serial.print(goal_x);
   Serial.print(" goal_y=");
   Serial.print(goal_y);
-  Serial.print(" ball_tof=");
-  Serial.print(ball_tof);
   Serial.print(" gyro=");
   Serial.print(gyro);
   Serial.print(" b=");
@@ -296,9 +294,9 @@ void loop() {
         } else { //goal can find
           if ((goal_y >= 50) && (goal_y <= 80)) { //goal is nearby 
             dribbler(50);
-            digitalWrite(Kick1, HIGH);
-            delay(1000);
             dribbler(0);
+            digitalWrite(Kick1, HIGH);
+            delay(2000);
             digitalWrite(Kick1, LOW);
           } else { //goal isn't nearby
             dribbler(50);
