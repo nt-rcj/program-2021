@@ -42,6 +42,7 @@ static int line[4];
 
 void setup()
 {
+  int pin;
 
   pinMode(StartSW, INPUT_PULLUP);
 
@@ -49,7 +50,7 @@ void setup()
 
   pinMode(ledPin, OUTPUT);
 
-  pinMode(angle, INPUT);
+  //pinMode(angle, INPUT);
 
   pinMode(LINE_LED, OUTPUT);
   pinMode(LINE1D, INPUT_PULLUP);
@@ -82,6 +83,9 @@ void setup()
 
   pinMode(INT_29, INPUT_PULLUP); // interrupt port set
 
+  Serial.begin(9600); //  シリアル出力を初期化
+  Serial.println("Starting...");
+
   //*****************************************************************************
   // Set initial value to variable
 
@@ -90,7 +94,20 @@ void setup()
   power = 70; //  set initial motor power
 
   //*****************************************************************************
+
+  Wire.begin();
   // initialize ToF sensers
+  // Set PCF8574pinMode to OUTPUT
+  for (i = 0; i < 8; i++)
+    pcf8574.pinMode(i, OUTPUT);
+  for (pin = 0; pin < 8; pin++)
+    pcf8574.digitalWrite(pin, LOW); //deactivate(reset) ToF_front,ToF_back
+
+  /*
+    CE端子をLOWにするとデバイスがリセットされアドレスが初期値に
+    　戻るので注意
+  */
+
   delay(10);
   pcf8574.digitalWrite(5 - 1, HIGH); //Activate ToF_front VL6180X
   delay(10);
@@ -108,8 +125,12 @@ void setup()
   ToF_back.setTimeout(100);
   delay(10);
 
+  Serial.println("Initialize 1 ...");
+
   motorInit(); //  モーター制御の初期化
   dribInit();  //  ドリブラモーターの初期化
+
+  Serial.println("Initialize 2 ...");
 
   delay(1000); //  ドリブラ・キッカーの動作チェック
   dribbler1(50);
@@ -122,6 +143,8 @@ void setup()
   delay(100);
   digitalWrite(Kick1, LOW);
 
+  Serial.println("Initialize 3 ...");
+
   Serial3.begin(19200);  // initialize serialport for openMV
   Serial2.begin(115200); // WT901 IMU Sener
 
@@ -133,9 +156,6 @@ void setup()
   // Caution D29 -> Interrupt5
 
   attachInterrupt(INT_29, intHandle, RISING);
-
-  Serial.begin(9600); //  シリアル出力を初期化
-  Serial.println("Starting...");
 
   // LEDを初期化する
   LED_Init();
@@ -334,7 +354,7 @@ void loop()
               delay(100);
             }
             else
-            {//ball 追いかけ
+            { //ball 追いかけ
               dribbler(0);
               m = y / x;
               z = atan(m); // arc tangent of m
