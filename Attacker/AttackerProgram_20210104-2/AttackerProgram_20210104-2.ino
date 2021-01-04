@@ -138,8 +138,8 @@ void setup() {
   Serial.println("Initialize 2 ...");
 
   delay(1000);  //  ドリブラ・キッカーの動作チェック
-  dribbler1(50);
-  dribbler2(50);
+  dribbler1(25);
+  dribbler2(25);
   delay(1500);
   dribbler1(0);
   dribbler2(0);
@@ -333,24 +333,12 @@ void loop() {
                 z = atan(m); // arc tangent of m
                 motorfunction(z, (abs(x) + abs(y)) / 2 , -gyro);
               } else {
-                if (y < 0) {
-                  if ( y <= 20) {
-                    dribbler(0);
-                    m = y / -x;
-                    z = atan(m) + PI; // arc tangent of m
-                    motorfunction(z, abs(y) + 20, -gyro);
-                  } else {
-                    dribbler(0);
-                    m = y / x;
-                    z = atan(m) + PI; // arc tangent of m
-                    motorfunction(z, abs(y) + 20, -gyro);
-                  }
-                } else {
+
                   dribbler(0);
                   m = y / x;
                   z = atan(m) + PI; // arc tangent of m
-                  motorfunction(z, abs(y) + 20, -gyro);
-                }
+                  motorfunction(z, 20, -gyro);
+
               }
           }
         }
