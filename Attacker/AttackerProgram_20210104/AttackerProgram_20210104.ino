@@ -6,28 +6,25 @@
 //
 //           Ver 3.0 Nov.13.2020
 //           Ver 3.1 Dec.06.2020
+//           Ver 3.2 Jan.03.2021
+//           Ver 3.3 Jan.04.2020
 //           modefied by H.Saeki
 //
 
-//Motor control program
 
 #include "NT_Robot202011.h" // Header file for Teensy 3.5
 #include "motorDRV4.h" //  モーター制御のプログラムを読み込む
 
-#include <Adafruit_NeoPixel.h>
-
-#define PIN            40
-#define NUMPIXELS      16
-Adafruit_NeoPixel strip(NUMPIXELS, PIN, NEO_GRB + NEO_KHZ800);
-
 #include <Wire.h>
-#include <VL53L0X.h>
+#include <PCF8574.h>
 #include <VL6180X.h>
 
-VL6180X sensor;
+PCF8574 pcf8574(I2C_PCF8574);
+VL6180X ToF_front;  // create front ToF object
+VL6180X ToF_back;   // create back ToF object
 
 const int angle = 0;
-const int Vlow = 13.5;  // Low limit voltage 3.4*4 = 14.0
+const int Vlow = 13.0;  // Low limit voltage 1.1*12 = 13.2
 const float Vstep = 0.01811;  // Voltage step 15.3V/845 = 0.01811
 
 int blob_count, i;
@@ -37,7 +34,7 @@ static int x_data_yellowgoal, y_data_yellowgoal, w_data_yellowgoal, h_data_yello
 static int x_data_bluegoal, y_data_bluegoal, w_data_bluegoal, h_data_bluegoal;
 
 static int8_t  gyro;
-static int robot_dir, ball_dir, power;
+static int robot_dir, power;
 
 static int emergency;
 static int  outofbounds;   // "out of bounds" flag
@@ -47,6 +44,7 @@ static int lineflag;//line
 static int line[4];
 
 void setup() {
+  int pin;
 
   pinMode(StartSW, INPUT_PULLUP);
 
@@ -54,7 +52,7 @@ void setup() {
 
   pinMode(ledPin, OUTPUT);
 
-  pinMode(angle, INPUT);
+  //pinMode(angle, INPUT);
 
   pinMode(LINE_LED, OUTPUT);
   pinMode(LINE1D, INPUT_PULLUP);
@@ -69,6 +67,7 @@ void setup() {
   pinMode(LINE5A, INPUT);
 
   pinMode(Kick1, OUTPUT);
+  pinMode(Kick_Dir, OUTPUT);
 
   pinMode(SWR, OUTPUT);
   pinMode(SWG, OUTPUT);
@@ -79,6 +78,7 @@ void setup() {
   pinMode(LED_B, OUTPUT);
 
   digitalWrite(Kick1, LOW);
+  digitalWrite(Kick_Dir, LOW);
   digitalWrite(SWR, LOW);
   digitalWrite(SWG, LOW);
 
@@ -87,8 +87,55 @@ void setup() {
 
   pinMode(INT_29, INPUT_PULLUP);          // interrupt port set
 
+  Serial.begin(9600);   //  シリアル出力を初期化
+  Serial.println("Starting...");
+
+  //*****************************************************************************
+  // Set initial value to variable
+
+  emergency = false;
+  outofbounds = false;
+  power = 70;   //  set initial motor power
+
+  //*****************************************************************************
+
+  Wire.begin();
+  // initialize ToF sensers
+  // Set PCF8574pinMode to OUTPUT
+  for ( i = 0; i < 8; i++)
+    pcf8574.pinMode(i, OUTPUT);
+  pcf8574.begin();
+  for ( pin = 0; pin < 8; pin++)
+    pcf8574.digitalWrite(pin, LOW);   //deactivate(reset) ToF_front,ToF_back
+
+  /*
+    CE端子をLOWにするとデバイスがリセットされアドレスが初期値に
+    　戻るので注意
+  */
+
+  delay(10);
+  pcf8574.digitalWrite(1 - 1, HIGH); //Activate ToF_front VL6180X
+  delay(10);
+  ToF_front.init();
+  ToF_front.configureDefault();
+  ToF_front.setAddress(TOF_1);  //好きなアドレスに設定
+  ToF_front.setTimeout(100);
+  delay(10);
+
+  pcf8574.digitalWrite(2 - 1, HIGH); //Activate ToF_back VL6180X
+  delay(10);
+  ToF_back.init();
+  ToF_back.configureDefault();
+  ToF_back.setAddress(TOF_2);  //好きなアドレスに設定
+  ToF_back.setTimeout(100);
+  delay(10);
+
+  Serial.println("Initialize 1 ...");
+
   motorInit();  //  モーター制御の初期化
   dribInit();   //  ドリブラモーターの初期化
+
+  Serial.println("Initialize 2 ...");
 
   delay(1000);  //  ドリブラ・キッカーの動作チェック
   dribbler1(50);
@@ -101,10 +148,7 @@ void setup() {
   delay(100);
   digitalWrite(Kick1, LOW);
 
-  emergency = false;
-  outofbounds = false;
-
-  power = 70;   //  set initial motor power
+  Serial.println("Initialize 3 ...");
 
   Serial3.begin(19200);  // initialize serialport for openMV
   Serial2.begin(115200);   // WT901 IMU Sener
@@ -118,32 +162,8 @@ void setup() {
 
   attachInterrupt(INT_29, intHandle, RISING);
 
-  Serial.begin(9600);   //  シリアル出力を初期化
-  Serial.println("Starting...");
-
-  Wire.begin();
-  sensor.init();
-  sensor.configureDefault();
-  sensor.setTimeout(500);
-
-#if defined LONG_RANGE
-  // lower the return signal rate limit (default is 0.25 MCPS)
-  sensor.setSignalRateLimit(0.1);
-  // increase laser pulse periods (defaults are 14 and 10 PCLKs)
-  sensor.setVcselPulsePeriod(VL53L0X::VcselPeriodPreRange, 18);
-  sensor.setVcselPulsePeriod(VL53L0X::VcselPeriodFinalRange, 14);
-#endif
-
-#if defined HIGH_SPEED
-  // reduce timing budget to 20 ms (default is about 33 ms)
-  sensor.setMeasurementTimingBudget(20000);
-#elif defined HIGH_ACCURACY
-  // increase timing budget to 200 ms
-  sensor.setMeasurementTimingBudget(200000);
-#endif
-
   // LEDを初期化する
-  // LED_Init();
+  LED_Init();
   digitalWrite(LED_R, LOW);  // LED_R消灯
   digitalWrite(LED_Y, LOW);  // LED_Y消灯
   digitalWrite(LED_G, LOW);  // LED_G消灯
@@ -155,23 +175,16 @@ void setup() {
 }
 
 void loop() {
-  int level, data;
-  int j;
   int sig, w, h, area;
   int bg_w, bg_h, bg_area;
   int yg_w, yg_h, yg_area;
-  int blocks;
-  int i;
-  char buf[64];
   float m , z;
   float x, y;
   float bg_x, bg_y;
   float yg_x, yg_y;
   float goal_x, goal_y;
   float y_sig, b_sig, goal_sig;
-  int b;
-
-  int tof_ball_front;
+  int ball_tof;
 
   blob_count = get_openMV_coordinate();
   x_data_ball = (openMV[5] & 0b0000000000111111) + ((openMV[6] & 0b0000000000111111) << 6);
@@ -242,7 +255,7 @@ void loop() {
     goal_y = 110 - goal_y;
   }
 
-  tof_ball_front = sensor.readRangeSingleMillimeters();
+  ball_tof = ToF_front.readRangeSingleMillimeters();
   Serial.print(" Sig=");  //  openMVのデータを出力する
   Serial.print(sig);
   Serial.print(" X=");
@@ -253,31 +266,23 @@ void loop() {
   Serial.print(goal_x);
   Serial.print(" goal_y=");
   Serial.print(goal_y);
+  Serial.print(" ball_tof=");
+  Serial.print(ball_tof);
   Serial.print(" gyro=");
   Serial.print(gyro);
-  Serial.print(" b=");
-  Serial.print(b);
-  Serial.print(" tbf="); //tofdeta出力
-  Serial.print(tof_ball_front);
+  Serial.print(" ToF=");
+  Serial.print(ball_tof);
   Serial.println();
 
-
-  if (!digitalRead(StartSW)) {  // Lowでスタート
+  if (digitalRead(StartSW) == LOW) { // STartSW == Lowでスタート
     digitalWrite(SWR, HIGH);
     digitalWrite(SWG, LOW);
 
-    checkvoltage(Vlow);
-    if (emergency == true) {       // 電池の電圧が下がっていたら
-      digitalWrite(LINE_LED, LOW); // ラインセンサのLEDを消灯
-      motorFree();                 //　モーターを停止
-      while (1) {                  //　無限ループ
-        digitalWrite(SWR, LOW);
-        digitalWrite(SWG, LOW);
-        delay(300);
-        digitalWrite(SWR, HIGH);
-        digitalWrite(SWG, HIGH);
-        delay(300);
-      }
+    checkvoltage(Vlow);  //  電池の電圧をチェック
+    if ( emergency == true ) {
+      Serial.println("");
+      Serial.println("  Battery Low!");
+      doOutofbound();    //  故障なのでコートの外へ
     }
 
     digitalWrite(LINE_LED, HIGH); // ラインセンサのLEDを点灯
@@ -286,19 +291,19 @@ void loop() {
     }
     if (abs(gyro) < 20) {
       digitalWrite(LED_BUILTIN, LOW);
-      if (sensor.readRangeSingleMillimeters() <= 50) {  //　ドリブラの直近にボールがあればドリブラを回す
+      if (ToF_front.readRangeSingleMillimeters() <= 50) {  //　ドリブラの直近にボールがあればドリブラを回す
         dribbler(50);
-        if ( goal_sig == 0) { //goal can't find
+        if ( goal_sig == 0) {
           //dribbler(100);
           motorfunction(0, power, -gyro);
-        } else { //goal can find
-          if ((goal_y >= 50) && (goal_y <= 80)) { //goal is nearby 
+        } else {
+          if ((goal_y >= 50) && (goal_y <= 80)) {
             dribbler(50);
-            dribbler(0);
             digitalWrite(Kick1, HIGH);
-            delay(2000);
+            delay(1000);
+            dribbler(0);
             digitalWrite(Kick1, LOW);
-          } else { //goal isn't nearby
+          } else {
             dribbler(50);
             if (abs(goal_x) < 2) {
               motorfunction(0, power, -gyro);
@@ -320,10 +325,23 @@ void loop() {
           if (y >= 70) {
             motorfunction(0 , power, -gyro);
           } else {
-            dribbler(0);
-            m = y / x;
-            z = atan(m); // arc tangent of m
-            motorfunction(z, (abs(x) + abs(y)) / 2 , -gyro);
+            if ((abs(x) < 2) && (y >= 0)) {
+              motorfunction(0 , 30, -gyro);
+              dribbler(50);
+              delay(100);
+            } else {
+              if (y >= 40) { //ball is front
+                dribbler(0);
+                m = y / x;
+                z = atan(m); // arc tangent of m
+                motorfunction(z, (abs(x) + abs(y)) / 2 , -gyro);
+              } else { //ball is back
+                  dribbler(0);
+                  m = 0.5 * y / -x;
+                  z = atan(m) + PI; // arc tangent of m
+                  motorfunction(z, abs(y) + 40, -gyro);
+              }
+            }
           }
         }
       }
@@ -347,7 +365,11 @@ void loop() {
   }
 }
 
-// **** end of main loop ****
+
+//
+// **** end of main loop ******************************************************
+//
+
 
 int get_openMV_coordinate() { // get the coordinate data of orange ball
   int i;
@@ -366,13 +388,14 @@ int getOpenMV() { // get serial data from openMV
   return Serial3.read();
 }
 
+
+//*****************************************************************************
 // interrupt handler
 // 割り込みの処理プログラム
 // Lineを踏んだらバックする
 
 void intHandle() {  // Lineを踏んだらlineflagをセットして止まる。
-  int i, power, back_dir;
-  float azimuth;
+  int power;
 
   if ( digitalRead(StartSW) == HIGH)  // スイッチがOFFなら何もしない。
     return;
@@ -394,7 +417,7 @@ void intHandle() {  // Lineを踏んだらlineflagをセットして止まる。
     }
   }
 
-  if (lineflag = false)     // センサーの反応がない場合は何もしない
+  if (lineflag == false)     // センサーの反応がない場合は何もしない
     return;
   lineflag = true;          // set lineflag
   motorStop();                  // ラインから外れたらモーターstop
@@ -469,9 +492,19 @@ void back_Line4(int power) {             // Lineセンサ4が反応しなくな�
   motorStop();
 }
 
+
+//
+//割り込みの処理プログラム終わり
+//*****************************************************************************
+//
+
+//
+//電池電圧を監視して電圧が下がったらOutOfBounceさせる処理**********************
+//
+
 float checkvoltage(float Vlow) {  // 電池電圧を監視する。
   int voltage, limit;
-  limit = Vlow / Vstep;
+  limit = Vlow / 0.01811;
   voltage = analogRead(Vbatt); // Get Volatge
   if ( voltage < limit ) {      // 電圧が　Vlow以下であればemergencyをセットする。
     emergency = true;
@@ -479,18 +512,16 @@ float checkvoltage(float Vlow) {  // 電池電圧を監視する。
     digitalWrite(SWR, LOW);
 
   }
-  return voltage * Vstep;
+  return voltage * 0.01811;
 }
 
 void doOutofbound() { // 強制的にOut of bounds させる。
-  int pixel;
-  uint32_t color;
 
   detachInterrupt(5);   // Out of bounds するために割込みを禁止する
   digitalWrite(LINE_LED, LOW); // ラインセンサのLEDを消灯
 
   while (true) {  // 無限ループ
-    if ( digitalRead(StartSW))
+    if ( digitalRead(StartSW) == LOW)
       motorfunction(3.14159 / 2.0, 30, 0);
     else          // スタートスイッチが切られたら止まる
       motorfunction(3.14159 / 2.0, 0, 0);
