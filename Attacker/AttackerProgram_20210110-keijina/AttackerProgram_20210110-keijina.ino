@@ -310,7 +310,7 @@ void loop() {
             } else {
               m = goal_y / goal_x;
               z = atan(-m); // arc tangent of m
-              motorfunction(z, x/5, -gyro);
+              motorfunction(z, x/5+5, -gyro);
               //delay(500);
             }
           }
@@ -323,17 +323,21 @@ void loop() {
       } else if (ball_back <= 100) { // backドリブラの直近にボールがあればドリブラを回す
         dribbler2(50);
         if(ball_back <= 30){
+          motorfunction(3.14, power,-gyro);
+          delay(100);
         if ( goal_sig == 0) {
           //dribbler2(100);
           motorfunction(0, power, -gyro);
         } else {
           if (goal_y <= (70-abs(goal_x)/10)) {
             turnCW(goal_x*40);
+            digitalWrite(Kick_Dir, HIGH);
             delay(400);
-            digitalWrite(Kick1, HIGH);
+            digitalWrite(Kicker, HIGH);
             dribbler2(0);
             delay(1500);
-            digitalWrite(Kick1, LOW);
+            digitalWrite(Kicker, LOW);
+            digitalWrite(Kick_Dir, LOW);
           } else {
             dribbler2(50);
             if (abs(goal_x) < 5) {
