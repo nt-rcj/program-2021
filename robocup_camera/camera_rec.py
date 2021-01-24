@@ -1,11 +1,12 @@
 import cv2
-from cv2 import data
 import numpy as np
 import math
 from numpy.core.defchararray import greater
 from numpy.core.numeric import NaN
-
 from numpy.core.records import get_remaining_size
+import serial
+
+ser = serial.Serial('/dev/ttyS0', '9600', timeout=0.1)
 
 lower_green=np.array([100,100,70])
 upper_green=np.array([120,225,220])
@@ -16,8 +17,11 @@ upper_yellow=np.array([22,235,180])
 lower_ball=np.array([0,100,53])
 upper_ball=np.array([0,100,100])
 
-cap = cv2.VideoCapture(0)
+cap = cv2.VideoCapture(-1)
 while True:
+    i_o=0
+    i_y=0
+    i_b=0
     x_list_grren=[]
     y_list_green=[]
     x_list_yellow=[]
@@ -25,6 +29,7 @@ while True:
     green=[]
     yellow=[]
     ball=[]
+    ball_pos=[]
     min_range_green=()
     min_range_yellow=()
     _,frame=cap.read()
@@ -39,7 +44,7 @@ while True:
         rect = cv2.boundingRect(approx)
         rects.append(np.array(rect))
     if len(rects) > 0:
-        ball = max(rects, key=(lambda x: x[2] * x[3]))
+        ball = max(rects, key=(lambda x: x[2] * x[3])).tolist()
         if ball[2]*ball[3]<=10:
             ball=0
     goal_green,trash_green=cv2.findContours(mask_green, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
@@ -86,11 +91,47 @@ while True:
     if not math.isnan(green[0][0]):
         min_range_green=min(green,key=lambda i: (i[0]-160)**2+(120-i[1])**2)
     else:
-        min_range_green=0
+        i_b=0
     if not math.isnan(yellow[0][0]):
         min_range_yellow=min(yellow,key=lambda i: (i[0]-160)**2+(120-i[1])**2)
     else:
-        min_range_yellow=0
-    print('\r green is'+str(min_range_green)+'yellow is'+str(min_range_yellow)+'ball is '+str(ball),end='')
+        i_y=i_y+1
+    if type(ball)!=list:
+        if ball==0:
+            i_o=i_o+1
+    else:
+        if ball==[]:
+            i_o=i_o+1
+        else:
+            ball_pos=[ball[0]+(ball[2]/2),ball[1]+(ball[3]/2)]
+    print('\r green is'+str(min_range_green)+'yellow is'+str(min_range_yellow)+'ball is '+str(ball_pos))
+    ser.write(254)
+    ser.write(i_o)
+    ser.write(0)
+    ser.write(0)
+    ser.write(0)
+    ser.write(ball_pos[0] & 0b00000000000111111)
+    ser.write((ball_pos[0] & 0b0000111111000000)>>6)
+    ser.write(ball_pos[1] & 0b00000000000111111)
+    ser.write((ball_pos[1] & 0b0000111111000000)>>6)
+    ser.write(253)
+    ser.write(i_y)
+    ser.write(0)
+    ser.write(0)
+    ser.write(0)
+    ser.write(min_range_yellow[0] & 0b00000000000111111)
+    ser.write((min_range_yellow[0] & 0b0000111111000000)>>6)
+    ser.write(min_range_yellow[1] & 0b00000000000111111)
+    ser.write((min_range_yellow[1] & 0b0000111111000000)>>6)
+    ser.write(252)
+    ser.write(i_b)
+    ser.write(0)
+    ser.write(0)
+    ser.write(0)
+    ser.write(min_range_green[0] & 0b00000000000111111)
+    ser.write((min_range_green[0] & 0b0000111111000000)>>6)
+    ser.write(min_range_green[1] & 0b00000000000111111)
+    ser.write((min_range_green[1] & 0b0000111111000000)>>6)
+
     if cv2.waitKey(1) & 0xFF == 27:
         break
