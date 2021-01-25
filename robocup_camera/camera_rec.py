@@ -6,7 +6,7 @@ from numpy.core.numeric import NaN
 from numpy.core.records import get_remaining_size
 import serial
 
-ser = serial.Serial('/dev/ttyS0', '9600', timeout=0.1)
+ser = serial.Serial('/dev/tty1', '9600', timeout=0.1)
 
 lower_green=np.array([100,100,70])
 upper_green=np.array([120,225,220])
@@ -37,7 +37,7 @@ while True:
     mask_green = cv2.inRange(hsv, lower_green, upper_green)
     mask_yellow = cv2.inRange(hsv, lower_yellow, upper_yellow)
     mask_ball=cv2.inRange(hsv, lower_ball, upper_ball)
-    contours, hierarchy  = cv2.findContours(mask_ball, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
+    _,contours, hierarchy  = cv2.findContours(mask_ball, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
     rects = []
     for contour in contours:
         approx = cv2.convexHull(contour)
@@ -47,9 +47,9 @@ while True:
         ball = max(rects, key=(lambda x: x[2] * x[3])).tolist()
         if ball[2]*ball[3]<=10:
             ball=0
-    goal_green,trash_green=cv2.findContours(mask_green, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
+    _,goal_green,trash_green=cv2.findContours(mask_green, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
     
-    goal_yellow,trash_yellow=cv2.findContours(mask_yellow, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
+    _,goal_yellow,trash_yellow=cv2.findContours(mask_yellow, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
     if len(goal_green)>0:
         green_pos=max(goal_green,key=cv2.contourArea)
         if cv2.contourArea(green_pos)>1000:
@@ -91,47 +91,51 @@ while True:
     if not math.isnan(green[0][0]):
         min_range_green=min(green,key=lambda i: (i[0]-160)**2+(120-i[1])**2)
     else:
-        i_b=0
+        i_b=i_b+1
+        min_range_green=[0,0]
     if not math.isnan(yellow[0][0]):
         min_range_yellow=min(yellow,key=lambda i: (i[0]-160)**2+(120-i[1])**2)
     else:
         i_y=i_y+1
+        min_range_yellow[0,0]
     if type(ball)!=list:
         if ball==0:
             i_o=i_o+1
     else:
         if ball==[]:
             i_o=i_o+1
+            ball_pos=[0,0]
         else:
             ball_pos=[ball[0]+(ball[2]/2),ball[1]+(ball[3]/2)]
+    len(ball_pos)
     print('\r green is'+str(min_range_green)+'yellow is'+str(min_range_yellow)+'ball is '+str(ball_pos))
-    ser.write(254)
-    ser.write(i_o)
-    ser.write(0)
-    ser.write(0)
-    ser.write(0)
-    ser.write(ball_pos[0] & 0b00000000000111111)
-    ser.write((ball_pos[0] & 0b0000111111000000)>>6)
-    ser.write(ball_pos[1] & 0b00000000000111111)
-    ser.write((ball_pos[1] & 0b0000111111000000)>>6)
-    ser.write(253)
-    ser.write(i_y)
-    ser.write(0)
-    ser.write(0)
-    ser.write(0)
-    ser.write(min_range_yellow[0] & 0b00000000000111111)
-    ser.write((min_range_yellow[0] & 0b0000111111000000)>>6)
-    ser.write(min_range_yellow[1] & 0b00000000000111111)
-    ser.write((min_range_yellow[1] & 0b0000111111000000)>>6)
-    ser.write(252)
-    ser.write(i_b)
-    ser.write(0)
-    ser.write(0)
-    ser.write(0)
-    ser.write(min_range_green[0] & 0b00000000000111111)
-    ser.write((min_range_green[0] & 0b0000111111000000)>>6)
-    ser.write(min_range_green[1] & 0b00000000000111111)
-    ser.write((min_range_green[1] & 0b0000111111000000)>>6)
+    ser.write(bytes([254]))
+    ser.write(bytes(i_o))
+    ser.write(bytes([0]))
+    ser.write(bytes([0]))
+    ser.write(bytes([0]))
+    ser.write(bytes([ball_pos[0] & 0b00000000000111111]))
+    ser.write(bytes([(ball_pos[0] & 0b0000111111000000)>>6]))
+    ser.write(bytes([ball_pos[1] & 0b00000000000111111]))
+    ser.write(bytes([(ball_pos[1] & 0b0000111111000000)>>6]))
+    ser.write(bytes([253]))
+    ser.write(bytes([i_y]))
+    ser.write(bytes([0]))
+    ser.write(bytes([0]))
+    ser.write(bytes([0]))
+    ser.write(bytes([min_range_yellow[0] & 0b00000000000111111]))
+    ser.write(bytes([(min_range_yellow[0] & 0b0000111111000000)>>6]))
+    ser.write(bytes([min_range_yellow[1] & 0b00000000000111111]))
+    ser.write(bytes([(min_range_yellow[1] & 0b0000111111000000)>>6]))
+    ser.write(bytes([252]))
+    ser.write(bytes([i_b]))
+    ser.write(bytes([0]))
+    ser.write(bytes([0]))
+    ser.write(bytes([0]))
+    ser.write(bytes([min_range_green[0] & 0b00000000000111111]))
+    ser.write(bytes([(min_range_green[0] & 0b0000111111000000)>>6]))
+    ser.write(bytes([min_range_green[1] & 0b00000000000111111]))
+    ser.write(bytes([(min_range_green[1] & 0b0000111111000000)>>6]))
 
     if cv2.waitKey(1) & 0xFF == 27:
         break
