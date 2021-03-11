@@ -187,7 +187,7 @@ void loop(){
   }else if(digitalRead(Aux2) == LOW){
     keeper();
   }else{
- /*   Serial1.print("ball_x");
+    Serial1.print("ball_x");
     Serial1.print(x);
     Serial1.print("ball_y");
     Serial1.print(y);
@@ -308,7 +308,7 @@ void keeper() {
     ball_y = goal_y + y;
   }
 
-  ball_tof = sensor.readRangeSingleMillimeters();
+  ball_tof = ToF_front.readRangeSingleMillimeters();
   Serial.print(" Sig=");  //  openMVのデータを出力する
   Serial.print(sig);
   Serial.print(" X=");
@@ -528,7 +528,7 @@ void attacker() {
     }
     if (abs(gyro) < 20) {
       digitalWrite(LED_BUILTIN, LOW);      
-      if(x<=abs(20)&&y<=abs(20){
+      if(x<=abs(20)&&y<=abs(20)){
       }else{  
       }
       dribbler1(0);
