@@ -149,6 +149,7 @@ void setup() {
 
   Serial3.begin(19200);  // initialize serialport for openMV
   Serial2.begin(115200);   // WT901 IMU Sener
+  Serial1.begin(9600); //xbee
 
   lineflag = false;   //reset outofbounds　flag
   for ( i = 0; i < 4; i++ )
@@ -173,6 +174,82 @@ void setup() {
 
 void loop(){
   int occupation;
+  
+  int level, data;
+  int j;
+  int sig, w, h, area;
+  int bg_w, bg_h, bg_area;
+  int yg_w, yg_h, yg_area;
+  int blocks;
+  int i;
+  int ball_x, ball_y;
+  int o_x, o_y;
+  char buf[64];
+  float m , z;
+  float x, y;
+  float bg_x, bg_y;
+  float yg_x, yg_y;
+  float goal_x, goal_y;
+  float y_sig, b_sig, goal_sig;
+  float az, AZ, d, k;
+  float targetP, distance, pointP;
+  float goal_dist;
+  float angle, inroot;
+  float divergence, RtoBdist;
+  float speed, ballback;
+  float ball_tof;
+
+  int pixel;
+  uint32_t color;
+
+
+  blob_count = get_openMV_coordinate();
+  x_data_ball = (openMV[5] & 0b0000000000111111) + ((openMV[6] & 0b0000000000111111) << 6);
+  y_data_ball = (openMV[7] & 0b0000000000111111) + ((openMV[8] & 0b0000000000111111) << 6);
+  w_data_ball = (openMV[9] & 0b0000000000111111) + ((openMV[10] & 0b0000000000111111) << 6);
+  h_data_ball = (openMV[11] & 0b0000000000111111) + ((openMV[12] & 0b0000000000111111) << 6);
+
+  x_data_yellowgoal = (openMV[18] & 0b0000000000111111) + ((openMV[19] & 0b0000000000111111) << 6);
+  y_data_yellowgoal = (openMV[20] & 0b0000000000111111) + ((openMV[21] & 0b0000000000111111) << 6);
+  w_data_yellowgoal = (openMV[22] & 0b0000000000111111) + ((openMV[23] & 0b0000000000111111) << 6);
+  h_data_yellowgoal = (openMV[24] & 0b0000000000111111) + ((openMV[25] & 0b0000000000111111) << 6);
+
+  x_data_bluegoal = (openMV[31] & 0b0000000000111111) + ((openMV[32] & 0b0000000000111111) << 6);
+  y_data_bluegoal = (openMV[33] & 0b0000000000111111) + ((openMV[34] & 0b0000000000111111) << 6);
+  w_data_bluegoal = (openMV[35] & 0b0000000000111111) + ((openMV[36] & 0b0000000000111111) << 6);
+  h_data_bluegoal = (openMV[37] & 0b0000000000111111) + ((openMV[38] & 0b0000000000111111) << 6);
+
+
+  if (lineflag == true) {
+    lineflag = false;
+  }
+
+  // get gyro data
+  if (Serial2.available() > 0)
+    while (Serial2.available() != 0) { //  Gyroの方位データをgyroに取り込む
+      gyro = Serial2.read();
+    }
+
+  // openMVのデーターを変換
+
+  sig = openMV[1]; //  openMVのデータをsig,x,y,w,hに取り込む
+  x = x_data_ball;
+  y = y_data_ball;
+  w = w_data_ball;
+  h = h_data_ball;
+  area = w * h;      // 認識したブロックの面積
+  b_sig = openMV[27];
+  bg_x = x_data_bluegoal;
+  bg_y = y_data_bluegoal;
+  bg_w = w_data_bluegoal;
+  bg_h = h_data_bluegoal;
+  bg_area = bg_w * bg_h;      // 認識したブロックの面積
+  y_sig = openMV[14];
+  yg_x = x_data_yellowgoal;
+  yg_y = y_data_yellowgoal;
+  yg_w = w_data_yellowgoal;
+  yg_h = h_data_yellowgoal;
+  yg_area = yg_w * yg_h;      // 認識したブロックの面積
   Serial.print("occupation:");
   Serial.print(occupation);
   Serial.print(" ,Aux1:");
@@ -191,7 +268,8 @@ void loop(){
     Serial1.print(x);
     Serial1.print("ball_y");
     Serial1.print(y);
-    if(Serial1.avaliable() > 0){
+    Serial1.println();
+    if(Serial1.available() > 0){
       if(Serial.read() == ball_x){
         o_x = Serial1.read();
       }
@@ -203,7 +281,7 @@ void loop(){
       occupation = 1;
     }else{
       occupation = 2;
-    }*/
+    }
   } 
 }
 
@@ -330,7 +408,12 @@ void keeper() {
   Serial.print(" gyro=");
   Serial.print(gyro);
   Serial.println();
-
+  
+    Serial1.print("ball_x");
+    Serial1.print(x);
+    Serial1.print("ball_y");
+    Serial1.print(y);
+    Serial1.println();  
 
   // check line and reverse
   if (digitalRead(StartSW) == LOW) {
@@ -510,6 +593,12 @@ void attacker() {
   Serial.print(" gyro=");
   Serial.print(gyro);
   Serial.println();
+
+    Serial1.print("ball_x");
+    Serial1.print(x);
+    Serial1.print("ball_y");
+    Serial1.print(y);  
+    Serial1.println();
 
   if (digitalRead(StartSW) == LOW) { // STartSW == Lowでスタート
     digitalWrite(SWR, HIGH);
