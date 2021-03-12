@@ -172,9 +172,9 @@ void setup() {
   Serial.println("Initialize end");
 }
 
-void loop(){
+void loop() {
   int occupation;
-  
+
   int level, data;
   int j;
   int sig, w, h, area;
@@ -259,30 +259,30 @@ void loop(){
   Serial.println();
 
 
-  if(digitalRead(Aux1) == LOW){
+  if (digitalRead(Aux1) == LOW) {
     attacker();
-  }else if(digitalRead(Aux2) == LOW){
+  } else if (digitalRead(Aux2) == LOW) {
     keeper();
-  }else{
+  } else {
     Serial1.print("ball_x");
     Serial1.print(x);
     Serial1.print("ball_y");
     Serial1.print(y);
     Serial1.println();
-    if(Serial1.available() > 0){
-      if(Serial.read() == ball_x){
+    if (Serial1.available() > 0) {
+      if (Serial.read() == ball_x) {
         o_x = Serial1.read();
       }
-      if(Serial.read() == ball_y){
+      if (Serial.read() == ball_y) {
         o_y = Serial1.read();
       }
     }
-    if(x * y < o_x * o_y){
-      occupation = 1;
-    }else{
-      occupation = 2;
+    if (x + y < o_x + o_y) {
+      attacker();
+    } else {
+      keeper();
     }
-  } 
+  }
 }
 
 void keeper() {
@@ -408,12 +408,12 @@ void keeper() {
   Serial.print(" gyro=");
   Serial.print(gyro);
   Serial.println();
-  
-    Serial1.print("ball_x");
-    Serial1.print(x);
-    Serial1.print("ball_y");
-    Serial1.print(y);
-    Serial1.println();  
+
+  Serial1.print("ball_x");
+  Serial1.print(x);
+  Serial1.print("ball_y");
+  Serial1.print(y);
+  Serial1.println();
 
   // check line and reverse
   if (digitalRead(StartSW) == LOW) {
@@ -475,7 +475,7 @@ void keeper() {
           motorfunction(az, 30, -gyro);
         }
       } else {
-        
+
       }
     } else {
       digitalWrite(LED_BUILTIN, HIGH);
@@ -589,16 +589,16 @@ void attacker() {
   Serial.print(" ball_front=");
   Serial.print(ball_front);
   Serial.print(" ball_back=");
-  Serial.print(ball_back);  
+  Serial.print(ball_back);
   Serial.print(" gyro=");
   Serial.print(gyro);
   Serial.println();
 
-    Serial1.print("ball_x");
-    Serial1.print(x);
-    Serial1.print("ball_y");
-    Serial1.print(y);  
-    Serial1.println();
+  Serial1.print("ball_x");
+  Serial1.print(x);
+  Serial1.print("ball_y");
+  Serial1.print(y);
+  Serial1.println();
 
   if (digitalRead(StartSW) == LOW) { // STartSW == Lowでスタート
     digitalWrite(SWR, HIGH);
@@ -616,15 +616,77 @@ void attacker() {
       lineflag = false;
     }
     if (abs(gyro) < 20) {
-      digitalWrite(LED_BUILTIN, LOW);      
-      if(x<=abs(20)&&y<=abs(20)){
-      }else{  
+      digitalWrite(LED_BUILTIN, LOW);
+      if ((x <= abs(20) && y <= abs(20)) && ball_front <= 50) {
+        dribbler1(50);
+        if (ball_front <= 30) {
+          if ( goal_sig == 0) {
+            //dribbler1(100);
+            motorfunction(0, power, -gyro);
+          } else {
+            if (goal_y <= (70 - abs(goal_x) / 10)) {
+              dribbler1(0);
+              digitalWrite(Kick1, HIGH);
+              delay(1500);
+              digitalWrite(Kick1, LOW);
+            } else {
+              dribbler1(100);
+              if (abs(goal_x) < (goal_y - 50)) {
+                motorfunction(0, 70, -gyro);
+              } else {
+                m = goal_y / goal_x;
+                z = atan(-m); // arc tangent of m
+                motorfunction(z, 2 * abs(goal_x) + 10, -gyro);
+              }
+            }
+          }
+        } else {
+          motorfunction(0, power, -gyro);
+        }
+      } else {
+        dribbler1(0);
+        dribbler2(0);
+        if (sig == 0) {      // No Ball found
+          motorfunction(0, 0, 0);
+        } else {                // Ball find
+          if (y >= 70) {
+            motorfunction(0 , 80, -gyro);
+          } else {
+            if (y >= 40) {
+              dribbler1(0);
+              m = x / y;
+              z = atan(m); // arc tangent of m
+              motorfunction(z, (abs(x) + abs(y)) / 2 , -gyro);
+            } else {
+              if (y < 0) {
+                if ( y <= 40) {
+                  dribbler1(0);
+                  m = y / -(5 * x);
+                  z = atan(m) + PI; // arc tangent of m
+                  motorfunction(z, abs(y) + 40, -gyro);
+                } else {
+                  dribbler1(0);
+                  m = y / (2.5 * x);
+                  z = atan(m) + PI; // arc tangent of m
+                  motorfunction(z, abs(y) + 40, -gyro);
+                }
+              } else {
+                dribbler1(0);
+                m = 0.5 * y / -x;
+                z = atan(m) + PI; // arc tangent of m
+                motorfunction(z, abs(y) + 40, -gyro);
+              }
+            }
+          }
+        }
       }
+      /*
       dribbler1(0);
       dribbler2(0);
       m = x / y;
       z = atan(m); // arc tangent of m
       motorfunction(z, 30, -gyro);
+      */
     } else {
       digitalWrite(LED_BUILTIN, HIGH);
       power = abs(gyro);   //  モーターの速度をgyroにする
