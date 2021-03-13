@@ -58,7 +58,7 @@ static int line[4];
   float az, AZ, d, k;
   float targetP, distance, pointP;
   float goal_dist;
-  float angle, inroot;
+  float inroot;
   float divergence, RtoBdist;
   float speed, ballback;
   int pixel;
