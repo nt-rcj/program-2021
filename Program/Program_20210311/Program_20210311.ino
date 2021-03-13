@@ -51,17 +51,11 @@ static int line[4];
   
   int level, data;
   int j;
-  int sig, w, h, area;
-  int bg_w, bg_h, bg_area;
-  int yg_w, yg_h, yg_area;
   int blocks;
   int i;
   int ball_y;
   char buf[64];
-  float m , z;
-  float x, y;
-  float bg_x, bg_y;
-  float yg_x, yg_y;
+
   float goal_x, goal_y;
   float y_sig, b_sig, goal_sig;
   float az, AZ, d, k;
@@ -214,34 +208,6 @@ void setup() {
 }
 
 void loop() {
-  int level, data;
-  int j;
-  int sig, w, h, area;
-  int bg_w, bg_h, bg_area;
-  int yg_w, yg_h, yg_area;
-  int blocks;
-  int i;
-  int ball_x, ball_y;
-  int o_x, o_y;
-  char buf[64];
-  float m , z;
-  float x, y;
-  float bg_x, bg_y;
-  float yg_x, yg_y;
-  float goal_x, goal_y;
-  float y_sig, b_sig, goal_sig;
-  float az, AZ, d, k;
-  float targetP, distance, pointP;
-  float goal_dist;
-  float angle, inroot;
-  float divergence, RtoBdist;
-  float speed, ballback;
-  float ball_tof;
-
-  int pixel;
-  uint32_t color;
-
-
   blob_count = get_openMV_coordinate();
   x_data_ball = (openMV[5] & 0b0000000000111111) + ((openMV[6] & 0b0000000000111111) << 6);
   y_data_ball = (openMV[7] & 0b0000000000111111) + ((openMV[8] & 0b0000000000111111) << 6);
