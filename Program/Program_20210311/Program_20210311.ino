@@ -52,7 +52,8 @@ static int line[4];
   int level, data;
   int j;
   int blocks;
-  int ball_y;
+  int ball_x, ball_y;
+  int o_x, o_y;
   char buf[64];
 
   float az, AZ, d, k;
