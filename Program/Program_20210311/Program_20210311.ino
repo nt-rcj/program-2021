@@ -52,21 +52,15 @@ static int line[4];
   int level, data;
   int j;
   int blocks;
-  int i;
   int ball_y;
   char buf[64];
 
-  float goal_x, goal_y;
-  float y_sig, b_sig, goal_sig;
   float az, AZ, d, k;
   float targetP, distance, pointP;
   float goal_dist;
   float angle, inroot;
   float divergence, RtoBdist;
   float speed, ballback;
-  float ball_tof;
-  //int i;
-
   int pixel;
   uint32_t color;
 
