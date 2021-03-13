@@ -38,6 +38,44 @@ static int  outofbounds;   // "out of bounds" flag
 static int lineflag;//line
 static int line[4];
 
+  int sig, w, h, area;
+  int bg_w, bg_h, bg_area;
+  int yg_w, yg_h, yg_area;
+  float m , z;
+  float x, y;
+  float bg_x, bg_y;
+  float yg_x, yg_y;
+  float goal_x, goal_y;
+  float y_sig, b_sig, goal_sig;
+  int ball_front, ball_back;
+  
+  int level, data;
+  int j;
+  int sig, w, h, area;
+  int bg_w, bg_h, bg_area;
+  int yg_w, yg_h, yg_area;
+  int blocks;
+  int i;
+  int ball_y;
+  char buf[64];
+  float m , z;
+  float x, y;
+  float bg_x, bg_y;
+  float yg_x, yg_y;
+  float goal_x, goal_y;
+  float y_sig, b_sig, goal_sig;
+  float az, AZ, d, k;
+  float targetP, distance, pointP;
+  float goal_dist;
+  float angle, inroot;
+  float divergence, RtoBdist;
+  float speed, ballback;
+  float ball_tof;
+  //int i;
+
+  int pixel;
+  uint32_t color;
+
 void setup() {
   int pin;
 
@@ -176,8 +214,6 @@ void setup() {
 }
 
 void loop() {
-  int occupation;
-
   int level, data;
   int j;
   int sig, w, h, area;
@@ -289,34 +325,6 @@ void loop() {
 }
 
 void keeper() {
-  int level, data;
-  int j;
-  int sig, w, h, area;
-  int bg_w, bg_h, bg_area;
-  int yg_w, yg_h, yg_area;
-  int blocks;
-  int i;
-  int ball_y;
-  char buf[64];
-  float m , z;
-  float x, y;
-  float bg_x, bg_y;
-  float yg_x, yg_y;
-  float goal_x, goal_y;
-  float y_sig, b_sig, goal_sig;
-  float az, AZ, d, k;
-  float targetP, distance, pointP;
-  float goal_dist;
-  float angle, inroot;
-  float divergence, RtoBdist;
-  float speed, ballback;
-  float ball_tof;
-  //int i;
-
-  int pixel;
-  uint32_t color;
-
-
   blob_count = get_openMV_coordinate();
   x_data_ball = (openMV[5] & 0b0000000000111111) + ((openMV[6] & 0b0000000000111111) << 6);
   y_data_ball = (openMV[7] & 0b0000000000111111) + ((openMV[8] & 0b0000000000111111) << 6);
@@ -502,17 +510,6 @@ void keeper() {
 }
 
 void attacker() {
-  int sig, w, h, area;
-  int bg_w, bg_h, bg_area;
-  int yg_w, yg_h, yg_area;
-  float m , z;
-  float x, y;
-  float bg_x, bg_y;
-  float yg_x, yg_y;
-  float goal_x, goal_y;
-  float y_sig, b_sig, goal_sig;
-  int ball_front, ball_back;
-
   blob_count = get_openMV_coordinate();
   x_data_ball = (openMV[5] & 0b0000000000111111) + ((openMV[6] & 0b0000000000111111) << 6);
   y_data_ball = (openMV[7] & 0b0000000000111111) + ((openMV[8] & 0b0000000000111111) << 6);
