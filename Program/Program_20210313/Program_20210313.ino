@@ -286,54 +286,6 @@ void loop() {
 }
 
 void keeper() {
-  blob_count = get_openMV_coordinate();
-  x_data_ball = (openMV[5] & 0b0000000000111111) + ((openMV[6] & 0b0000000000111111) << 6);
-  y_data_ball = (openMV[7] & 0b0000000000111111) + ((openMV[8] & 0b0000000000111111) << 6);
-  w_data_ball = (openMV[9] & 0b0000000000111111) + ((openMV[10] & 0b0000000000111111) << 6);
-  h_data_ball = (openMV[11] & 0b0000000000111111) + ((openMV[12] & 0b0000000000111111) << 6);
-
-  x_data_yellowgoal = (openMV[18] & 0b0000000000111111) + ((openMV[19] & 0b0000000000111111) << 6);
-  y_data_yellowgoal = (openMV[20] & 0b0000000000111111) + ((openMV[21] & 0b0000000000111111) << 6);
-  w_data_yellowgoal = (openMV[22] & 0b0000000000111111) + ((openMV[23] & 0b0000000000111111) << 6);
-  h_data_yellowgoal = (openMV[24] & 0b0000000000111111) + ((openMV[25] & 0b0000000000111111) << 6);
-
-  x_data_bluegoal = (openMV[31] & 0b0000000000111111) + ((openMV[32] & 0b0000000000111111) << 6);
-  y_data_bluegoal = (openMV[33] & 0b0000000000111111) + ((openMV[34] & 0b0000000000111111) << 6);
-  w_data_bluegoal = (openMV[35] & 0b0000000000111111) + ((openMV[36] & 0b0000000000111111) << 6);
-  h_data_bluegoal = (openMV[37] & 0b0000000000111111) + ((openMV[38] & 0b0000000000111111) << 6);
-
-
-  if (lineflag == true) {
-    lineflag = false;
-  }
-
-  // get gyro data
-  if (Serial2.available() > 0)
-    while (Serial2.available() != 0) { //  Gyroの方位データをgyroに取り込む
-      gyro = Serial2.read();
-    }
-
-  // openMVのデーターを変換
-
-  sig = openMV[1]; //  openMVのデータをsig,x,y,w,hに取り込む
-  x = x_data_ball;
-  y = y_data_ball;
-  w = w_data_ball;
-  h = h_data_ball;
-  area = w * h;      // 認識したブロックの面積
-  b_sig = openMV[27];
-  bg_x = x_data_bluegoal;
-  bg_y = y_data_bluegoal;
-  bg_w = w_data_bluegoal;
-  bg_h = h_data_bluegoal;
-  bg_area = bg_w * bg_h;      // 認識したブロックの面積
-  y_sig = openMV[14];
-  yg_x = x_data_yellowgoal;
-  yg_y = y_data_yellowgoal;
-  yg_w = w_data_yellowgoal;
-  yg_h = h_data_yellowgoal;
-  yg_area = yg_w * yg_h;      // 認識したブロックの面積
-
   if (digitalRead(GoalSW)) {  // 青色の場合
     goal_sig = y_sig;
     goal_x = yg_x;
@@ -471,49 +423,6 @@ void keeper() {
 }
 
 void attacker() {
-  blob_count = get_openMV_coordinate();
-  x_data_ball = (openMV[5] & 0b0000000000111111) + ((openMV[6] & 0b0000000000111111) << 6);
-  y_data_ball = (openMV[7] & 0b0000000000111111) + ((openMV[8] & 0b0000000000111111) << 6);
-  w_data_ball = (openMV[9] & 0b0000000000111111) + ((openMV[10] & 0b0000000000111111) << 6);
-  h_data_ball = (openMV[11] & 0b0000000000111111) + ((openMV[12] & 0b0000000000111111) << 6);
-
-  x_data_yellowgoal = (openMV[18] & 0b0000000000111111) + ((openMV[19] & 0b0000000000111111) << 6);
-  y_data_yellowgoal = (openMV[20] & 0b0000000000111111) + ((openMV[21] & 0b0000000000111111) << 6);
-  w_data_yellowgoal = (openMV[22] & 0b0000000000111111) + ((openMV[23] & 0b0000000000111111) << 6);
-  h_data_yellowgoal = (openMV[24] & 0b0000000000111111) + ((openMV[25] & 0b0000000000111111) << 6);
-
-  x_data_bluegoal = (openMV[31] & 0b0000000000111111) + ((openMV[32] & 0b0000000000111111) << 6);
-  y_data_bluegoal = (openMV[33] & 0b0000000000111111) + ((openMV[34] & 0b0000000000111111) << 6);
-  w_data_bluegoal = (openMV[35] & 0b0000000000111111) + ((openMV[36] & 0b0000000000111111) << 6);
-  h_data_bluegoal = (openMV[37] & 0b0000000000111111) + ((openMV[38] & 0b0000000000111111) << 6);
-
-  // get gyro data
-  if (Serial2.available() > 0)
-    while (Serial2.available() != 0) { //  Gyroの方位データをgyroに取り込む
-      gyro = Serial2.read();
-    }
-
-  // openMVのデーターを変換
-
-  sig = openMV[1]; //  openMVのデータをsig,x,y,w,hに取り込む
-  x = x_data_ball;
-  y = y_data_ball;
-  w = w_data_ball;
-  h = h_data_ball;
-  area = w * h;      // 認識したブロックの面積
-  b_sig = openMV[27];
-  bg_x = x_data_bluegoal;
-  bg_y = y_data_bluegoal;
-  bg_w = w_data_bluegoal;
-  bg_h = h_data_bluegoal;
-  bg_area = bg_w * bg_h;      // 認識したブロックの面積
-  y_sig = openMV[14];
-  yg_x = x_data_yellowgoal;
-  yg_y = y_data_yellowgoal;
-  yg_w = w_data_yellowgoal;
-  yg_h = h_data_yellowgoal;
-  yg_area = yg_w * yg_h;      // 認識したブロックの面積
-
   if (digitalRead(GoalSW)) { // GoalSWはHighなら「青ゴール」を認識する。
     goal_sig = b_sig;
     goal_x = bg_x;
@@ -534,7 +443,7 @@ void attacker() {
     goal_y = 110 - goal_y;
   }
 
-  ball_back = ToF_back.readRangeSingleMillimeters();
+  //ball_back = ToF_back.readRangeSingleMillimeters();
   ball_front = ToF_front.readRangeSingleMillimeters();
 
   Serial.print(" Sig=");  //  openMVのデータを出力する
