@@ -26,10 +26,10 @@ void loop() {
   char buf[4];
   xbeeSerial.listen();  // メインCPUからのデータを受信する
   if (xbeeSerial.available() > 0) {
-    digitalWrite(led, HIGH);   // turn the LED on (HIGH is the voltage level)
     Serial.write(xbeeSerial.read());  // メインCPUから来たデータをXbeeに送り出す。
   }
   if (Serial.available() > 0){
+    digitalWrite(led, HIGH);   // turn the LED on (HIGH is the voltage level)
     xbeeSerial.write(Serial.read());
     digitalWrite(led, LOW);   // turn the LED off (LOW is the voltage level)    
   }

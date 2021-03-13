@@ -72,6 +72,9 @@ void setup() {
   pinMode(SWR, OUTPUT);
   pinMode(SWG, OUTPUT);
 
+  pinMode(Aux1, INPUT);
+  pinMode(Aux2, INPUT);  
+
   pinMode(GoalSW, INPUT_PULLUP);
 
   pinMode(LED_R, OUTPUT);

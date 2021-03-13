@@ -67,6 +67,9 @@ void setup() {
   pinMode(SWR, OUTPUT);
   pinMode(SWG, OUTPUT);
 
+  pinMode(Aux1, INPUT);
+  pinMode(Aux2, INPUT);  
+
   pinMode(GoalSW, INPUT_PULLUP);
 
   pinMode(LED_R, OUTPUT);
@@ -250,8 +253,8 @@ void loop() {
   yg_w = w_data_yellowgoal;
   yg_h = h_data_yellowgoal;
   yg_area = yg_w * yg_h;      // 認識したブロックの面積
-  Serial.print("occupation:");
-  Serial.print(occupation);
+  Serial.print("o_x:");
+  Serial.print(o_x);
   Serial.print(" ,Aux1:");
   Serial.print(digitalRead(Aux1));
   Serial.print(" ,Aux2:");
@@ -270,17 +273,17 @@ void loop() {
     Serial1.print(y);
     Serial1.println();
     if (Serial1.available() > 0) {
-      if (Serial.read() == ball_x) {
+      if (Serial1.read() == ball_x) {
         o_x = Serial1.read();
       }
-      if (Serial.read() == ball_y) {
+      if (Serial1.read() == ball_y) {
         o_y = Serial1.read();
       }
     }
     if (x + y < o_x + o_y) {
-      attacker();
-    } else {
       keeper();
+    } else {
+      attacker();
     }
   }
 }
@@ -469,10 +472,10 @@ void keeper() {
 
         if (AZ > 0) {
           az = AZ - d;
-          motorfunction(az, 30, -gyro);
+          motorfunction(az, abs(x)+5, -gyro);
         } else {
           az = AZ + d;
-          motorfunction(az, 30, -gyro);
+          motorfunction(az, abs(x)+5, -gyro);
         }
       } else {
 
@@ -617,14 +620,14 @@ void attacker() {
     }
     if (abs(gyro) < 20) {
       digitalWrite(LED_BUILTIN, LOW);
-      if ((x <= abs(20) && y <= abs(20)) && ball_front <= 50) {
-        dribbler1(50);
-        if (ball_front <= 30) {
+      if (ball_front <= 80) {
+        dribbler1(100);
+        if (ball_front <= 50) {
           if ( goal_sig == 0) {
-            //dribbler1(100);
+            dribbler1(100);
             motorfunction(0, power, -gyro);
           } else {
-            if (goal_y <= (70 - abs(goal_x) / 10)) {
+            if (goal_y <= (75 - abs(goal_x) / 10)) {
               dribbler1(0);
               digitalWrite(Kick1, HIGH);
               delay(1500);
@@ -634,9 +637,9 @@ void attacker() {
               if (abs(goal_x) < (goal_y - 50)) {
                 motorfunction(0, 70, -gyro);
               } else {
-                m = goal_y / goal_x;
+                m = goal_x / goal_y;
                 z = atan(-m); // arc tangent of m
-                motorfunction(z, 2 * abs(goal_x) + 10, -gyro);
+                motorfunction(z, abs(goal_x) * abs(goal_x) + 10, -gyro);
               }
             }
           }
@@ -656,7 +659,7 @@ void attacker() {
               dribbler1(0);
               m = x / y;
               z = atan(m); // arc tangent of m
-              motorfunction(z, (abs(x) + abs(y)) / 2 , -gyro);
+              motorfunction(z, (abs(x) + abs(y)) , -gyro);
             } else {
               if (y < 0) {
                 if ( y <= 40) {
