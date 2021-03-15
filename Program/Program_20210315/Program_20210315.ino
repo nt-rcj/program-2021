@@ -350,6 +350,14 @@ void keeper() {
     if (abs(gyro) <= 10) {
       digitalWrite(LED_BUILTIN, LOW);
       if (sig == 0) {
+        divergence = 0;
+        if(goal_y > 10){
+          m = goal_y / goal_x;
+          z = atan(m) + 3.14159;
+          motorfunction(z, 45, -gyro);
+        }else{
+          motorfunction(0, 0, 0);
+        }
       } else {
         if (abs(x) <= 7) {
           divergence = 0;
