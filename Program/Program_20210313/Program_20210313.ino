@@ -350,7 +350,7 @@ void keeper(int ) {
       if (sig == 0) {
         divergence = 0;
         if(goal_y > 10){
-          m = goal_x / goal_y;
+          m = goal_y / goal_x;
           z = atan(m) + 3.14159;
           motorfunction(z, 45, -gyro);
         }else{
