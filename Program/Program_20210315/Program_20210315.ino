@@ -480,7 +480,7 @@ void attacker() {
               digitalWrite(Kick1, LOW);
             } else {
               dribbler1(50);
-              if (abs(goal_x) < (goal_y - 50)) {//??????
+              if (goal_sig == 0) {//??????
                 motorfunction(0, 70, -gyro);
               } else {
                 m = (goal_x*2) / goal_y;
