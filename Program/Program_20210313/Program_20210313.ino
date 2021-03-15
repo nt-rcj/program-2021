@@ -370,7 +370,7 @@ void keeper(int ) {
           divergence = 1;
         }
       }
-      if (divergence == 1) {
+      if (divergence == 1) { //P制御
         targetP = distance / cosf(angle);
         inroot = sqrt(targetP * targetP + 33310);
         pointP = targetP * 6866 / (15850 + 72.01 * inroot);
