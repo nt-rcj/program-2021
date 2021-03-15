@@ -255,13 +255,13 @@ void loop() {
   Serial.print(digitalRead(Aux2));
   Serial.println();
 
-
+  //役割判定
   if (digitalRead(Aux1) == LOW) {
     attacker();
   } else if (digitalRead(Aux2) == LOW) {
     keeper();
   } else {
-    Serial1.print(x+y);
+    Serial1.print(x + y);
     Serial1.println();
     if (Serial.read() == "k") {
       keeper();
@@ -271,7 +271,7 @@ void loop() {
   }
 }
 
-void keeper() {
+void keeper(int ) {
   if (digitalRead(GoalSW)) {  // 青色の場合
     goal_sig = y_sig;
     goal_x = yg_x;
@@ -319,10 +319,7 @@ void keeper() {
   Serial.print(gyro);
   Serial.println();
 
-  Serial1.print("ball_x");
-  Serial1.print(x);
-  Serial1.print("ball_y");
-  Serial1.print(y);
+  Serial1.print(x + y);
   Serial1.println();
 
   // check line and reverse
@@ -450,10 +447,7 @@ void attacker() {
   Serial.print(gyro);
   Serial.println();
 
-  Serial1.print("ball_x");
-  Serial1.print(x);
-  Serial1.print("ball_y");
-  Serial1.print(y);
+  Serial1.print(x + y);
   Serial1.println();
 
   if (digitalRead(StartSW) == LOW) { // STartSW == Lowでスタート
@@ -510,7 +504,7 @@ void attacker() {
           } else {
             if (y >= 40) {
               dribbler1(0);
-              m = x / y;
+              m = x / (y - 20);
               z = atan(m); // arc tangent of m
               motorfunction(z, (abs(x) + abs(y)) , -gyro);
             } else {
