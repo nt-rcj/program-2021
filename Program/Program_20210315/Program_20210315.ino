@@ -253,6 +253,7 @@ void loop() {
   Serial.print(digitalRead(Aux1));
   Serial.print(" ,Aux2:");
   Serial.print(digitalRead(Aux2));
+  Serial.print("xbee=");
   Serial.print(Serial1.read());
   Serial.println();
 
@@ -298,7 +299,7 @@ void loop() {
     } else if (digitalRead(Aux2) == LOW) {
       keeper();
     } else {
-      Serial1.print(x + y);
+      Serial1.print(abs(x + y));
       Serial1.println();
       if (Serial.read() == "k") {
         keeper();
@@ -365,7 +366,7 @@ void keeper() {
   Serial.print(gyro);
   Serial.println();
 
-  Serial1.print(x + y);
+  Serial1.print(abs(x + y));
   Serial1.println();
 
   if (abs(gyro) <= 10) {
@@ -473,19 +474,19 @@ void attacker() {
   Serial.print(gyro);
   Serial.println();
 
-  Serial1.print(x + y);
+  Serial1.print(abs(x + y));
   Serial1.println();
 
   if (abs(gyro) < 20) {
     digitalWrite(LED_BUILTIN, LOW);
     if (ball_front <= 80) {
       dribbler1(50);
-      if (ball_front <= 50) {
+      if (ball_front <= 40) {
         if ( goal_sig == 0) {
           dribbler1(100);
           motorfunction(0, power, -gyro);
         } else {
-          if (goal_y <= (65 + abs(goal_x) / 10)) {
+          if (goal_y <= (65 - abs(goal_x) / 5)) {
             dribbler1(0);
             digitalWrite(Kick1, HIGH);
             delay(1500);
@@ -527,7 +528,7 @@ void attacker() {
                 motorfunction(z, abs(y) + 40, -gyro);
               } else {
                 dribbler1(0);
-                m = y / (2.5 * x);
+                m = y / (1.5 * x);
                 z = atan(m) + PI; // arc tangent of m
                 motorfunction(z, abs(y) + 40, -gyro);
               }
