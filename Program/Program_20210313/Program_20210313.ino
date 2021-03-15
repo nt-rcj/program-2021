@@ -348,6 +348,14 @@ void keeper(int ) {
     if (abs(gyro) <= 10) {
       digitalWrite(LED_BUILTIN, LOW);
       if (sig == 0) {
+        divergence = 0;
+        if(goal_y > 10){
+          m = goal_x / goal_y;
+          z = atan(m) + 3.14159;
+          motorfunction(z, 45, -gyro);
+        }else{
+          motorfunction(0, 0, 0);
+        }
       } else {
         if (abs(x) <= 7) {
           divergence = 0;
@@ -382,7 +390,7 @@ void keeper(int ) {
           motorfunction(az, abs(x) + 5, -gyro);
         }
       } else {
-
+        //divergence = 0 の時は上のところで制御する
       }
     } else {
       digitalWrite(LED_BUILTIN, HIGH);
