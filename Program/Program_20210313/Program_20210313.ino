@@ -58,7 +58,7 @@ char buf[64];
 float az, AZ, d, k;
 float targetP, distance, pointP;
 float goal_dist;
-float inroot;
+float angle, inroot;
 float divergence, RtoBdist;
 float speed, ballback;
 int pixel;
@@ -296,7 +296,7 @@ void keeper() {
     ball_y = goal_y + y;
   }
 
-  ball_tof = ToF_front.readRangeSingleMillimeters();
+  ball_front = ToF_front.readRangeSingleMillimeters();
   Serial.print(" Sig=");  //  openMVのデータを出力する
   Serial.print(sig);
   Serial.print(" X=");
@@ -311,8 +311,8 @@ void keeper() {
   Serial.print(goal_dist);
   Serial.print(" RtoBdist=");
   Serial.print(RtoBdist);
-  Serial.print(" ball_tof=");
-  Serial.print(ball_tof);
+  Serial.print(" ball_front=");
+  Serial.print(ball_front);
   Serial.println();
 
   Serial.print(" gyro=");
