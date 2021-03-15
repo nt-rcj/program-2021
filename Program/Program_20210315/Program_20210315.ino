@@ -253,25 +253,69 @@ void loop() {
   Serial.print(digitalRead(Aux1));
   Serial.print(" ,Aux2:");
   Serial.print(digitalRead(Aux2));
+  Serial.print(Serial1.read());
   Serial.println();
 
-  ball_back = ToF_back.readRangeSingleMillimeters();
-  ball_front = ToF_front.readRangeSingleMillimeters();  
+  Serial1.print(x + y);
+  Serial1.println();
 
-  //役割判定
-  if (digitalRead(Aux1) == LOW) {
-    attacker();
-  } else if (digitalRead(Aux2) == LOW) {
-    keeper();
-  } else {
-    Serial1.print(x + y);
-    Serial1.println();
-    if (Serial.read() == "k") {
-      keeper();
-    } else if (Serial.read() == "a") {
-      attacker();
+  ball_back = ToF_back.readRangeSingleMillimeters();
+  ball_front = ToF_front.readRangeSingleMillimeters();
+
+
+  if (digitalRead(StartSW) == LOW) { // STartSW == Lowでスタート
+    digitalWrite(SWR, HIGH);
+    digitalWrite(SWG, LOW);
+
+    //checkvoltage(Vlow);  //  電池の電圧をチェック
+    if ( emergency == true ) {
+      Serial.println("");
+      Serial.println("  Battery Low!");
+      //doOutofbound();    //  故障なのでコートの外へ
     }
+    /*
+        checkvoltage(Vlow);
+          if (emergency == true) {       // 電池の電圧が下がっていたら
+            digitalWrite(LINE_LED, LOW); // ラインセンサのLEDを消灯
+            motorFree();                 //　モーターを停止
+            while (1) {                  //　無限ループ
+              digitalWrite(SWR, LOW);
+              digitalWrite(SWG, LOW);
+              delay(300);
+              digitalWrite(SWR, HIGH);
+              digitalWrite(SWG, HIGH);
+              delay(300);
+            }
+          }
+    */
+    digitalWrite(LINE_LED, HIGH); // ラインセンサのLEDを点灯
+    if (lineflag == true) {
+      lineflag = false;
+    }
+    //役割判定
+    if (digitalRead(Aux1) == LOW) {
+      attacker();
+    } else if (digitalRead(Aux2) == LOW) {
+      keeper();
+    } else {
+      Serial1.print(x + y);
+      Serial1.println();
+      if (Serial.read() == "k") {
+        keeper();
+      } else if (Serial.read() == "a") {
+        attacker();
+      }
+    }
+  } else {  // ロボット停止
+    motorFree();
+    dribbler1(0);
+    dribbler2(0);
+    digitalWrite(LINE_LED, LOW); // ラインセンサのLEDを消灯
+    digitalWrite(SWR, LOW);
+    digitalWrite(SWG, HIGH);
   }
+
+
 }
 
 void keeper() {
@@ -324,99 +368,69 @@ void keeper() {
   Serial1.print(x + y);
   Serial1.println();
 
-  // check line and reverse
-  if (digitalRead(StartSW) == LOW) {
-    digitalWrite(SWR, HIGH);
-    digitalWrite(SWG, LOW);
-
-    /*
-        checkvoltage(Vlow);
-          if (emergency == true) {       // 電池の電圧が下がっていたら
-            digitalWrite(LINE_LED, LOW); // ラインセンサのLEDを消灯
-            motorFree();                 //　モーターを停止
-            while (1) {                  //　無限ループ
-              digitalWrite(SWR, LOW);
-              digitalWrite(SWG, LOW);
-              delay(300);
-              digitalWrite(SWR, HIGH);
-              digitalWrite(SWG, HIGH);
-              delay(300);
-            }
-          }
-    */
-
-    digitalWrite(LINE_LED, HIGH); // ラインセンサのLEDを点灯
-
-    if (abs(gyro) <= 10) {
-      digitalWrite(LED_BUILTIN, LOW);
-      if (sig == 0) {
-        divergence = 0;
-        if(goal_y > 50){
-          m = goal_x / goal_y;
-          z = atan(m) + 3.14159;
-          motorfunction(z, 45, -gyro);
-        }else{
-          motorfunction(0, 0, 0);
-        }
+  if (abs(gyro) <= 10) {
+    digitalWrite(LED_BUILTIN, LOW);
+    if (sig == 0) {
+      divergence = 0;
+      if (goal_y > 50) {
+        m = goal_x / goal_y;
+        z = atan(m) + 3.14159;
+        motorfunction(z, 45, -gyro);
       } else {
-        if(goal_y > 300){ //ロボットがゴールより遠すぎた場合(ロボットが動くゴールからの距離(distance)の値によって変える予定)
-          divergence = 0;
-          motorfunction(3.14159, 60, -gyro); // 前向きからπ回転した方向に進む
-        }else{
-          if (abs(x) <= 7) {
-            divergence = 0;
-            motorfunction(0, 0, 0);
-          } else if (x > 0) {
-            distance = 400; //この値は不確定
-            AZ = 3.14159 / 2.0;
-            divergence = 1;
-          } else {
-            distance = 400; //この値は不確定
-            AZ = -3.14159 / 2.0;
-            divergence = 1;
-          }
-        }
-      }
-      if (divergence == 1) {
-        targetP = distance / cosf(angle);
-        inroot = sqrt(targetP * targetP + 33310);
-        pointP = targetP * 6866 / (15850 + 72.01 * inroot);
-
-        d = k * (pointP - goal_dist);
-        if (d < -1.3) {
-          d = -1.3;
-        } else if (d > 1.3) {
-          d = 1.3;
-        }
-
-        if (AZ > 0) {
-          az = AZ - d;
-          motorfunction(az, abs(x) + 5, -gyro);
-        } else {
-          az = AZ + d;
-          motorfunction(az, abs(x) + 5, -gyro);
-        }
-      } else {
-
+        motorfunction(0, 0, 0);
       }
     } else {
-      digitalWrite(LED_BUILTIN, HIGH);
-      power = abs(gyro);   //  モーターの速度をgyroにする
-
-      if (gyro > 0) {         // Ball is 1st quadrant
-        turnCCW(power);
-      } else if (gyro < 0) {  // 2nd quadrant
-        turnCW(power);
+      if (goal_y > 80) { //ロボットがゴールより遠すぎた場合(ロボットが動くゴールからの距離(distance)の値によって変える予定)
+        divergence = 0;
+        motorfunction(3.14159, 60, -gyro); // 前向きからπ回転した方向に進む
       } else {
-
+        if (abs(x) <= 7) {
+          divergence = 0;
+          motorfunction(0, 0, 0);
+        } else if (x > 0) {
+          distance = 400; //この値は不確定
+          AZ = 3.14159 / 2.0;
+          divergence = 1;
+        } else {
+          distance = 400; //この値は不確定
+          AZ = -3.14159 / 2.0;
+          divergence = 1;
+        }
       }
     }
+    if (divergence == 1) {
+      targetP = distance / cosf(angle);
+      inroot = sqrt(targetP * targetP + 33310);
+      pointP = targetP * 6866 / (15850 + 72.01 * inroot);
+
+      d = k * (pointP - goal_dist);
+      if (d < -1.3) {
+        d = -1.3;
+      } else if (d > 1.3) {
+        d = 1.3;
+      }
+
+      if (AZ > 0) {
+        az = AZ - d;
+        motorfunction(az, abs(x) + 5, -gyro);
+      } else {
+        az = AZ + d;
+        motorfunction(az, abs(x) + 5, -gyro);
+      }
+    } else {
+
+    }
   } else {
-    motorFree();
-    dribbler(0);
-    digitalWrite(SWR, LOW);
-    digitalWrite(SWG, HIGH);
-    digitalWrite(LINE_LED, LOW); // ラインセンサのLEDを消灯
+    digitalWrite(LED_BUILTIN, HIGH);
+    power = abs(gyro);   //  モーターの速度をgyroにする
+
+    if (gyro > 0) {         // Ball is 1st quadrant
+      turnCCW(power);
+    } else if (gyro < 0) {  // 2nd quadrant
+      turnCW(power);
+    } else {
+
+    }
   }
 }
 
@@ -462,111 +476,88 @@ void attacker() {
   Serial1.print(x + y);
   Serial1.println();
 
-  if (digitalRead(StartSW) == LOW) { // STartSW == Lowでスタート
-    digitalWrite(SWR, HIGH);
-    digitalWrite(SWG, LOW);
-
-    //checkvoltage(Vlow);  //  電池の電圧をチェック
-    if ( emergency == true ) {
-      Serial.println("");
-      Serial.println("  Battery Low!");
-      //doOutofbound();    //  故障なのでコートの外へ
-    }
-
-    digitalWrite(LINE_LED, HIGH); // ラインセンサのLEDを点灯
-    if (lineflag == true) {
-      lineflag = false;
-    }
-    if (abs(gyro) < 20) {
-      digitalWrite(LED_BUILTIN, LOW);
-      if (ball_front <= 80) {
-        dribbler1(50);
-        if (ball_front <= 50) {
-          if ( goal_sig == 0) {
-            dribbler1(100);
-            motorfunction(0, power, -gyro);
+  if (abs(gyro) < 20) {
+    digitalWrite(LED_BUILTIN, LOW);
+    if (ball_front <= 80) {
+      dribbler1(50);
+      if (ball_front <= 50) {
+        if ( goal_sig == 0) {
+          dribbler1(100);
+          motorfunction(0, power, -gyro);
+        } else {
+          if (goal_y <= (65 + abs(goal_x) / 10)) {
+            dribbler1(0);
+            digitalWrite(Kick1, HIGH);
+            delay(1500);
+            digitalWrite(Kick1, LOW);
           } else {
-            if (goal_y <= (65 - abs(goal_x) / 10)) {
-              dribbler1(0);
-              digitalWrite(Kick1, HIGH);
-              delay(1500);
-              digitalWrite(Kick1, LOW);
+            dribbler1(50);
+            if (goal_sig == 0) {//??????
+              motorfunction(0, 70, -gyro);
             } else {
-              dribbler1(50);
-              if (goal_sig == 0) {//??????
-                motorfunction(0, 70, -gyro);
-              } else {
-                m = (goal_x*2) / goal_y;
-                z = atan(m); // arc tangent of m
-                motorfunction(z, abs(goal_x) + abs(goal_x) + 10, -gyro);
-              }
+              m = (goal_x * 2) / goal_y;
+              z = atan(m); // arc tangent of m
+              motorfunction(z, abs(goal_x) + abs(goal_x) + 10, -gyro);
             }
           }
-        } else {
-          motorfunction(0, power, -gyro);
         }
       } else {
-        dribbler1(0);
-        dribbler2(0);
-        if (sig == 0) {      // No Ball found
-          motorfunction(0, 0, 0);
-        } else {                // Ball find
-          if (y >= 70) {
-            motorfunction(0 , 80, -gyro);
+        motorfunction(0, power, -gyro);
+      }
+    } else {
+      dribbler1(0);
+      dribbler2(0);
+      if (sig == 0) {      // No Ball found
+        motorfunction(0, 0, 0);
+      } else {                // Ball find
+        if (y >= 70) {
+          motorfunction(0 , 80, -gyro);
+        } else {
+          if (y >= 40) {
+            dribbler1(0);
+            m = x / (y - 20);
+            z = atan(m); // arc tangent of m
+            motorfunction(z, (abs(x) + abs(y)) / 2 , -gyro);
           } else {
-            if (y >= 40) {
-              dribbler1(0);
-              m = x / (y - 20);
-              z = atan(m); // arc tangent of m
-              motorfunction(z, (abs(x) + abs(y))/2 , -gyro);
-            } else {
-              if (y < 0) {
-                if ( y <= 40) {
-                  dribbler1(0);
-                  m = y / -(5 * x);
-                  z = atan(m) + PI; // arc tangent of m
-                  motorfunction(z, abs(y) + 40, -gyro);
-                } else {
-                  dribbler1(0);
-                  m = y / (2.5 * x);
-                  z = atan(m) + PI; // arc tangent of m
-                  motorfunction(z, abs(y) + 40, -gyro);
-                }
+            if (y < 0) {
+              if ( y <= 40) {
+                dribbler1(0);
+                m = y / -(5 * x);
+                z = atan(m) + PI; // arc tangent of m
+                motorfunction(z, abs(y) + 40, -gyro);
               } else {
                 dribbler1(0);
-                m = 0.5 * y / -x;
+                m = y / (2.5 * x);
                 z = atan(m) + PI; // arc tangent of m
                 motorfunction(z, abs(y) + 40, -gyro);
               }
+            } else {
+              dribbler1(0);
+              m = 0.5 * y / -x;
+              z = atan(m) + PI; // arc tangent of m
+              motorfunction(z, abs(y) + 40, -gyro);
             }
           }
         }
       }
-      /*
-        dribbler1(0);
-        dribbler2(0);
-        m = x / y;
-        z = atan(m); // arc tangent of m
-        motorfunction(z, 30, -gyro);
-      */
-    } else {
-      digitalWrite(LED_BUILTIN, HIGH);
-      power = abs(gyro);   //  モーターの速度をgyroにする
-      if (gyro > 0) {         // Ball is 1st quadrant
-        turnCCW(power);
-      } else if (gyro < 0) {  // 2nd quadrant
-        turnCCW(-power);
-      } else {
-
-      }
     }
-  } else {  // ロボット停止
-    motorFree();
-    dribbler1(0);
-    dribbler2(0);
-    digitalWrite(LINE_LED, LOW); // ラインセンサのLEDを消灯
-    digitalWrite(SWR, LOW);
-    digitalWrite(SWG, HIGH);
+    /*
+      dribbler1(0);
+      dribbler2(0);
+      m = x / y;
+      z = atan(m); // arc tangent of m
+      motorfunction(z, 30, -gyro);
+    */
+  } else {
+    digitalWrite(LED_BUILTIN, HIGH);
+    power = abs(gyro);   //  モーターの速度をgyroにする
+    if (gyro > 0) {         // Ball is 1st quadrant
+      turnCCW(power);
+    } else if (gyro < 0) {  // 2nd quadrant
+      turnCCW(-power);
+    } else {
+
+    }
   }
 }
 
