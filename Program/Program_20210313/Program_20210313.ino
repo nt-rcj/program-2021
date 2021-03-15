@@ -263,9 +263,9 @@ void loop() {
   } else {
     Serial1.print(x+y);
     Serial1.println();
-    if (Serial.read() == k) {
+    if (Serial.read() == "k") {
       keeper();
-    } else if (Serial.read() == a) {
+    } else if (Serial.read() == "a") {
       attacker();
     }
   }
