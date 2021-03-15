@@ -424,8 +424,8 @@ void attacker() {
     y = 117 - y;
   }
   if (goal_sig != 0) {
-    goal_x = goal_x - 170 ;
-    goal_y = 110 - goal_y;
+    goal_x = 163 - goal_x;
+    goal_y = 117 - goal_y;
   }
 
   Serial.print(" Sig=");  //  openMVのデータを出力する
@@ -467,25 +467,25 @@ void attacker() {
     if (abs(gyro) < 20) {
       digitalWrite(LED_BUILTIN, LOW);
       if (ball_front <= 80) {
-        dribbler1(100);
+        dribbler1(50);
         if (ball_front <= 50) {
           if ( goal_sig == 0) {
             dribbler1(100);
             motorfunction(0, power, -gyro);
           } else {
-            if (goal_y <= (75 - abs(goal_x) / 10)) {
+            if (goal_y <= (65 - abs(goal_x) / 10)) {
               dribbler1(0);
               digitalWrite(Kick1, HIGH);
               delay(1500);
               digitalWrite(Kick1, LOW);
             } else {
-              dribbler1(100);
-              if (abs(goal_x) < (goal_y - 50)) {
+              dribbler1(50);
+              if (abs(goal_x) < (goal_y - 50)) {//??????
                 motorfunction(0, 70, -gyro);
               } else {
-                m = goal_x / goal_y;
-                z = atan(-m); // arc tangent of m
-                motorfunction(z, abs(goal_x) * abs(goal_x) + 10, -gyro);
+                m = (goal_x*2) / goal_y;
+                z = atan(m); // arc tangent of m
+                motorfunction(z, abs(goal_x) + abs(goal_x) + 10, -gyro);
               }
             }
           }
@@ -505,7 +505,7 @@ void attacker() {
               dribbler1(0);
               m = x / (y - 20);
               z = atan(m); // arc tangent of m
-              motorfunction(z, (abs(x) + abs(y)) , -gyro);
+              motorfunction(z, (abs(x) + abs(y))/2 , -gyro);
             } else {
               if (y < 0) {
                 if ( y <= 40) {
