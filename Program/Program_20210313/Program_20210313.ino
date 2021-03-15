@@ -347,7 +347,7 @@ void keeper(int ) {
 
     if (abs(gyro) <= 10) {
       digitalWrite(LED_BUILTIN, LOW);
-      if (sig == 0) { //ボールが見えない時(divergence = 0)
+      if (sig == 0) {
         divergence = 0;
         if(goal_y > 10){
           m = goal_x / goal_y;
@@ -357,14 +357,14 @@ void keeper(int ) {
           motorfunction(0, 0, 0);
         }
       } else {
-        if (abs(x) <= 7) { //ボールが前にある時(divergence = 0)
+        if (abs(x) <= 7) {
           divergence = 0;
           motorfunction(0, 0, 0);
-        } else if (x > 0) { //ボールが右にある時(divergence = 1)
+        } else if (x > 0) {
           distance = 400;
           AZ = 3.14159 / 2.0;
           divergence = 1;
-        } else { //ボールが左にある時(divergence = 1)
+        } else {
           distance = 400;
           AZ = -3.14159 / 2.0;
           divergence = 1;
