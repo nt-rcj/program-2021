@@ -359,17 +359,22 @@ void keeper() {
           motorfunction(0, 0, 0);
         }
       } else {
-        if (abs(x) <= 7) {
+        if(goal_y > 300){ //ロボットがゴールより遠すぎた場合(ロボットが動くゴールからの距離(distance)の値によって変える予定)
           divergence = 0;
-          motorfunction(0, 0, 0);
-        } else if (x > 0) {
-          distance = 400;
-          AZ = 3.14159 / 2.0;
-          divergence = 1;
-        } else {
-          distance = 400;
-          AZ = -3.14159 / 2.0;
-          divergence = 1;
+          motorfunction(3.14159, 60, -gyro); // 前向きからπ回転した方向に進む
+        }else{
+          if (abs(x) <= 7) {
+            divergence = 0;
+            motorfunction(0, 0, 0);
+          } else if (x > 0) {
+            distance = 400; //この値は不確定
+            AZ = 3.14159 / 2.0;
+            divergence = 1;
+          } else {
+            distance = 400; //この値は不確定
+            AZ = -3.14159 / 2.0;
+            divergence = 1;
+          }
         }
       }
       if (divergence == 1) {
