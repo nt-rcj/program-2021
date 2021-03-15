@@ -351,7 +351,7 @@ void keeper() {
       digitalWrite(LED_BUILTIN, LOW);
       if (sig == 0) {
         divergence = 0;
-        if(goal_y > 10){
+        if(goal_y > 50){
           m = goal_y / goal_x;
           z = atan(m) + 3.14159;
           motorfunction(z, 45, -gyro);
