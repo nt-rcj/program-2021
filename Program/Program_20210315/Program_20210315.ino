@@ -255,7 +255,7 @@ void loop() {
   Serial.print(digitalRead(Aux2));
   Serial.println();
 
-  //ball_back = ToF_back.readRangeSingleMillimeters();
+  ball_back = ToF_back.readRangeSingleMillimeters();
   ball_front = ToF_front.readRangeSingleMillimeters();  
 
   //役割判定
