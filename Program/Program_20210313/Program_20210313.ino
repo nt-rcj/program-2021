@@ -249,8 +249,6 @@ void loop() {
   yg_w = w_data_yellowgoal;
   yg_h = h_data_yellowgoal;
   yg_area = yg_w * yg_h;      // 認識したブロックの面積
-  Serial.print("o_x:");
-  Serial.print(o_x);
   Serial.print(" ,Aux1:");
   Serial.print(digitalRead(Aux1));
   Serial.print(" ,Aux2:");
@@ -265,9 +263,9 @@ void loop() {
   } else {
     Serial1.print(x+y);
     Serial1.println();
-    if (Serial k) {
+    if (Serial.read() == k) {
       keeper();
-    } else if (a) {
+    } else if (Serial.read() == a) {
       attacker();
     }
   }
