@@ -255,6 +255,9 @@ void loop() {
   Serial.print(digitalRead(Aux2));
   Serial.println();
 
+  //ball_back = ToF_back.readRangeSingleMillimeters();
+  ball_front = ToF_front.readRangeSingleMillimeters();  
+
   //役割判定
   if (digitalRead(Aux1) == LOW) {
     attacker();
@@ -271,7 +274,7 @@ void loop() {
   }
 }
 
-void keeper(int ) {
+void keeper() {
   if (digitalRead(GoalSW)) {  // 青色の場合
     goal_sig = y_sig;
     goal_x = yg_x;
@@ -296,7 +299,6 @@ void keeper(int ) {
     ball_y = goal_y + y;
   }
 
-  ball_front = ToF_front.readRangeSingleMillimeters();
   Serial.print(" Sig=");  //  openMVのデータを出力する
   Serial.print(sig);
   Serial.print(" X=");
@@ -425,9 +427,6 @@ void attacker() {
     goal_x = goal_x - 170 ;
     goal_y = 110 - goal_y;
   }
-
-  //ball_back = ToF_back.readRangeSingleMillimeters();
-  ball_front = ToF_front.readRangeSingleMillimeters();
 
   Serial.print(" Sig=");  //  openMVのデータを出力する
   Serial.print(sig);
