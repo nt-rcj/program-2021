@@ -18,7 +18,7 @@ PCF8574 pcf8574(I2C_PCF8574);
 VL6180X ToF_front;  // create front ToF object
 VL6180X ToF_back;   // create back ToF object
 
-const int angle = 0;
+//const int angle = 0;
 const int Vlow = 13.0;  // Low limit voltage 1.1*12 = 13.2
 const float Vstep = 0.01811;  // Voltage step 15.3V/845 = 0.01811
 
