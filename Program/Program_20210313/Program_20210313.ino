@@ -53,7 +53,6 @@ int level, data;
 int j;
 int blocks;
 int ball_x, ball_y;
-int o_x, o_y;
 char buf[64];
 
 float az, AZ, d, k;
@@ -264,22 +263,11 @@ void loop() {
   } else if (digitalRead(Aux2) == LOW) {
     keeper();
   } else {
-    Serial1.print("ball_x");
-    Serial1.print(x);
-    Serial1.print("ball_y");
-    Serial1.print(y);
+    Serial1.print(x+y);
     Serial1.println();
-    if (Serial1.available() > 0) {
-      if (Serial1.read() == ball_x) {
-        o_x = Serial1.read();
-      }
-      if (Serial1.read() == ball_y) {
-        o_y = Serial1.read();
-      }
-    }
-    if (x + y < o_x + o_y) {
+    if (Serial k) {
       keeper();
-    } else {
+    } else if (a) {
       attacker();
     }
   }
