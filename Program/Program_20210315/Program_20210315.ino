@@ -228,7 +228,11 @@ void loop() {
     while (Serial2.available() != 0) { //  Gyroの方位データをgyroに取り込む
       gyro = Serial2.read();
     }
-
+  //Xbeeからの信号を読む
+  if (Serial1.available() > 0)
+    while (Serial.available() > 0){
+      role = Serial1.read();
+    }
   // openMVのデーターを変換
 
   sig = openMV[1]; //  openMVのデータをsig,x,y,w,hに取り込む
@@ -291,10 +295,6 @@ void loop() {
     digitalWrite(LINE_LED, HIGH); // ラインセンサのLEDを点灯
     if (lineflag == true) {
       lineflag = false;
-    }
-    //Xbeeからの信号を読む
-    if(Serial.available() > 0){
-      role = Serial1.read();
     }
     //役割判定
     if (digitalRead(Aux1) == LOW) {
