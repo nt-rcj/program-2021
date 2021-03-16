@@ -27,20 +27,22 @@ void setup() {
 void loop() {
   char buf[4];
   xbeeSerial.listen();  // メインCPUからのデータを受信する
-  me =  xbeeSerial.read();
-  you = Serial.read();
   if (xbeeSerial.available() > 0) {
+    me =  xbeeSerial.read();
     Serial.write(me);  // メインCPUから来たデータをXbeeに送り出す。
   }
+  if (Serial.available() > 0){
+    you = Serial.read();
   if (me <= you){
     //attacker
     digitalWrite(led, HIGH);   // turn the LED on (HIGH is the voltage level)
-    xbeeSerial.println("1");
+    xbeeSerial.print("1");
     digitalWrite(led, LOW);   // turn the LED off (LOW is the voltage level)     
   }else{
     //keeper
     digitalWrite(led, HIGH);   // turn the LED on (HIGH is the voltage level)
-    xbeeSerial.println("2");
+    xbeeSerial.print("2");
     digitalWrite(led, LOW);   // turn the LED off (LOW is the voltage level)    
+  }
   }
 }

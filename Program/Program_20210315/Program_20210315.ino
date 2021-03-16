@@ -50,7 +50,7 @@ float y_sig, b_sig, goal_sig;
 int ball_front, ball_back;
 
 int level, data;
-int j;
+int role;
 int blocks;
 int ball_x, ball_y;
 char buf[64];
@@ -253,12 +253,11 @@ void loop() {
   Serial.print(digitalRead(Aux1));
   Serial.print(" ,Aux2:");
   Serial.print(digitalRead(Aux2));
-  Serial.print("xbee=");
-  Serial.print(Serial1.read());
+  Serial.print(" xbee=");
+  Serial.print(role);
   Serial.println();
 
   Serial1.print(x + y);
-  Serial1.println();
 
   ball_back = ToF_back.readRangeSingleMillimeters();
   ball_front = ToF_front.readRangeSingleMillimeters();
@@ -293,6 +292,10 @@ void loop() {
     if (lineflag == true) {
       lineflag = false;
     }
+    //Xbeeからの信号を読む
+    if(Serial.available() > 0){
+      role = Serial1.read();
+    }
     //役割判定
     if (digitalRead(Aux1) == LOW) {
       attacker();
@@ -300,10 +303,9 @@ void loop() {
       keeper();
     } else {
       Serial1.print(abs(x + y));
-      Serial1.println();
-      if (Serial.read() == "2") {
+      if (role == "2") {
         keeper();
-      } else if (Serial.read() == "1") {
+      } else if (role == "1") {
         attacker();
       }
     }
@@ -366,7 +368,7 @@ void keeper() {
   Serial.print(gyro);
   Serial.println();
 
-  Serial1.println(abs(x + y));
+  Serial1.print(abs(x + y));
 
   if (abs(gyro) <= 10) {
     digitalWrite(LED_BUILTIN, LOW);
@@ -473,7 +475,7 @@ void attacker() {
   Serial.print(gyro);
   Serial.println();
 
-  Serial1.println(abs(x + y));
+  Serial1.print(abs(x + y));
 
   if (abs(gyro) < 20) {
     digitalWrite(LED_BUILTIN, LOW);
