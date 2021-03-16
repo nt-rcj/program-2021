@@ -30,7 +30,7 @@ void loop() {
   me =  xbeeSerial.read();
   you = Serial.read();
   if (xbeeSerial.available() > 0) {
-    Serial.println(me);  // メインCPUから来たデータをXbeeに送り出す。
+    Serial.write(me);  // メインCPUから来たデータをXbeeに送り出す。
   }
   if (me <= you){
     //attacker

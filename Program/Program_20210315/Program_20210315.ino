@@ -366,8 +366,7 @@ void keeper() {
   Serial.print(gyro);
   Serial.println();
 
-  Serial1.print(abs(x + y));
-  Serial1.println();
+  Serial1.println(abs(x + y));
 
   if (abs(gyro) <= 10) {
     digitalWrite(LED_BUILTIN, LOW);
@@ -474,16 +473,14 @@ void attacker() {
   Serial.print(gyro);
   Serial.println();
 
-  Serial1.print(abs(x + y));
-  Serial1.println();
+  Serial1.println(abs(x + y));
 
   if (abs(gyro) < 20) {
     digitalWrite(LED_BUILTIN, LOW);
     if (ball_front <= 80) {
-      dribbler1(50);
+      dribbler1(100);
       if (ball_front <= 40) {
         if ( goal_sig == 0) {
-          dribbler1(100);
           motorfunction(0, power, -gyro);
         } else {
           if (goal_y <= (80 - abs(goal_x) / 5)) {
@@ -492,8 +489,7 @@ void attacker() {
             delay(1500);
             digitalWrite(Kick1, LOW);
           } else {
-            dribbler1(50);
-            if (goal_sig == 0) {//??????
+            if (goal_sig == 0) {
               motorfunction(0, 70, -gyro);
             } else {
               m = (goal_x * 2) / goal_y;
@@ -521,20 +517,21 @@ void attacker() {
             motorfunction(z, (abs(x) + abs(y)) / 2 , -gyro);
           } else {
             if (y < 0) {
-              if ( y <= -40) {
-                if ( x<= abs(40)){
+              if ( y <= -40) { //-40より後ろの場合
+                if (x < 0){
                 dribbler1(0);
                 m = y / -x;
                 z = atan(m) + PI; // arc tangent of m
                 motorfunction(z, abs(y) + 40, -gyro);                  
                 }else{
                 dribbler1(0);
-
-                motorfunction(3.14, abs(y) + 40, -gyro);
+                m = (x-50) / y;
+                z = atan(m) + PI; // arc tangent of m
+                motorfunction(z, abs(y) + 40, -gyro);
                 }
               } else {
                 dribbler1(0);
-                m = (y+50) / x;
+                m = x / (y-50);
                 z = atan(m) + PI; // arc tangent of m
                 motorfunction(z, abs(y) + 40, -gyro);
               }
