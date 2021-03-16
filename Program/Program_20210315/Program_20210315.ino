@@ -301,9 +301,9 @@ void loop() {
     } else {
       Serial1.print(abs(x + y));
       Serial1.println();
-      if (Serial.read() == "k") {
+      if (Serial.read() == "2") {
         keeper();
-      } else if (Serial.read() == "a") {
+      } else if (Serial.read() == "1") {
         attacker();
       }
     }
@@ -381,7 +381,7 @@ void keeper() {
         motorfunction(0, 0, 0);
       }
     } else {
-      if (goal_y > 80) { //ロボットがゴールより遠すぎた場合(ロボットが動くゴールからの距離(distance)の値によって変える予定)
+      if (goal_y < 20) { //ロボットがゴールより遠すぎた場合(ロボットが動くゴールからの距離(distance)の値によって変える予定)
         divergence = 0;
         motorfunction(3.14159, 60, -gyro); // 前向きからπ回転した方向に進む
       } else {
@@ -413,10 +413,10 @@ void keeper() {
 
       if (AZ > 0) {
         az = AZ - d;
-        motorfunction(az, abs(x) + 5, -gyro);
+        motorfunction(az, (abs(x)*2) + 10, -gyro);
       } else {
         az = AZ + d;
-        motorfunction(az, abs(x) + 5, -gyro);
+        motorfunction(az, (abs(x)*2) - 10, -gyro);
       }
     } else {
 
@@ -486,9 +486,9 @@ void attacker() {
           dribbler1(100);
           motorfunction(0, power, -gyro);
         } else {
-          if (goal_y <= (65 - abs(goal_x) / 5)) {
-            dribbler1(0);
+          if (goal_y <= (80 - abs(goal_x) / 5)) {
             digitalWrite(Kick1, HIGH);
+            dribbler1(0);
             delay(1500);
             digitalWrite(Kick1, LOW);
           } else {
@@ -498,7 +498,7 @@ void attacker() {
             } else {
               m = (goal_x * 2) / goal_y;
               z = atan(m); // arc tangent of m
-              motorfunction(z, abs(goal_x) + abs(goal_x) + 10, -gyro);
+              motorfunction(z, (abs(goal_x) + abs(goal_y)) + 10, -gyro);
             }
           }
         }
@@ -516,19 +516,25 @@ void attacker() {
         } else {
           if (y >= 40) {
             dribbler1(0);
-            m = x / (y - 20);
+            m = (x+5) / (y - 40);
             z = atan(m); // arc tangent of m
             motorfunction(z, (abs(x) + abs(y)) / 2 , -gyro);
           } else {
             if (y < 0) {
-              if ( y <= 40) {
+              if ( y <= -40) {
+                if ( x<= abs(40)){
                 dribbler1(0);
-                m = y / -(5 * x);
+                m = y / -x;
                 z = atan(m) + PI; // arc tangent of m
-                motorfunction(z, abs(y) + 40, -gyro);
+                motorfunction(z, abs(y) + 40, -gyro);                  
+                }else{
+                dribbler1(0);
+
+                motorfunction(3.14, abs(y) + 40, -gyro);
+                }
               } else {
                 dribbler1(0);
-                m = y / (1.5 * x);
+                m = (y+50) / x;
                 z = atan(m) + PI; // arc tangent of m
                 motorfunction(z, abs(y) + 40, -gyro);
               }
