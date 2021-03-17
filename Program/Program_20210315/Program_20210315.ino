@@ -233,6 +233,8 @@ void loop() {
     while (Serial.available() > 0){
       role = Serial1.read();
     }
+  Serial.print(" Xbee=");
+  Serial.print(role);
   // openMVのデーターを変換
 
   sig = openMV[1]; //  openMVのデータをsig,x,y,w,hに取り込む
@@ -257,8 +259,8 @@ void loop() {
   Serial.print(digitalRead(Aux1));
   Serial.print(" ,Aux2:");
   Serial.print(digitalRead(Aux2));
-  Serial.print(" xbee=");
-  Serial.print(role);
+  //Serial.print(" xbee=");
+  //Serial.print(role);
   Serial.println();
 
   Serial1.print(x + y);
