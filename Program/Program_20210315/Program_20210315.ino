@@ -303,9 +303,9 @@ void loop() {
       keeper();
     } else {
       Serial1.print(abs(x + y));
-      if (role == "2") {
+      if (role == 50) {
         keeper();
-      } else if (role == "1") {
+      } else if (role == 49) {
         attacker();
       }
     }
