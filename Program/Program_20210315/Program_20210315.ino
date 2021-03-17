@@ -272,7 +272,7 @@ void loop() {
     xbee_date = sqrt(pow(xbee_x , 2) + pow(xbee_y , 2));
   }
 
-  Serial1.write(xbeedate);// xbeeへ出力
+  Serial1.write(xbeedate);
 
   ball_back = ToF_back.readRangeSingleMillimeters();
   ball_front = ToF_front.readRangeSingleMillimeters();
@@ -391,9 +391,9 @@ void keeper() {
         motorfunction(0, 0, 0);
       }
     } else {
-      if (goal_y > 40) { //ロボットがゴールより遠すぎた場合(ロボットが動くゴールからの距離(distance)の値によって変える予定)
+      if (goal_y < 20) { //ロボットがゴールより遠すぎた場合(ロボットが動くゴールからの距離(distance)の値によって変える予定)
         divergence = 0;
-        motorfunction(3.14, 60, -gyro); // 前向きからπ回転した方向に進む
+        motorfunction(3.14159, 60, -gyro); // 前向きからπ回転した方向に進む
       } else {
         if (abs(x) <= 7) {
           divergence = 0;
