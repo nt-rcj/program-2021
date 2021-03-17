@@ -50,7 +50,7 @@ float y_sig, b_sig, goal_sig;
 int ball_front, ball_back;
 
 int level, data;
-int role;
+uint8_t role;
 int blocks;
 int ball_x, ball_y;
 char buf[64];
