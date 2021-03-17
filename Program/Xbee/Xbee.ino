@@ -35,12 +35,12 @@ void loop() {
     if (me <= you) {
       //attacker
       digitalWrite(led, HIGH);   // turn the LED on (HIGH is the voltage level)
-      xbeeSerial.print("1");
+      xbeeSerial.write("1");
       digitalWrite(led, LOW);   // turn the LED off (LOW is the voltage level)
     } else {
       //keeper
       digitalWrite(led, HIGH);   // turn the LED on (HIGH is the voltage level)
-      xbeeSerial.print("2");
+      xbeeSerial.write("2");
       digitalWrite(led, LOW);   // turn the LED off (LOW is the voltage level)
     }
     delay(20);

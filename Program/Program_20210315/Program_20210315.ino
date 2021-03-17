@@ -261,9 +261,9 @@ void loop() {
   Serial.print(role);
   Serial.println();
 
-  Serial1.print(x + y);
+  Serial1.print(abs(x) + abs(y));
 
-  ball_back = ToF_back.readRangeSingleMillimeters();
+  //ball_back = ToF_back.readRangeSingleMillimeters();
   ball_front = ToF_front.readRangeSingleMillimeters();
 
 
@@ -302,7 +302,6 @@ void loop() {
     } else if (digitalRead(Aux2) == LOW) {
       keeper();
     } else {
-      Serial1.print(abs(x + y));
       if (role == 50) {
         keeper();
       } else if (role == 49) {
@@ -368,7 +367,6 @@ void keeper() {
   Serial.print(gyro);
   Serial.println();
 
-  Serial1.print(abs(x + y));
 
   if (abs(gyro) <= 10) {
     digitalWrite(LED_BUILTIN, LOW);
@@ -475,7 +473,6 @@ void attacker() {
   Serial.print(gyro);
   Serial.println();
 
-  Serial1.print(abs(x + y));
 
   if (abs(gyro) < 20) {
     digitalWrite(LED_BUILTIN, LOW);
