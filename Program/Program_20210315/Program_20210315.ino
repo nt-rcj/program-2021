@@ -259,7 +259,7 @@ void loop() {
   Serial.print(" ,Aux2:");
   Serial.print(digitalRead(Aux2));
   Serial.print(" xbee=");
-  Serial.print(role);
+  Serial.print(xbeedate);
   Serial.println();
 
   if (x == 4095) {
@@ -268,7 +268,7 @@ void loop() {
     xbeedate = sqrt(pow(x , 2) + pow(y , 2));
   }
 
-  Serial1.print(xbeedate);
+  Serial1.write(xbeedate);
 
   ball_back = ToF_back.readRangeSingleMillimeters();
   ball_front = ToF_front.readRangeSingleMillimeters();
