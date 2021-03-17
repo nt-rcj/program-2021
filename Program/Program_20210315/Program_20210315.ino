@@ -272,7 +272,7 @@ void loop() {
     xbee_date = sqrt(pow(xbee_x , 2) + pow(xbee_y , 2));
   }
 
-  Serial1.write(xbeedate);
+  Serial1.write(xbee_date);
 
   ball_back = ToF_back.readRangeSingleMillimeters();
   ball_front = ToF_front.readRangeSingleMillimeters();
