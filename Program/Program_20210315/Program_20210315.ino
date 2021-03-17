@@ -230,7 +230,7 @@ void loop() {
     }
   //Xbeeからの信号を読む
   if (Serial1.available() > 0)
-    while (Serial.available() > 0){
+    while (Serial1.available() > 0){
       role = Serial1.read();
     }
   Serial.print(" Xbee=");
