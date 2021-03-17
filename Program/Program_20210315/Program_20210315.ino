@@ -51,6 +51,7 @@ int ball_front, ball_back;
 
 int level, data;
 uint8_t role;
+int xbeedate;
 int blocks;
 int ball_x, ball_y;
 char buf[64];
@@ -230,7 +231,7 @@ void loop() {
     }
   //Xbeeからの信号を読む
   if (Serial1.available() > 0)
-    while (Serial1.available() > 0){
+    while (Serial1.available() > 0) {
       role = Serial1.read();
     }
   // openMVのデーターを変換
@@ -261,9 +262,15 @@ void loop() {
   Serial.print(role);
   Serial.println();
 
-  Serial1.print(abs(x) + abs(y));
+  if (x == 4095) {
+    xbeedate = 255;
+  } else {
+    xbeedate = sqrt(pow(x , 2) + pow(y , 2));
+  }
 
-  //ball_back = ToF_back.readRangeSingleMillimeters();
+  Serial1.print(xbeedate);
+
+  ball_back = ToF_back.readRangeSingleMillimeters();
   ball_front = ToF_front.readRangeSingleMillimeters();
 
 
@@ -412,10 +419,10 @@ void keeper() {
 
       if (AZ > 0) {
         az = AZ - d;
-        motorfunction(az, (abs(x)*2) + 10, -gyro);
+        motorfunction(az, (abs(x) * 2) + 10, -gyro);
       } else {
         az = AZ + d;
-        motorfunction(az, (abs(x)*2) - 10, -gyro);
+        motorfunction(az, (abs(x) * 2) - 10, -gyro);
       }
     } else {
 
@@ -511,26 +518,26 @@ void attacker() {
         } else {
           if (y >= 40) {
             dribbler1(0);
-            m = (x+5) / (y - 40);
+            m = (x + 5) / (y - 40);
             z = atan(m); // arc tangent of m
             motorfunction(z, (abs(x) + abs(y)) / 2 , -gyro);
           } else {
             if (y < 0) {
               if ( y <= -40) { //-40より後ろの場合
-                if (x < 0){
-                dribbler1(0);
-                m = (x+50) / y;
-                z = atan(m) + PI; // arc tangent of m
-                motorfunction(z, abs(y) + 40, -gyro);                  
-                }else{
-                dribbler1(0);
-                m = (x-50) / y;
-                z = atan(m) + PI; // arc tangent of m
-                motorfunction(z, abs(y) + 40, -gyro);
+                if (x < 0) {
+                  dribbler1(0);
+                  m = (x + 50) / y;
+                  z = atan(m) + PI; // arc tangent of m
+                  motorfunction(z, abs(y) + 40, -gyro);
+                } else {
+                  dribbler1(0);
+                  m = (x - 50) / y;
+                  z = atan(m) + PI; // arc tangent of m
+                  motorfunction(z, abs(y) + 40, -gyro);
                 }
               } else {
                 dribbler1(0);
-                m = x / (y-50);
+                m = x / (y - 50);
                 z = atan(m) + PI; // arc tangent of m
                 motorfunction(z, abs(y) + 40, -gyro);
               }
