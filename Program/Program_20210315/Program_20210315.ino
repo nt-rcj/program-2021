@@ -522,7 +522,7 @@ void attacker() {
               if ( y <= -40) { //-40より後ろの場合
                 if (x < 0){
                 dribbler1(0);
-                m = y / -x;
+                m = (x+50) / y;
                 z = atan(m) + PI; // arc tangent of m
                 motorfunction(z, abs(y) + 40, -gyro);                  
                 }else{
