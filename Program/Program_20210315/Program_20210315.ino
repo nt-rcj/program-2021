@@ -51,7 +51,7 @@ int ball_front, ball_back;
 
 int level, data;
 uint8_t role;
-int xbeedate;
+int xbee_date, xbee_x, xbee_y;
 int blocks;
 int ball_x, ball_y;
 char buf[64];
@@ -259,13 +259,17 @@ void loop() {
   Serial.print(" ,Aux2:");
   Serial.print(digitalRead(Aux2));
   Serial.print(" xbee=");
-  Serial.print(xbeedate);
+  Serial.print(xbee_date);
   Serial.println();
 
+  if (sig != 0) { //xbeedate生成
+    xbee_x = 163 - x;
+    xbee_y = 117 - y;
+  }
   if (x == 4095) {
-    xbeedate = 255;
+    xbee_date = 255;
   } else {
-    xbeedate = sqrt(pow(x , 2) + pow(y , 2));
+    xbee_date = sqrt(pow(xbee_x , 2) + pow(xbee_y , 2));
   }
 
   Serial1.write(xbeedate);
