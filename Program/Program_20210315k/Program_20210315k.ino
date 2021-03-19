@@ -351,7 +351,7 @@ void keeper() {
 
   // Convert coordinates data
   if (sig != 0) {
-    x = 160 - x;
+    x = 152 - x;
     y = 81 - y;
     ball_y = goal_y + y;
   }
@@ -460,7 +460,7 @@ void attacker() {
 
   // Convert coordinates data
   if (sig != 0) {
-    x = 163 - x;
+    x = 153 - x;
     y = 117 - y;
   }
   if (goal_sig != 0) {
@@ -524,20 +524,20 @@ void attacker() {
         } else {
           if (y >= 40) {
             dribbler1(0);
-            m = x / (y - 40);
+            m = (x + 5) / (y - 40);
             z = atan(m); // arc tangent of m
-            motorfunction(z, abs(x) + 20 , -gyro);
+            motorfunction(z, (abs(x) + abs(y)) / 2 , -gyro);
           } else {
             if (y < 0) {
               if ( y <= -40) { //-40より後ろの場合
                 if (x < 0) {
                   dribbler1(0);
-                  m = (x + 50) / (y-50);
+                  m = (x + 50) / y;
                   z = atan(m) + PI; // arc tangent of m
                   motorfunction(z, abs(y) + 40, -gyro);
                 } else {
                   dribbler1(0);
-                  m = (x - 50) / (y-50);
+                  m = (x - 50) / y;
                   z = atan(m) + PI; // arc tangent of m
                   motorfunction(z, abs(y) + 40, -gyro);
                 }
@@ -549,7 +549,7 @@ void attacker() {
               }
             } else {
               dribbler1(0);
-              m = x / (y-50);
+              m = 0.5 * y / -x;
               z = atan(m) + PI; // arc tangent of m
               motorfunction(z, abs(y) + 40, -gyro);
             }

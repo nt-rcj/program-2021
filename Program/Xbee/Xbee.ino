@@ -43,6 +43,5 @@ void loop() {
       xbeeSerial.write("2");
       digitalWrite(led, LOW);   // turn the LED off (LOW is the voltage level)
     }
-    delay(20);
   }
 }
