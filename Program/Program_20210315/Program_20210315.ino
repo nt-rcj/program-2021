@@ -391,12 +391,12 @@ void keeper() {
         motorfunction(0, 0, 0);
       }
     } else {
-      if (goal_y > 50) { //ロボットがゴールより遠すぎた場合(ロボットが動くゴールからの距離(distance)の値によって変える予定)
+/*      if (goal_y > 50) { //ロボットがゴールより遠すぎた場合(ロボットが動くゴールからの距離(distance)の値によって変える予定)
         while (goal_y < 40){
         divergence = 0;
         motorfunction(3.14, 60, -gyro); // 前向きからπ回転した方向に進む
         }
-      } else {
+      } else {*/
         if (abs(x) <= 7) {
           divergence = 0;
           motorfunction(0, 0, 0);
@@ -409,7 +409,7 @@ void keeper() {
           AZ = -3.14159 / 2.0;
           divergence = 1;
         }
-      }
+//      }
     }
     if (divergence == 1) {
       targetP = distance / cosf(angle);
