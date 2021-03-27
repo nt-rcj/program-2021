@@ -2,7 +2,6 @@
 // FourWheel Motor control module
 //           Ver 4.1 Oct.24.2020
 //           By Saeki Akitoshi
-//           By Saeki Hidekazu
 // for Teensy 3.5
 //モーターを動かすサブプログラム
 //
