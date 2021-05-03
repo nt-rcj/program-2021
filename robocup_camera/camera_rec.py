@@ -137,5 +137,4 @@ while True:
     ser.write(bytes([min_range_green[1] & 0b00000000000111111]))
     ser.write(bytes([(min_range_green[1] & 0b0000111111000000)>>6]))
 
-    if cv2.waitKey(1) & 0xFF == 27:
-        break
+    cv2.imshow(frame,frame)
