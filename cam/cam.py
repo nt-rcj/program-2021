@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 """
 [summary]
-  極座標変換サンプル(動画版)
+  cam remapping test
 [description]
   -
 """
