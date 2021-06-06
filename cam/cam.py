@@ -76,27 +76,10 @@ def main():
         pitch = 50
 
         # 上下左右反転
-        for x in range(w):
-            for y in range(h):
-                rp = math.sqrt(x**2+y**2)
-                Rp = ((849*rp)/(2509-(707*math.sqrt(rp**2+9))))-20
-
-                try:
-                    map_x = Rp/(math.sqrt(1+(y/x)**2))
-                except ZeroDivisionError:
-                    map_x = 0.0
-        for x in range(w):
-            for y in range(h):
-                rp = math.sqrt(x**2+y**2)
-                Rp = ((849*rp)/(2509-(707*math.sqrt(rp**2+9))))-20
-                try:
-                    Rx = Rp/(math.sqrt(1+(y/x)**2))
-                except ZeroDivisionError:
-                    Rx = 0.0  
-                try:                                  
-                    map_y = (Rx*y)/x
-                except ZeroDivisionError:
-                    map_y = 0.0                  
+        for i in range(h):
+            map_x[i,:] = [(x*463700)/(140200+math.sqrt(x**2+28900)) for x in range(w)]
+        for j in range(w):
+            map_y[:,j] = [(y*463700)/(140200+math.sqrt(y**2+28900)) for y in range(h)]         
 
 
 
