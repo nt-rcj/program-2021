@@ -19,7 +19,8 @@ VL6180X ToF_front;  // create front ToF object
 VL6180X ToF_back;   // create back ToF object
 
 //const int angle = 0;
-const int Vlow = 13.0;  // Low limit voltage 1.1*12 = 13.2
+const int Vlow = 13.5;  // Low limit voltage 1.1*12 = 13.2
+//Mi-NHなら13.0,Li-poなら13.5(Li-poは過放電するので注意！)
 const float Vstep = 0.01811;  // Voltage step 15.3V/845 = 0.01811
 
 int blob_count, i;
@@ -312,7 +313,7 @@ void loop() {
     if ( emergency == true ) {
       Serial.println("");
       Serial.println("  Battery Low!");
-      //doOutofbound();    //  故障なのでコートの外へ
+      doOutofbound();    //  故障なのでコートの外へ
     }
     /*
         checkvoltage(Vlow);
