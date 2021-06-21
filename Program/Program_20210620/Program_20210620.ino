@@ -189,7 +189,7 @@ void setup() {
 
   // Caution D29 -> Interrupt5
 
-//  attachInterrupt(INT_29, intHandle, RISING);
+  attachInterrupt(INT_29, intHandle, RISING);
 
   // LEDを初期化する
   LED_Init();
@@ -416,56 +416,21 @@ void keeper() {
   if (abs(gyro) <= 10) {
     digitalWrite(LED_BUILTIN, LOW);
     if (sig == 0) {
-    divergence = 0;
-      if (goal_y > 10) {
-        m = goal_x / goal_y;
-        z = atan2(goal_x, goal_y) + 3.14;
+      if (goal_y > 22) {
+        m = goal_x / goal_y - 22;
+        z = atan2(goal_x, goal_y - 22) + 3.14;
         motorfunction(z, 45, -gyro);
       } else {
         motorfunction(0, 0, 0);
       }
     } else {
-/*      if (goal_y > 50) { //ロボットがゴールより遠すぎた場合(ロボットが動くゴールからの距離(distance)の値によって変える予定)
-        while (goal_y < 40){
-        divergence = 0;
-        motorfunction(3.14, 60, -gyro); // 前向きからπ回転した方向に進む
-        }
-      } else {*/
         if (abs(x) <= 7) {
-          divergence = 0;
           motorfunction(0, 0, 0);
-        } else if (x > 0) {
-          distance = 30 - goal_y; //この値は不確定
-          AZ = 3.14159 / 2.0;
-          divergence = 1;
         } else {
-          distance = 30 - goal_y; //この値は不確定
-          AZ = -3.14159 / 2.0;
-          divergence = 1;
+          distance = 25 - goal_y;
+          az = atan2(x, distance);
+          motorfunction(az, abs(x), -gyro);
         }
-//      }
-    }
-    if (divergence == 1) {
-    /*  targetP = distance / cosf(angle);
-      inroot = sqrt(targetP * targetP + 33310);
-      pointP = targetP * 6866 / (15850 + 72.01 * inroot);*/
-
-      d = k * (pointP - goal_dist);
-      if (d < -1.3) {
-        d = -1.3;
-      } else if (d > 1.3) {
-        d = 1.3;
-      }
-
-      if (AZ > 0) {
-        az = atan2(x, distance);
-        motorfunction(az, abs(x), -gyro);
-      } else {
-        az = atan2(x, distance);
-        motorfunction(az, abs(x) , -gyro);
-      }
-    } else {
-
     }
   } else {
     digitalWrite(LED_BUILTIN, HIGH);
