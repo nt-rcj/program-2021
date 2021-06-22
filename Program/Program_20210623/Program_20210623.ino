@@ -513,9 +513,9 @@ void attacker() {
       } else {
         motorfunction(0, power, -gyro);
       }
-    } else if (-50 <= y && y <= 0 && abs(x) < 5) { // backドリブラの直近にボールがあればドリブラを回す
+    } else if (-55 <= y && y <= 0 && abs(x) < 5) { // backドリブラの直近にボールがあればドリブラを回す
       dribbler2(100);
-      if (y >= -40) {
+      if (y >= -45) {
         if ( goal_sig == 0) {//前に持ってくる
           //dribbler2(100);
           motorfunction(0, power, -gyro);
@@ -538,7 +538,7 @@ void attacker() {
           }
         }
       } else {
-        motorfunction(3.14, power, -gyro);
+        motorfunction(3.14, 50, -gyro);
       }
     } else {
       dribbler1(0);
