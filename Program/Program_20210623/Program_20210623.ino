@@ -168,7 +168,7 @@ void setup() {
   delay(1000);  //  ドリブラ・キッカーの動作チェック
   dribbler1(100);
   dribbler2(100);
-  delay(500);
+  delay(1000);
   dribbler1(0);
   dribbler2(0);
   delay(100);
