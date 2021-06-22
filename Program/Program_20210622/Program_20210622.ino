@@ -487,9 +487,9 @@ void attacker() {
 
   if (abs(gyro) < 20) {
     digitalWrite(LED_BUILTIN, LOW);
-    if ((0 <= y <= 20)  && (abs(x) < 5)) {
+    if ((0 <= y <= 50)  && (abs(x) < 5)) {
       dribbler1(100);
-      if (y <= 5) {
+      if (y <= 40) {
         if ( goal_sig == 0) {
           motorfunction(0, power, -gyro);
         } else {
