@@ -307,8 +307,12 @@ void loop() {
   Serial.print(y);
   Serial.print(" ,tof_front=");
   Serial.print(ball_front);
-  Serial.print(" tof_back=");
+  Serial.print(" ,tof_back=");
   Serial.print(ball_back);
+  Serial.print(" ,goal_x=")
+  Serial.print(goal_x)
+  Serial.print(" ,goal_y=")
+  Serial.print(goal_y)  
   Serial.println();
 
   ball_back = ToF_back.readRangeSingleMillimeters();
@@ -490,10 +494,11 @@ void attacker() {
           motorfunction(0, power, -gyro);
         } else {
           if (goal_y <= (80 - abs(goal_x) / 5)) {
-            digitalWrite(Kick1, HIGH);
+            digitalWrite(Kick_Dir, HIGH);
+            digitalWrite(Kicker, HIGH);
             dribbler1(0);
             delay(1500);
-            digitalWrite(Kick1, LOW);
+            digitalWrite(Kicker, LOW);
           } else {
             if (goal_sig == 0) {
               motorfunction(0, 70, -gyro);
