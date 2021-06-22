@@ -456,12 +456,12 @@ void keeper() {
 void attacker() {
   if (digitalRead(GoalSW)) { // GoalSWはHighなら「青ゴール」を認識する。
     goal_sig = b_sig;
-    goal_x = bg_x;
-    goal_y = bg_y;
+    goal_x = -bg_x;
+    goal_y = -bg_y;
   } else {
     goal_sig = y_sig;
-    goal_x = yg_x;
-    goal_y = yg_y;
+    goal_x = -yg_x;
+    goal_y = -yg_y;
   }
 
 
@@ -493,7 +493,7 @@ void attacker() {
         if ( goal_sig == 0) {
           motorfunction(0, power, -gyro);
         } else {
-          if (goal_y >= (-80 + abs(goal_x) / 5)) {
+          if (goal_y <= (80 - abs(goal_x) / 5)) {
             dribbler1(0);
             digitalWrite(Kick_Dir, HIGH);
             digitalWrite(Kicker, HIGH);
@@ -520,7 +520,7 @@ void attacker() {
           //dribbler2(100);
           motorfunction(0, power, -gyro);
         } else {
-          if (goal_y <= (-80 + abs(goal_x) / 5)) {
+          if (goal_y <= (80 - abs(goal_x) / 5)) {
             turnCW(goal_x * 40);
             digitalWrite(Kick_Dir, HIGH);
             delay(400);
@@ -561,17 +561,10 @@ void attacker() {
           } else {
             if (y < 0) {
               if ( y <= -40) { //-40より後ろの場合
-                if (x < 0) {
-                  dribbler1(0);
-                  m = (x + 50) / (y - 50);
-                  z = atan(m) + PI; // arc tangent of m
-                  motorfunction(z, abs(y) + 40, -gyro);
-                } else {
-                  dribbler1(0);
-                  m = (x - 50) / (y - 50);
-                  z = atan(m) + PI; // arc tangent of m
-                  motorfunction(z, abs(y) + 40, -gyro);
-                }
+                dribbler1(0);
+                m = x / (y - 50);
+                z = atan(m) + PI; // arc tangent of m
+                motorfunction(z, abs(y) + 40, -gyro);                
               } else {
                 dribbler1(0);
                 m = x / (y - 50);
