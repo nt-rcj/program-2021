@@ -493,7 +493,7 @@ void attacker() {
         if ( goal_sig == 0) {
           motorfunction(0, power, -gyro);
         } else {
-          if (goal_y <= (80 - abs(goal_x) / 5)) {
+          if (goal_y >= (-80 + abs(goal_x) / 5)) {
             digitalWrite(Kick_Dir, HIGH);
             digitalWrite(Kicker, HIGH);
             dribbler1(0);
