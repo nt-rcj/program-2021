@@ -257,22 +257,20 @@ void loop() {
   yg_area = yg_w * yg_h;      // 認識したブロックの面
 
   if (sig != 0) { //中心補正
-    x = 148 - x;
-    y = 83 - y;
+    x = 159 - x;
+    y = 79 - y;
   }
   if (y_sig != 0) {
-    yg_x = 141 - yg_x;
-    yg_y = yg_y - 170;
+    yg_x = 160 - yg_x;
+    yg_y = yg_y - 172;
   }
   if (b_sig != 0) {
-    bg_x = 141 - bg_x;
-    bg_y = yg_y - 170;
+    bg_x = 160 - bg_x;
+    bg_y = yg_y - 172;
   }  
 
-  /*if (sig != 0) { //補正
-    x = (x*211800)/(140200+708*sqrt(x*x+28900));
-    y = (y*194600)/(140200+708*sqrt(y*y+28900));
-  }*/
+  if (sig != 0) { //補正
+  }
   if(y_sig != 0) {
     yg_x = -(yg_x*211800)/(140200+708*sqrt(yg_x*yg_x+28900));
     yg_y = (yg_y*194600)/(140200+708*sqrt(yg_y*yg_y+28900));
@@ -416,21 +414,19 @@ void keeper() {
   if (abs(gyro) <= 10) {
     digitalWrite(LED_BUILTIN, LOW);
     if (sig == 0) {
-      if (goal_y > 22) {
-        m = goal_x / goal_y - 22;
-        z = atan2(goal_x, goal_y - 22) + 3.14;
-        motorfunction(z, 45, -gyro);
+      if (goal_y > 18) {
+        z = atan2(goal_x, goal_y - 18) + 3.14;
+        motorfunction(z, 45, -gyro*3/2);
       } else {
         motorfunction(0, 0, 0);
       }
     } else {
-        if (abs(x) <= 7) {
-          motorfunction(0, 0, 0);
-        } else {
-          distance = 25 - goal_y;
-          az = atan2(x, distance);
-          motorfunction(az, abs(x), -gyro);
-        }
+      distance = y + 22;
+      if (distance > 32){
+        distance = 32;
+      }
+      az = atan2(x*2/3, distance - goal_y);
+      motorfunction(az, sqrt(x*x + y*y/4), -gyro*3/2);
     }
   } else {
     digitalWrite(LED_BUILTIN, HIGH);
@@ -504,7 +500,38 @@ void attacker() {
       } else {
         motorfunction(0, power, -gyro);
       }
-    } else {
+    }else if (ball_back <= 50) { // backドリブラの直近にボールがあればドリブラを回す
+      dribbler2(100);
+        if(ball_back <= 30){
+          if ( goal_sig == 0) {
+            //dribbler2(100);
+            motorfunction(0, power, -gyro);
+          } else {
+            if (goal_y <= (70-abs(goal_x)/10)) {
+              turnCW(goal_x*40);
+              digitalWrite(Kick_Dir, HIGH);
+              delay(400);
+              digitalWrite(Kicker, HIGH);
+              motorfunction(0,0,0);
+              dribbler2(0);
+              delay(1500);
+              digitalWrite(Kicker, LOW);
+              digitalWrite(Kick_Dir, LOW);
+            } else {
+              dribbler2(50);
+              if (abs(goal_x) < 5) {
+                motorfunction(0, 70, -gyro);
+              } else {
+                m = goal_y / goal_x;
+                z = atan(-m); // arc tangent of m
+                motorfunction(z, 2*abs(goal_x)+10, -gyro);
+              }
+            }
+          }
+        }else{
+          motorfunction(3.14, power,-gyro);
+        } 
+      } else {
       dribbler1(0);
       dribbler2(0);
       if (sig == 0) {      // No Ball found
