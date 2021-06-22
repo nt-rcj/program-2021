@@ -494,10 +494,9 @@ void attacker() {
           motorfunction(0, power, -gyro);
         } else {
           if (goal_y <= (80 - abs(goal_x) / 5)) {
-            dribbler1(0);
             digitalWrite(Kick_Dir, HIGH);
             digitalWrite(Kicker, HIGH);
-            
+            dribbler1(0);
             delay(1500);
             digitalWrite(Kicker, LOW);
           } else {
@@ -551,7 +550,7 @@ void attacker() {
         } else {
           if (y >= 40) {
             dribbler1(0);
-            m = x / (y - 40);
+            m = x / (y + 40);//-?
             z = atan(m); // arc tangent of m
             motorfunction(z, abs(x) + 20 , -gyro);
           } else {
