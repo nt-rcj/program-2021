@@ -510,7 +510,7 @@ void attacker() {
     } else if ((-20 <= y <= -10)  && (abs(x) < 5)) { // backドリブラの直近にボールがあればドリブラを回す
       dribbler2(100);
       if (ball_back <= 30) {
-        if ( goal_sig == 0) {
+        if ( goal_sig == 0) {//前に持ってくる
           //dribbler2(100);
           motorfunction(0, power, -gyro);
         } else {
