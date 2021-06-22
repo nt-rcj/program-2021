@@ -487,7 +487,7 @@ void attacker() {
 
   if (abs(gyro) < 20) {
     digitalWrite(LED_BUILTIN, LOW);
-    if ((10 <= y <= 20)  && (abs(x) < 5)) {
+    if ((0 <= y <= 20)  && (abs(x) < 5)) {
       dribbler1(100);
       if (y <= 5) {
         if ( goal_sig == 0) {
