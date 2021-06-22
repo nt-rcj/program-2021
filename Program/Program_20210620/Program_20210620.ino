@@ -168,13 +168,22 @@ void setup() {
   delay(1000);  //  ドリブラ・キッカーの動作チェック
   dribbler1(0);
   dribbler2(0);
-  delay(1500);
+  delay(500);
   dribbler1(0);
   dribbler2(0);
   delay(100);
-  digitalWrite(Kick1, HIGH);
+  digitalWrite(Kick_Dir, Low);
   delay(100);
-  digitalWrite(Kick1, LOW);
+  digitalWrite(Kicker, HIGH);
+  delay(100);
+  digitalWrite(Kicker, LOW);
+  delay(100);
+  digitalWrite(Kick_Dir, HIGH);
+  delay(100);
+  digitalWrite(Kicker, HIGH);
+  delay(100);
+  digitalWrite(Kicker, LOW);
+  delay(100);  
 
   Serial.println("Initialize 3 ...");
 
