@@ -166,8 +166,8 @@ void setup() {
   Serial.println("Initialize 2 ...");
 
   delay(1000);  //  ドリブラ・キッカーの動作チェック
-  dribbler1(0);
-  dribbler2(0);
+  dribbler1(100);
+  dribbler2(100);
   delay(500);
   dribbler1(0);
   dribbler2(0);
@@ -515,7 +515,7 @@ void attacker() {
       }
     } else if ((-50 <= y <= 0)  && (abs(x) < 5)) { // backドリブラの直近にボールがあればドリブラを回す
       dribbler2(100);
-      if (y <= 40) {
+      if (y >= -40) {
         if ( goal_sig == 0) {//前に持ってくる
           //dribbler2(100);
           motorfunction(0, power, -gyro);
