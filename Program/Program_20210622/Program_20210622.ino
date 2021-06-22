@@ -309,10 +309,10 @@ void loop() {
   Serial.print(ball_front);
   Serial.print(" ,tof_back=");
   Serial.print(ball_back);
-  Serial.print(" ,goal_x=")
-  Serial.print(goal_x)
-  Serial.print(" ,goal_y=")
-  Serial.print(goal_y)  
+  Serial.print(" ,goal_x=");
+  Serial.print(goal_x);
+  Serial.print(" ,goal_y=");
+  Serial.print(goal_y);  
   Serial.println();
 
   ball_back = ToF_back.readRangeSingleMillimeters();
