@@ -487,7 +487,7 @@ void attacker() {
 
   if (abs(gyro) < 20) {
     digitalWrite(LED_BUILTIN, LOW);
-    if (0 <= y <= 50 && abs(x) < 5) {
+    if (0 <= y && y <= 50 && abs(x) < 5) {
       dribbler1(100);
       if (y <= 40) {
         if ( goal_sig == 0) {
@@ -513,8 +513,8 @@ void attacker() {
       } else {
         motorfunction(0, power, -gyro);
       }
-    } else if (-50 <= y <= 0 && abs(x) < 5) { // backドリブラの直近にボールがあればドリブラを回す
-      //dribbler2(100);
+    } else if (-50 <= y && y <= 0 && abs(x) < 5) { // backドリブラの直近にボールがあればドリブラを回す
+      dribbler2(100);
       if (y >= -40) {
         if ( goal_sig == 0) {//前に持ってくる
           //dribbler2(100);
