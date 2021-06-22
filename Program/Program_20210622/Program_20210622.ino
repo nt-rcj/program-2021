@@ -275,7 +275,7 @@ void loop() {
   }
   if (b_sig != 0) {
     bg_x = 160 - bg_x;
-    bg_y = yg_y - 172;
+    bg_y = bg_y - 172;
   }
 
   if (sig != 0) { //補正
@@ -309,10 +309,10 @@ void loop() {
   Serial.print(ball_front);
   Serial.print(" ,tof_back=");
   Serial.print(ball_back);
-  Serial.print(" ,goal_x=");
-  Serial.print(goal_x);
-  Serial.print(" ,goal_y=");
-  Serial.print(goal_y);  
+  Serial.print(" ,bluegoal_x=");//青ゴールのx座標
+  Serial.print(bg_x);
+  Serial.print(" ,bluegoal_y="); //青ゴールのy座標
+  Serial.print(bg_y);  
   Serial.println();
 
   ball_back = ToF_back.readRangeSingleMillimeters();
