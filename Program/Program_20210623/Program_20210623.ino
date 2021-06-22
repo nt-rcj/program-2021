@@ -312,7 +312,7 @@ void loop() {
   Serial.print(" ,bluegoal_x=");//青ゴールのx座標
   Serial.print(bg_x);
   Serial.print(" ,bluegoal_y="); //青ゴールのy座標
-  Serial.print(bg_y);  
+  Serial.print(bg_y);
   Serial.println();
 
   ball_back = ToF_back.readRangeSingleMillimeters();
@@ -512,32 +512,39 @@ void attacker() {
       } else {
         motorfunction(0, power, -gyro);
       }
-    } else if (-55 <= y && y <= 0 && abs(x) < 5) { // backドリブラの直近にボールがあればドリブラを回す
+    } else if (-55 <= y && y <= 0) { // backドリブラの直近にボールがあればドリブラを回す
       dribbler2(100);
-      if (y >= -45) {
-        if ( goal_sig == 0) {//前に持ってくる
-          //dribbler2(100);
-          motorfunction(0, power, -gyro);
-        } else {
-          if (goal_y <= (80 - abs(goal_x) / 5)) {
-            turnCW(goal_x * 40);
-            digitalWrite(Kick_Dir, HIGH);
-            delay(400);
-            digitalWrite(Kicker, HIGH);
-            motorfunction(0, 0, 0);
-            dribbler2(0);
-            delay(1500);
-            digitalWrite(Kicker, LOW);
-            digitalWrite(Kick_Dir, LOW);
+      if (abs(x) < 5) {
+        if (y >= -45) {
+          if ( goal_sig == 0) {//前に持ってくる
+            //dribbler2(100);
+            motorfunction(0, power, -gyro);
           } else {
-            dribbler2(100);
+            if (goal_y <= (80 - abs(goal_x) / 5)) {
+              turnCW(goal_x * 40);
+              digitalWrite(Kick_Dir, HIGH);
+              delay(400);
+              digitalWrite(Kicker, HIGH);
+              motorfunction(0, 0, 0);
+              dribbler2(0);
+              delay(1500);
+              digitalWrite(Kicker, LOW);
+              digitalWrite(Kick_Dir, LOW);
+            } else {
+              dribbler2(100);
               m = (goal_x * 2) / goal_y;
               z = atan(m); // arc tangent of m
               motorfunction(z, (abs(goal_x) + abs(goal_y)) + 10, -gyro);
+            }
           }
+        } else {
+          motorfunction(3.14, 50, -gyro);
         }
       } else {
-        motorfunction(3.14, 50, -gyro);
+        dribbler1(0);
+        m = x / (y - 50);
+        z = atan(m) + PI; // arc tangent of m
+        motorfunction(z, abs(y) + 40, -gyro);
       }
     } else {
       dribbler1(0);
@@ -559,7 +566,7 @@ void attacker() {
                 dribbler1(0);
                 m = x / (y - 50);
                 z = atan(m) + PI; // arc tangent of m
-                motorfunction(z, abs(y) + 40, -gyro);                
+                motorfunction(z, abs(y) + 40, -gyro);
               } else {
                 dribbler1(0);
                 m = x / (y - 50);
