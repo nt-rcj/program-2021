@@ -531,14 +531,10 @@ void attacker() {
             digitalWrite(Kicker, LOW);
             digitalWrite(Kick_Dir, LOW);
           } else {
-            dribbler2(50);
-            if (abs(goal_x) < 5) {
-              motorfunction(0, 70, -gyro);
-            } else {
-              m = goal_y / goal_x;
-              z = atan(-m); // arc tangent of m
-              motorfunction(z, 2 * abs(goal_x) + 10, -gyro);
-            }
+            dribbler2(100);
+              m = (goal_x * 2) / goal_y;
+              z = atan(m); // arc tangent of m
+              motorfunction(z, (abs(goal_x) + abs(goal_y)) + 10, -gyro);
           }
         }
       } else {
