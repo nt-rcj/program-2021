@@ -76,10 +76,10 @@ def main():
         pitch = 50
 
         # 上下左右反転
-        for x in range(h):
-            map_x[x,:] = [(x*463700)/(140200+math.sqrt(x**2+28900)) for x in range(w)]
-        for x in range(w):
-            map_y[:,y] = [(y*463700)/(140200+math.sqrt(y**2+28900)) for y in range(h)]         
+        for i in range(h):
+            map_x[i,:] = [(x*463700)/(140200+math.sqrt(x**2+28900)) for x in range(w)]
+        for j in range(w):
+            map_y[:,j] = [(y*463700)/(140200+math.sqrt(y**2+28900)) for y in range(h)]         
 
 
 
