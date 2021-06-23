@@ -333,205 +333,210 @@ void loop() {
         delay(300);
       }
     }
-//main
-if(bg_x >= ?? && bg_y >= ??){//1
-  digitalWrite(LED_R, HIGH);
-}else{
-  digitalWrite(LED_R, LOW);
-}
-
-if(bg_x >= ?? && bg_y >= ??){//2
-  digitalWrite(LED_R, HIGH);
-}else{
-  digitalWrite(LED_R, LOW);
-}
-
-if(bg_x >= ?? && bg_y >= ??){//3
-  digitalWrite(LED_R, HIGH);
-}else{
-  digitalWrite(LED_R, LOW);
-}
-
-if(bg_x >= ?? && bg_y >= ??){//4
-  digitalWrite(LED_R, HIGH);
-}else{
-  digitalWrite(LED_R, LOW);
-}
-
-if(bg_x >= ?? && bg_y >= ??){//5
-  digitalWrite(LED_R, HIGH);
-}else{
-  digitalWrite(LED_R, LOW);
-}
-
-}
 
 
-//
-// **** end of main loop ******************************************************
-//
+    //----------------main-------------------
 
 
-int get_openMV_coordinate() { // get the coordinate data of orange ball
-  int i;
-  while (Serial3.available() != 0) { // buffer flush
-    Serial3.read();
+    if (bg_x >= 1 && bg_y >= 1 ) { //1
+      digitalWrite(LED_B, HIGH);
+    } else {
+      digitalWrite(LED_B, LOW);
+    }
+
+    if (yg_x >= 1 && yg_y >= 1 ) { //2
+      digitalWrite(LED_Y, HIGH);
+    } else {
+      digitalWrite(LED_Y, LOW);
+    }
+
+    if (bg_y >= 1 && yg_y >= 1 ) { //3_中央
+      digitalWrite(LED_R, HIGH);
+    } else {
+      digitalWrite(LED_R, LOW);
+    }
+
+    if (bg_x >= 1 && bg_y >= 1 ) { //4
+      digitalWrite(LED_G, HIGH);
+    } else {
+      digitalWrite(LED_G, LOW);
+    }
+
+    if (yg_x >= 1 && yg_y >= 1 ) { //5
+      digitalWrite(LED_R, HIGH);
+    } else {
+      digitalWrite(LED_R, LOW);
+    }
+
   }
-  while ((openMV[0] = getOpenMV()) != 254); // wait for "254"
-  for (i = 1; i < 39; i++) {
-    openMV[i] = getOpenMV();
+}  
+
+
+  //
+  // **** end of main loop ******************************************************
+  //
+
+
+  int get_openMV_coordinate() { // get the coordinate data of orange ball
+    int i;
+    while (Serial3.available() != 0) { // buffer flush
+      Serial3.read();
+    }
+    while ((openMV[0] = getOpenMV()) != 254); // wait for "254"
+    for (i = 1; i < 39; i++) {
+      openMV[i] = getOpenMV();
+    }
+    return openMV[0];
   }
-  return openMV[0];
-}
 
-int getOpenMV() { // get serial data from openMV
-  while (Serial3.available() == 0); // wait for serial data
-  return Serial3.read();
-}
+  int getOpenMV() { // get serial data from openMV
+    while (Serial3.available() == 0); // wait for serial data
+    return Serial3.read();
+  }
 
 
-//*****************************************************************************
-// interrupt handler
-// 割り込みの処理プログラム
-// Lineを踏んだらバックする
+  //*****************************************************************************
+  // interrupt handler
+  // 割り込みの処理プログラム
+  // Lineを踏んだらバックする
 
-void intHandle() {  // Lineを踏んだらlineflagをセットして止まる。
-  int power;
+  void intHandle() {  // Lineを踏んだらlineflagをセットして止まる。
+    int power;
 
-  if ( digitalRead(StartSW) == HIGH)  // スイッチがOFFなら何もしない。
+    if ( digitalRead(StartSW) == HIGH)  // スイッチがOFFなら何もしない。
+      return;
+    power = 30;
+
+    while (digitalRead(INT_29) == HIGH) {     // Lineセンサが反応している間は繰り返す
+      if (digitalRead(LINE1D) == HIGH) {     // lineを踏んだセンサーを調べる
+        back_Line1(power);        // Lineセンサと反対方向へ移動する
+        lineflag = true;          // set lineflag
+      } else if (digitalRead(LINE2D) == HIGH) {
+        back_Line2(power);
+        lineflag = true;          // set lineflag
+      } else if (digitalRead(LINE3D) == HIGH) {
+        back_Line3(power);
+        lineflag = true;          // set lineflag
+      } else if (digitalRead(LINE4D) == HIGH) {
+        back_Line4(power);
+        lineflag = true;          // set lineflag
+      }
+    }
+
+    if (lineflag == false)     // センサーの反応がない場合は何もしない
+      return;
+    lineflag = true;          // set lineflag
+    motorStop();                  // ラインから外れたらモーターstop
     return;
-  power = 30;
+  }
 
-  while (digitalRead(INT_29) == HIGH) {     // Lineセンサが反応している間は繰り返す
-    if (digitalRead(LINE1D) == HIGH) {     // lineを踏んだセンサーを調べる
-      back_Line1(power);        // Lineセンサと反対方向へ移動する
-      lineflag = true;          // set lineflag
-    } else if (digitalRead(LINE2D) == HIGH) {
-      back_Line2(power);
-      lineflag = true;          // set lineflag
-    } else if (digitalRead(LINE3D) == HIGH) {
-      back_Line3(power);
-      lineflag = true;          // set lineflag
-    } else if (digitalRead(LINE4D) == HIGH) {
-      back_Line4(power);
-      lineflag = true;          // set lineflag
+  void back_Line1(int power) {             // Lineセンサ1が反応しなくなるまで後ろに進む
+    float azimuth;
+    digitalWrite(LED_R, HIGH);  // LED_R点灯
+    while ((digitalRead(LINE1D) == HIGH) || (digitalRead(LINE5D) == HIGH) || (digitalRead(LINE3D) == HIGH)) {
+      if (digitalRead(LINE4D) == HIGH) {
+        azimuth = 3.14159 * 3.0 / 4.0;   // 後ろ方向(1+4)をradianに変換
+      } else if (digitalRead(LINE2D) == HIGH) {
+        azimuth = 3.14159 * 5.0 / 4.0;   // 後ろ方向(1+2)をradianに変換
+      } else {
+        azimuth = 3.14159 * 4.0 / 4.0;   // 後ろ方向(3)をradianに変換
+      }
+      motorfunction(azimuth, power, 0);  // azimuthの方向に進ませる
+    }
+    digitalWrite(LED_R, LOW);  // LED_R消灯
+    motorStop();
+  }
+
+  void back_Line2(int power) {             // Lineセンサ2が反応しなくなるまで左に進む
+    float azimuth;
+    digitalWrite(LED_Y, HIGH);  // LED_Y点灯
+    while ((digitalRead(LINE2D) == HIGH) || (digitalRead(LINE5D) == HIGH) || (digitalRead(LINE4D) == HIGH)) {
+      if (digitalRead(LINE1D) == HIGH) {
+        azimuth = 3.14159 * 5.0 / 4.0;   // 後ろ方向(2+1)をradianに変換
+      } else if (digitalRead(LINE3D) == HIGH) {
+        azimuth = 3.14159 * 7.0 / 4.0;   // 後ろ方向(2+3)をradianに変換
+      } else {
+        azimuth = 3.14159 * 6.0 / 4.0;   // 後ろ方向(4)をradianに変換
+      }
+      motorfunction(azimuth, power, 0);  // azimuthの方向に進ませる
+    }
+    digitalWrite(LED_Y, LOW);  // LED_Y消灯
+    motorStop();
+  }
+
+  void back_Line3(int power) {             // Lineセンサ3が反応しなくなるまで前に進む
+    float azimuth;
+    digitalWrite(LED_G, HIGH);  // LED_G点灯
+    while ((digitalRead(LINE3D) == HIGH) || (digitalRead(LINE5D) == HIGH) || (digitalRead(LINE1D) == HIGH)) {
+      if (digitalRead(LINE4D) == HIGH) {
+        azimuth = 3.14159 * 1.0 / 4.0;   // 後ろ方向(3+4)をradianに変換
+      } else if (digitalRead(LINE2D) == HIGH) {
+        azimuth = 3.14159 * 7.0 / 4.0;   // 後ろ方向(3+2)をradianに変換
+      } else {
+        azimuth = 3.14159 * 0.0 / 4.0;   // 後ろ方向(1)をradianに変換
+      }
+      motorfunction(azimuth, power, 0);  // azimuthの方向に進ませる
+    }
+    digitalWrite(LED_G, LOW);  // LED_G消灯
+    motorStop();
+  }
+
+  void back_Line4(int power) {             // Lineセンサ4が反応しなくなるまで右に進む
+    float azimuth;
+    digitalWrite(LED_B, HIGH);  // LED_B点灯
+    while ((digitalRead(LINE4D) == HIGH) || (digitalRead(LINE5D) == HIGH) || (digitalRead(LINE2D) == HIGH)) {
+      if (digitalRead(LINE3D) == HIGH) {
+        azimuth = 3.14159 * 1.0 / 4.0;   // 後ろ方向(4+3)をradianに変換
+      } else if (digitalRead(LINE1D) == HIGH) {
+        azimuth = 3.14159 * 3.0 / 4.0;   // 後ろ方向(4+1)をradianに変換
+      } else {
+        azimuth = 3.14159 * 2.0 / 4.0;   // 後ろ方向(2)をradianに変換
+      }
+      motorfunction(azimuth, power, 0);  // azimuthの方向に進ませる
+    }
+    digitalWrite(LED_B, LOW);  // LED_B消灯
+    motorStop();
+  }
+
+
+  //
+  //割り込みの処理プログラム終わり
+  //*****************************************************************************
+  //
+
+  //
+  //電池電圧を監視して電圧が下がったらOutOfBounceさせる処理**********************
+  //
+
+  float checkvoltage(float Vlow) {  // 電池電圧を監視する。
+    int voltage, limit;
+    limit = Vlow / 0.01811;
+    voltage = analogRead(Vbatt); // Get Volatge
+    if ( voltage < limit ) {      // 電圧が　Vlow以下であればemergencyをセットする。
+      emergency = true;
+      digitalWrite(SWG, LOW);
+      digitalWrite(SWR, LOW);
+
+    }
+    return voltage * 0.01811;
+  }
+
+  void doOutofbound() { // 強制的にOut of bounds させる。
+
+    detachInterrupt(5);   // Out of bounds するために割込みを禁止する
+    digitalWrite(LINE_LED, LOW); // ラインセンサのLEDを消灯
+
+    while (true) {  // 無限ループ
+      if ( digitalRead(StartSW) == LOW)
+        motorfunction(3.14159 / 2.0, 30, 0);
+      else          // スタートスイッチが切られたら止まる
+        motorfunction(3.14159 / 2.0, 0, 0);
+      digitalWrite(SWG, LOW);
+      digitalWrite(SWR, LOW);
+      delay(25);
+      digitalWrite(SWG, HIGH);
+      digitalWrite(SWR, HIGH);
+      delay(25);
+
     }
   }
-
-  if (lineflag == false)     // センサーの反応がない場合は何もしない
-    return;
-  lineflag = true;          // set lineflag
-  motorStop();                  // ラインから外れたらモーターstop
-  return;
-}
-
-void back_Line1(int power) {             // Lineセンサ1が反応しなくなるまで後ろに進む
-  float azimuth;
-  digitalWrite(LED_R, HIGH);  // LED_R点灯
-  while ((digitalRead(LINE1D) == HIGH) || (digitalRead(LINE5D) == HIGH) || (digitalRead(LINE3D) == HIGH)) {
-    if (digitalRead(LINE4D) == HIGH) {
-      azimuth = 3.14159 * 3.0 / 4.0;   // 後ろ方向(1+4)をradianに変換
-    } else if (digitalRead(LINE2D) == HIGH) {
-      azimuth = 3.14159 * 5.0 / 4.0;   // 後ろ方向(1+2)をradianに変換
-    } else {
-      azimuth = 3.14159 * 4.0 / 4.0;   // 後ろ方向(3)をradianに変換
-    }
-    motorfunction(azimuth, power, 0);  // azimuthの方向に進ませる
-  }
-  digitalWrite(LED_R, LOW);  // LED_R消灯
-  motorStop();
-}
-
-void back_Line2(int power) {             // Lineセンサ2が反応しなくなるまで左に進む
-  float azimuth;
-  digitalWrite(LED_Y, HIGH);  // LED_Y点灯
-  while ((digitalRead(LINE2D) == HIGH) || (digitalRead(LINE5D) == HIGH) || (digitalRead(LINE4D) == HIGH)) {
-    if (digitalRead(LINE1D) == HIGH) {
-      azimuth = 3.14159 * 5.0 / 4.0;   // 後ろ方向(2+1)をradianに変換
-    } else if (digitalRead(LINE3D) == HIGH) {
-      azimuth = 3.14159 * 7.0 / 4.0;   // 後ろ方向(2+3)をradianに変換
-    } else {
-      azimuth = 3.14159 * 6.0 / 4.0;   // 後ろ方向(4)をradianに変換
-    }
-    motorfunction(azimuth, power, 0);  // azimuthの方向に進ませる
-  }
-  digitalWrite(LED_Y, LOW);  // LED_Y消灯
-  motorStop();
-}
-
-void back_Line3(int power) {             // Lineセンサ3が反応しなくなるまで前に進む
-  float azimuth;
-  digitalWrite(LED_G, HIGH);  // LED_G点灯
-  while ((digitalRead(LINE3D) == HIGH) || (digitalRead(LINE5D) == HIGH) || (digitalRead(LINE1D) == HIGH)) {
-    if (digitalRead(LINE4D) == HIGH) {
-      azimuth = 3.14159 * 1.0 / 4.0;   // 後ろ方向(3+4)をradianに変換
-    } else if (digitalRead(LINE2D) == HIGH) {
-      azimuth = 3.14159 * 7.0 / 4.0;   // 後ろ方向(3+2)をradianに変換
-    } else {
-      azimuth = 3.14159 * 0.0 / 4.0;   // 後ろ方向(1)をradianに変換
-    }
-    motorfunction(azimuth, power, 0);  // azimuthの方向に進ませる
-  }
-  digitalWrite(LED_G, LOW);  // LED_G消灯
-  motorStop();
-}
-
-void back_Line4(int power) {             // Lineセンサ4が反応しなくなるまで右に進む
-  float azimuth;
-  digitalWrite(LED_B, HIGH);  // LED_B点灯
-  while ((digitalRead(LINE4D) == HIGH) || (digitalRead(LINE5D) == HIGH) || (digitalRead(LINE2D) == HIGH)) {
-    if (digitalRead(LINE3D) == HIGH) {
-      azimuth = 3.14159 * 1.0 / 4.0;   // 後ろ方向(4+3)をradianに変換
-    } else if (digitalRead(LINE1D) == HIGH) {
-      azimuth = 3.14159 * 3.0 / 4.0;   // 後ろ方向(4+1)をradianに変換
-    } else {
-      azimuth = 3.14159 * 2.0 / 4.0;   // 後ろ方向(2)をradianに変換
-    }
-    motorfunction(azimuth, power, 0);  // azimuthの方向に進ませる
-  }
-  digitalWrite(LED_B, LOW);  // LED_B消灯
-  motorStop();
-}
-
-
-//
-//割り込みの処理プログラム終わり
-//*****************************************************************************
-//
-
-//
-//電池電圧を監視して電圧が下がったらOutOfBounceさせる処理**********************
-//
-
-float checkvoltage(float Vlow) {  // 電池電圧を監視する。
-  int voltage, limit;
-  limit = Vlow / 0.01811;
-  voltage = analogRead(Vbatt); // Get Volatge
-  if ( voltage < limit ) {      // 電圧が　Vlow以下であればemergencyをセットする。
-    emergency = true;
-    digitalWrite(SWG, LOW);
-    digitalWrite(SWR, LOW);
-
-  }
-  return voltage * 0.01811;
-}
-
-void doOutofbound() { // 強制的にOut of bounds させる。
-
-  detachInterrupt(5);   // Out of bounds するために割込みを禁止する
-  digitalWrite(LINE_LED, LOW); // ラインセンサのLEDを消灯
-
-  while (true) {  // 無限ループ
-    if ( digitalRead(StartSW) == LOW)
-      motorfunction(3.14159 / 2.0, 30, 0);
-    else          // スタートスイッチが切られたら止まる
-      motorfunction(3.14159 / 2.0, 0, 0);
-    digitalWrite(SWG, LOW);
-    digitalWrite(SWR, LOW);
-    delay(25);
-    digitalWrite(SWG, HIGH);
-    digitalWrite(SWR, HIGH);
-    delay(25);
-
-  }
-}
