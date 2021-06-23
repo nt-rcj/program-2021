@@ -494,7 +494,7 @@ void attacker() {
           if ( goal_sig == 0) {
             motorfunction(0, power, -gyro);
           } else {
-            if (goal_y <= (70 - abs(goal_x) / 5)) {
+            if (goal_y <= (90 - abs(goal_x) / 5)) {
               digitalWrite(Kick_Dir, HIGH);
               digitalWrite(Kicker, HIGH);
               dribbler1(0);
@@ -527,7 +527,7 @@ void attacker() {
             //dribbler2(100);
             motorfunction(0, power, -gyro);
           } else {
-            if (goal_y <= (70 - abs(goal_x) / 5)) {//goqal_sig追加
+            if (goal_y <= (90 - abs(goal_x) / 5)) {//goqal_sig追加
               turnCW(goal_x * 40);
               digitalWrite(Kick_Dir, HIGH);
               delay(400);
