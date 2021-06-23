@@ -492,14 +492,14 @@ void attacker() {
     } else if (-65 <= y && y <= 0) { // backドリブラの直近にボールがあればドリブラを回す
       dribbler2(100);
       if (abs(x) < 5) {
-        if (y >= -40) {//つかんでいる
+        if (y >= -38) {//つかんでいる
           if ( goal_sig == 0) {//ゴールが見えないので前に持ってくる
             //dribbler2(100);
             motorfunction(0, power, -gyro);
           } else {
             if (goal_y <= (95 - abs(goal_x) / 5)) {//goal_sig追加
               turnCW(100);
-              delay(50);
+              delay(60);
               //digitalWrite(Kick_Dir, HIGH);
               //delay(400);
               //digitalWrite(Kicker, HIGH);
