@@ -266,16 +266,16 @@ void loop() {
   yg_area = yg_w * yg_h;      // 認識したブロックの面
 
   if (sig != 0) { //中心補正
-    x = 148 - x;
-    y = 83 - y;
+    x = 162 - x;
+    y = 120 - y;
   }
   if (y_sig != 0) {
-    yg_x = 141 - yg_x;
-    yg_y = yg_y - 170;
+    yg_x = 160 - yg_x;
+    yg_y = yg_y - 172;
   }
   if (b_sig != 0) {
-    bg_x = 141 - bg_x;
-    bg_y = yg_y - 170;
+    bg_x = 160 - bg_x;
+    bg_y = bg_y - 172;
   }
 
   /*if (sig != 0) { //補正
@@ -290,18 +290,6 @@ void loop() {
     bg_x = -(bg_x * 211800) / (140200 + 708 * sqrt(bg_x * bg_x + 28900));
     bg_y = (bg_y * 194600) / (140200 + 708 * sqrt(bg_y * bg_y + 28900));
   }
-
-  if (sig != 0) { //xbeedate生成
-    xbee_x = x;
-    xbee_y = y;
-  }
-  if (x == 4095) {
-    xbee_date = 255;
-  } else {
-    xbee_date = sqrt(xbee_x * xbee_x + xbee_y * xbee_y);
-  }
-
-  Serial1.write(xbee_date);// xbeeへ出力
 
   Serial.print("ball_x:");
   Serial.print(x);
