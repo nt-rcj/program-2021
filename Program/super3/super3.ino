@@ -428,14 +428,15 @@ void loop() {
           if (y >= 70) {
             motorfunction(0 , 80, -gyro);
           } else {
-            if (y >= 40) {
+            if (y >= 25) {//普通に追いかける(前)
               dribbler1(0);
-              m = x / (y - 40);
+              m = x / (y - 30);//-?
               z = atan(m); // arc tangent of m
-              motorfunction(z, abs(x) + 20 , -gyro);
+              motorfunction(z, abs(x) + 10, -gyro);
             } else {
               if (y < 0) {
-                if ( y <= -40) { //-40より後ろの場合
+                if ( y <= -25) { //-25より後ろの場合
+                  dribbler1(0);
                   if (x < 0) {
                     dribbler1(0);
                     m = (x + 50) / (y - 50);
@@ -449,15 +450,15 @@ void loop() {
                   }
                 } else {
                   dribbler1(0);
-                  m = x / (y - 50);
+                  m = x / (y - 30);
                   z = atan(m) + PI; // arc tangent of m
-                  motorfunction(z, abs(y) + 40, -gyro);
+                  motorfunction(z, abs(y), -gyro);
                 }
               } else {
                 dribbler1(0);
-                m = x / (y - 50);
+                m = x / (y - 30);
                 z = atan(m) + PI; // arc tangent of m
-                motorfunction(z, abs(y) + 40, -gyro);
+                motorfunction(z, abs(y), -gyro);
               }
             }
           }
