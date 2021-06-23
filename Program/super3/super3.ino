@@ -368,14 +368,14 @@ void loop() {
     if (abs(gyro) < 20) {
       digitalWrite(LED_BUILTIN, LOW);
       if (0 <= y && y <= 50) {//front
-        dribbler1(100);
+        //dribbler1(100);
         if (abs(x) < 5) {
           if (y <= 40) {
             if ( goal_sig == 0) {
               motorfunction(0, power, -gyro);
             } else {
               if (goal_y <= (85 - abs(goal_x) / 5)) {//goalからの距離で制限する
-                dribbler1(100);
+                //dribbler1(100);
                 if (goal_x <= abs(5)) {
                   digitalWrite(Kick_Dir, LOW);
                   dribbler1(0);
