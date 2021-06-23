@@ -172,7 +172,7 @@ void setup() {
   dribbler1(0);
   dribbler2(0);
   delay(100);
-  digitalWrite(Kick_Dir, Low);
+  digitalWrite(Kick_Dir, LOW);
   delay(100);
   digitalWrite(Kicker, HIGH);
   delay(100);
@@ -295,12 +295,10 @@ void loop() {
   Serial.print(x);
   Serial.print(" ,ball_y:");
   Serial.print(y);
-  Serial.print(" ygoal_x=");
-  Serial.print(yg_x);
-  Serial.print(" ygoal_y=");
-  Serial.print(yg_y);
-  Serial.print(" arctan=");
-  Serial.print(atan2(x, 30 - yg_y));
+  Serial.print(" bgoal_x=");
+  Serial.print(-bg_x);
+  Serial.print(" bgoal_y=");
+  Serial.print(-bg_y);
   Serial.println();
 
   ball_back = ToF_back.readRangeSingleMillimeters();
@@ -376,7 +374,7 @@ void loop() {
             if ( goal_sig == 0) {
               motorfunction(0, power, -gyro);
             } else {
-              if (goal_y <= (90 - abs(goal_x) / 5)) {//goalからの距離で制限する
+              if (goal_y <= (85 - abs(goal_x) / 5)) {//goalからの距離で制限する
                 dribbler1(100);
                 if (goal_x <= abs(5)) {
                   digitalWrite(Kick_Dir, LOW);
@@ -388,7 +386,7 @@ void loop() {
                 } else {
                   turnCW(goal_x + 10);
                 }
-              } else if (goal_y <= (90 - abs(goal_x) / 5)) { //ストッパー
+              } else if (goal_y <= (80 - abs(goal_x) / 5)) { //ストッパー
                 motorStop();
               } else {
                 if (goal_sig == 0) {
