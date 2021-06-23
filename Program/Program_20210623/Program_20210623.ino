@@ -487,40 +487,47 @@ void attacker() {
 
   if (abs(gyro) < 20) {
     digitalWrite(LED_BUILTIN, LOW);
-    if (0 <= y && y <= 50 && abs(x) < 5) {
+    if (0 <= y && y <= 50) {
       dribbler1(100);
-      if (y <= 40) {
-        if ( goal_sig == 0) {
-          motorfunction(0, power, -gyro);
-        } else {
-          if (goal_y <= (80 - abs(goal_x) / 5)) {
-            digitalWrite(Kick_Dir, HIGH);
-            digitalWrite(Kicker, HIGH);
-            dribbler1(0);
-            delay(1500);
-            digitalWrite(Kicker, LOW);
+      if (abs(x) < 5) {
+        if (y <= 40) {
+          if ( goal_sig == 0) {
+            motorfunction(0, power, -gyro);
           } else {
-            if (goal_sig == 0) {
-              motorfunction(0, 70, -gyro);
+            if (goal_y <= (70 - abs(goal_x) / 5)) {
+              digitalWrite(Kick_Dir, HIGH);
+              digitalWrite(Kicker, HIGH);
+              dribbler1(0);
+              delay(1500);
+              digitalWrite(Kicker, LOW);
             } else {
-              m = (goal_x * 2) / goal_y;
-              z = atan(m); // arc tangent of m
-              motorfunction(z, (abs(goal_x) + abs(goal_y)) + 10, -gyro);
+              if (goal_sig == 0) {
+                motorfunction(0, 70, -gyro);
+              } else {
+                m = (goal_x * 2) / goal_y;
+                z = atan(m); // arc tangent of m
+                motorfunction(z, (abs(goal_x) + abs(goal_y)) + 10, -gyro);
+              }
             }
           }
+        } else {
+          motorfunction(0, power, -gyro);
         }
       } else {
-        motorfunction(0, power, -gyro);
+        m = x / (y - 30);//-?
+        z = atan(m); // arc tangent of m
+        motorfunction(z, abs(x), -gyro);
+
       }
     } else if (-55 <= y && y <= 0) { // backドリブラの直近にボールがあればドリブラを回す
       dribbler2(100);
       if (abs(x) < 5) {
-        if (y >= -45) {
-          if ( goal_sig == 0) {//前に持ってくる
+        if (y >= -45) {//つかんでいる
+          if ( goal_sig == 0) {//ゴールが見えないので前に持ってくる
             //dribbler2(100);
             motorfunction(0, power, -gyro);
           } else {
-            if (goal_y <= (80 - abs(goal_x) / 5)) {
+            if (goal_y <= (70 - abs(goal_x) / 5)) {//goqal_sig追加
               turnCW(goal_x * 40);
               digitalWrite(Kick_Dir, HIGH);
               delay(400);
@@ -542,7 +549,7 @@ void attacker() {
         }
       } else {
         dribbler1(0);
-        m = x / (y - 50);
+        m = x / (y + 50);
         z = atan(m) + PI; // arc tangent of m
         motorfunction(z, abs(y) + 40, -gyro);
       }
@@ -555,29 +562,29 @@ void attacker() {
         if (y >= 70) {
           motorfunction(0 , 80, -gyro);
         } else {
-          if (y >= 40) {
+          if (y >= 25) {//普通に追いかける(前)
             dribbler1(0);
-            m = x / (y - 40);//-?
+            m = x / (y - 30);//-?
             z = atan(m); // arc tangent of m
-            motorfunction(z, abs(x) + 20 , -gyro);
+            motorfunction(z, abs(x), -gyro);
           } else {
             if (y < 0) {
-              if ( y <= -40) { //-40より後ろの場合
+              if ( y <= -25) { //-40より後ろの場合
                 dribbler1(0);
-                m = x / (y + 50);
+                m = x / (y + 30);
                 z = atan(m) + PI; // arc tangent of m
-                motorfunction(z, abs(y) + 40, -gyro);
+                motorfunction(z, abs(y), -gyro);
               } else {
                 dribbler1(0);
-                m = x / (y - 50);
+                m = x / (y - 30);
                 z = atan(m) + PI; // arc tangent of m
-                motorfunction(z, abs(y) + 40, -gyro);
+                motorfunction(z, abs(y), -gyro);
               }
             } else {
               dribbler1(0);
-              m = x / (y - 50);
+              m = x / (y - 30);
               z = atan(m) + PI; // arc tangent of m
-              motorfunction(z, abs(y) + 40, -gyro);
+              motorfunction(z, abs(y), -gyro);
             }
           }
         }
