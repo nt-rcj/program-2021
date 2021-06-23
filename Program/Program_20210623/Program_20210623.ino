@@ -557,14 +557,14 @@ void attacker() {
         } else {
           if (y >= 40) {
             dribbler1(0);
-            m = x / (y + 40);//-?
+            m = x / (y - 40);//-?
             z = atan(m); // arc tangent of m
             motorfunction(z, abs(x) + 20 , -gyro);
           } else {
             if (y < 0) {
               if ( y <= -40) { //-40より後ろの場合
                 dribbler1(0);
-                m = x / (y - 50);
+                m = x / (y + 50);
                 z = atan(m) + PI; // arc tangent of m
                 motorfunction(z, abs(y) + 40, -gyro);
               } else {
