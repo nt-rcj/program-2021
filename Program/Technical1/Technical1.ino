@@ -487,40 +487,8 @@ void attacker() {
 
   if (abs(gyro) < 20) {
     digitalWrite(LED_BUILTIN, LOW);
-    if (0 <= y && y <= 50) {//front
-      dribbler1(100);
-      if (abs(x) < 5) {
-        if (y <= 40) {
-          if ( goal_sig == 0) {
-            motorfunction(0, power, -gyro);
-          } else {
-            if (goal_y <= (90 - abs(goal_x) / 5)) {
-              dribbler1(100);
-              digitalWrite(Kick_Dir, LOW);
-              dribbler1(0);
-              delay(100);
-              digitalWrite(Kicker, HIGH);
-              delay(1500);
-              digitalWrite(Kicker, LOW);
-            } else {
-              if (goal_sig == 0) {
-                motorfunction(0, 70, -gyro);
-              } else {
-                m = (goal_x * 2) / goal_y;
-                z = atan(m); // arc tangent of m
-                motorfunction(z, abs(goal_x)/10 + abs(goal_y), -gyro);
-              }
-            }
-          }
-        } else {
-          motorfunction(0, 70, -gyro);
-        }
-      } else {
-        m = x / (y - 30);//-?
-        z = atan(m); // arc tangent of m
-        motorfunction(z, abs(x), -gyro);
-
-      }
+    if (0 <= y && y <= 1000) {//front
+        motorfunction(0, 70, -gyro);
     } else if (-65 <= y && y <= 0) { // backドリブラの直近にボールがあればドリブラを回す
       dribbler2(100);
       if (abs(x) < 5) {
@@ -544,7 +512,7 @@ void attacker() {
               dribbler2(100);
               m = ((goal_x + 30) * 2) / goal_y;
               z = atan(m); // arc tangent of m
-              motorfunction(z, abs(goal_x)/10 + (abs(goal_y) - 80)*2, -gyro);
+              motorfunction(z, abs(goal_x)/10 + (abs(goal_y) - 80)*5/2, -gyro);
             }
           }
         } else {
@@ -576,7 +544,7 @@ void attacker() {
                 dribbler1(0);
                 m = x / (y + 40);
                 z = atan(m) + PI; // arc tangent of m
-                motorfunction(z, abs(x) + abs(y)*2/3, -gyro);
+                motorfunction(z, abs(x) + abs(y)/2, -gyro);
               } else {
                 dribbler1(0);
                 m = x / (y - 30);
