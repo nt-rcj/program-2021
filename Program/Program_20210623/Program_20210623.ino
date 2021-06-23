@@ -487,7 +487,7 @@ void attacker() {
 
   if (abs(gyro) < 20) {
     digitalWrite(LED_BUILTIN, LOW);
-    if (0 <= y && y <= 50) {
+    if (0 <= y && y <= 50) {//front
       dribbler1(100);
       if (abs(x) < 5) {
         if (y <= 40) {
@@ -495,7 +495,9 @@ void attacker() {
             motorfunction(0, power, -gyro);
           } else {
             if (goal_y <= (90 - abs(goal_x) / 5)) {
+              dribbler1(100);
               digitalWrite(Kick_Dir, HIGH);
+              delay(100);
               digitalWrite(Kicker, HIGH);
               dribbler1(0);
               delay(1500);
@@ -566,7 +568,7 @@ void attacker() {
             dribbler1(0);
             m = x / (y - 30);//-?
             z = atan(m); // arc tangent of m
-            motorfunction(z, abs(x), -gyro);
+            motorfunction(z, abs(x)+10, -gyro);
           } else {
             if (y < 0) {
               if ( y <= -25) { //-40より後ろの場合
