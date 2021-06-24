@@ -350,7 +350,7 @@ void loop() {
                 if (bg_y <= 102) {//goalからの距離で制限する
                   dribbler1(100);
                   while (true) {
-                    if (bg_x <= abs(7)) {
+                    if (bg_x <= abs(5)) {
                       dribbler1(0);
                       digitalWrite(Kick_Dir, LOW);
                       delay(500);
@@ -358,13 +358,12 @@ void loop() {
                       delay(1500);
                       digitalWrite(Kicker, LOW);
                       break;
-                    } else if (bg_x < -7) {
+                    } else if (bg_x < -5) {
                       dribbler1(100);
-                      turnCCW(15);
-                    } else if (bg_x > 7) {
-                      dribbler1(100);
-                      turnCW(15);
+                      turnCCW(20);
                     } else {
+                      dribbler1(100);
+                      turnCW(20);
                     }
                   }
 
