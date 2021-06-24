@@ -340,7 +340,7 @@ void loop() {
 
 
     if (abs(gyro) < 20) {
-      if (yg_y >= 38) {
+      if (yg_y >= 36) {
         motorfunction(3.14, 30, -gyro);
       } else {
         digitalWrite(LED_BUILTIN, LOW);
@@ -351,7 +351,7 @@ void loop() {
               if ( b_sig == 0) {
                 motorfunction(0, power, -gyro);
               } else {
-                if (yg_y >= 36) {//goalからの距離で制限する
+                if (yg_y >= 34) {//goalからの距離で制限する
                   dribbler1(100);
                   motorfunction(0, 0, 0);
                   delay(600);
@@ -371,15 +371,14 @@ void loop() {
               motorfunction(0, 30, -gyro);
             }
           } else {
-            motorfunction(3.14,10,-gyro);
             //if (y >= 40) {
-              //m = x / (y - 30);//-?
-              //z = atan(m); // arc tangent of m
-              //motorfunction(z, abs(x) + 10, -gyro);
+            //m = x / (y - 30);//-?
+            //z = atan(m); // arc tangent of m
+            //motorfunction(z, abs(x) + 10, -gyro);
             //} else {
-              //m = x / (y - 30);
-              //z = atan(m) + PI; // arc tangent of m
-              //motorfunction(z, abs(y)+10, -gyro);
+            //m = x / (y - 30);
+            //z = atan(m) + PI; // arc tangent of m
+            //motorfunction(z, abs(y)+10, -gyro);
             //}
           }
         } else {
@@ -395,7 +394,7 @@ void loop() {
                 dribbler1(0);
                 m = x / (y - 40);//-?
                 z = atan(m); // arc tangent of m
-                motorfunction(z, abs(x) + 10, -gyro);
+                motorfunction(z, abs(x) + 20, -gyro);
               } else {
                 if (y < 0) {
                   if ( y <= -40) { //-25より後ろの場合
@@ -415,13 +414,13 @@ void loop() {
                     dribbler1(0);
                     m = x / (y - 40);
                     z = atan(m) + PI; // arc tangent of m
-                    motorfunction(z, abs(y), -gyro);
+                    motorfunction(z, abs(y) + 20, -gyro);
                   }
                 } else {
                   dribbler1(0);//なんかおかしい？
                   m = x / (y - 40);
                   z = atan(m) + PI; // arc tangent of m
-                  motorfunction(z, abs(y), -gyro);
+                  motorfunction(z, abs(y) + 20, -gyro);
                 }
               }
             }
