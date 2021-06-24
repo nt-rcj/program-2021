@@ -371,12 +371,12 @@ void loop() {
               motorfunction(0, 30, -gyro);
             }
           } else {
-            if (y >= 48) {
-              m = x / (y - 40);//-?
+            if (y >= 40) {
+              m = x / (y - 30);//-?
               z = atan(m); // arc tangent of m
               motorfunction(z, abs(x) + 10, -gyro);
             } else {
-              m = x / (y - 40);
+              m = x / (y - 30);
               z = atan(m) + PI; // arc tangent of m
               motorfunction(z, abs(y)+10, -gyro);
             }
