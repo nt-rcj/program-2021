@@ -429,40 +429,24 @@ void loop() {
         }else{
           if(y <= 0 && x <= 0){
             motorfunction(-PI/2*abs(y)/r, 30, -gyro);
-            digitalWrite(LED_R, HIGH);
-            digitalWrite(LED_Y, LOW);
-            digitalWrite(LED_G, LOW);
-            digitalWrite(LED_B, LOW);
             if(quadrant != 1){
               turn = turn + 1;
               quadrant = 1;
             }
           }else if(y <= 0 && 0 < x){
             motorfunction(-PI/2*abs(x)/r - PI/2, 30, -gyro);
-            digitalWrite(LED_R, LOW);
-            digitalWrite(LED_Y, HIGH);
-            digitalWrite(LED_G, LOW);
-            digitalWrite(LED_B, LOW);
             if(quadrant != 2){
               turn = turn + 1;
               quadrant = 2;
             }
           }else if(0 < y && 0 < x){
             motorfunction(PI - PI/2*abs(y)/r, 30, -gyro);
-            digitalWrite(LED_R, LOW);
-            digitalWrite(LED_Y, LOW);
-            digitalWrite(LED_G, HIGH);
-            digitalWrite(LED_B, LOW);
             if(quadrant != 3){
               turn = turn + 1;
               quadrant = 3;
             }
           }else{
             motorfunction(PI/2*(r - abs(x))/r, 30, -gyro);
-            digitalWrite(LED_R, LOW);
-            digitalWrite(LED_Y, LOW);
-            digitalWrite(LED_G, LOW);
-            digitalWrite(LED_B, HIGH);
             if(quadrant != 4){
               turn = turn + 1;
               quadrant = 4;
