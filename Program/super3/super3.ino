@@ -57,12 +57,8 @@ int blocks;
 int ball_x, ball_y;
 char buf[64];
 
-float az, AZ, d, k;
-float targetP, distance, pointP;
-float goal_dist;
-float angle, inroot;
-float divergence, RtoBdist;
-float speed, ballback;
+float r, quadrant, turn;
+float divergence, progress;
 int pixel;
 uint32_t color;
 
@@ -290,14 +286,12 @@ void loop() {
 
   Serial1.write(xbee_date);// xbeeへ出力
 
-  Serial.print("ball_x:");
+  Serial.print("x:");
   Serial.print(x);
-  Serial.print(" ,ball_y:");
+  Serial.print(" ,y:");
   Serial.print(y);
-  Serial.print(" ,tof_front=");
-  Serial.print(ball_front);
-  Serial.print(" ,tof_back=");
-  Serial.print(ball_back);
+  Serial.print(" ,turn=");
+  Serial.print(turn);
   Serial.print(" ,bluegoal_x=");//青ゴールのx座標
   Serial.print(bg_x);
   Serial.print(" ,bluegoal_y="); //青ゴールのy座標
@@ -335,21 +329,82 @@ void loop() {
 
 
     //----------------main-------------------
-    if(abs(gyro) < 6){
-      d = 50;
+    r = 60;
+    if(progress == 0){
+      divergence = 0;
       if(sig == 0){
-        motorfunction(0, 0, 0);
+        motorfunction(-PI/4, 40, -gyro*3/2);
       }else{
-        if(y <= 0 && x <= 0){
-          motorfunction(-PI/2*abs(y)/d, 60, -gyro);
-        }else if(y <= 0 && 0 < x){
-          motorfunction(-PI/2*abs(x)/d - PI/2, 60, -gyro);
-        }else if(0 < y && 0 < x){
-          motorfunction(PI - PI/2*abs(y)/d, 60, -gyro);
-        }else{
-          motorfunction(PI/2*(d - abs(x))/d, 60, -gyro);
+        m = atan2(x + r, (y + 7)*2);
+        motorfunction(m, 30, -gyro*3/2);
+        if(abs(x + r) < 5, abs(y + 7) < 5){
+          progress = 1;
         }
       }
+    }else if(progress == 1){
+      divergence = 1;
+      if(turn == 7){
+        progress = 2;
+        turn = 0;
+      }
+    }else{
+      divergence = 0;
+      motorfunction(0, 0, 0);
+    }
+
+    if(divergence == 1){
+      if(abs(gyro) < 6){
+        if(sig == 0){
+          motorfunction(0, 0, 0);
+        }else{
+          if(y <= 0 && x <= 0){
+            motorfunction(-PI/2*abs(y)/r, 20, -gyro*3/2);
+            digitalWrite(LED_R, HIGH);
+            digitalWrite(LED_Y, LOW);
+            digitalWrite(LED_G, LOW);
+            digitalWrite(LED_B, LOW);
+            if(quadrant != 1){
+              turn = turn + 1;
+              quadrant = 1;
+            }
+          }else if(y <= 0 && 0 < x){
+            motorfunction(-PI/2*abs(x)/r - PI/2, 20, -gyro*3/2);
+            digitalWrite(LED_R, LOW);
+            digitalWrite(LED_Y, HIGH);
+            digitalWrite(LED_G, LOW);
+            digitalWrite(LED_B, LOW);
+            if(quadrant != 2){
+              turn = turn + 1;
+              quadrant = 2;
+            }
+          }else if(0 < y && 0 < x){
+            motorfunction(PI - PI/2*abs(y)/r, 20, -gyro*3/2);
+            digitalWrite(LED_R, LOW);
+            digitalWrite(LED_Y, LOW);
+            digitalWrite(LED_G, HIGH);
+            digitalWrite(LED_B, LOW);
+            if(quadrant != 3){
+              turn = turn + 1;
+              quadrant = 3;
+            }
+          }else{
+            motorfunction(PI/2*(r - abs(x))/r, 20, -gyro*3/2);
+            digitalWrite(LED_R, LOW);
+            digitalWrite(LED_Y, LOW);
+            digitalWrite(LED_G, LOW);
+            digitalWrite(LED_B, HIGH);
+            if(quadrant != 4){
+              turn = turn + 1;
+              quadrant = 4;
+            }
+          }
+        }
+      }  
+    }else{
+      digitalWrite(LED_R, LOW);
+      digitalWrite(LED_Y, LOW);
+      digitalWrite(LED_G, LOW);
+      digitalWrite(LED_B, LOW);
     }
   //
   // **** end of main loop ******************************************************
@@ -361,6 +416,12 @@ void loop() {
     digitalWrite(LINE_LED, LOW); // ラインセンサのLEDを消灯
     digitalWrite(SWR, LOW);
     digitalWrite(SWG, HIGH);
+    digitalWrite(LED_R, LOW);
+    digitalWrite(LED_Y, LOW);
+    digitalWrite(LED_G, LOW);
+    digitalWrite(LED_B, LOW);
+    progress = 0;
+    turn = 0;
   }
 }
 
