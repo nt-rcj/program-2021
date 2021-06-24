@@ -348,26 +348,26 @@ void loop() {
         progress = 2;
       }
     }else if(progress == 2){//段階2
-        divergence = 0;//回らない
-        quadrant = 0;//回るところの定数初期化
-        turn = 0;//回るところの定数初期化
-        motorfunction(PI, 20, -gyro*3/2);
-        if(y < -10){
-          find = 1;// yが十分負であるとき、次のペットボトルを見つけたとする
-        }
-        if(abs(y) < 6 && find == 1){//ペットボトルの横に到達し、次のペットボトルを見つけていたら次の段階に進む
-          progress = 3;
-        }
+      divergence = 0;//回らない
+      quadrant = 0;//回るところの定数初期化
+      turn = 0;//回るところの定数初期化
+      motorfunction(PI, 20, -gyro*3/2);
+      if(y < -10){
+        find = 1;// yが十分負であるとき、次のペットボトルを見つけたとする
+      }
+      if(abs(y) < 6 && find == 1){//ペットボトルの横に到達し、次のペットボトルを見つけていたら次の段階に進む
+        progress = 3;
+      }
     }else if(progress = 3){//段階3
-        divergence = 1;//回る
-        find = 0;//探すところの初期化
-        if(turn == 6){//6回目に突入したら次の段階に進む
-          progress = 4;
-        }else{//段階4
-          divergence = 0;//回るところの定数初期化
-          turn = 0;//回るところの定数初期化
-          motorfunction(0, 0, 0);
-        }
+      divergence = 1;//回る
+      find = 0;//探すところの初期化
+      if(turn == 6){//6回目に突入したら次の段階に進む
+        progress = 4;
+      }
+    }else{//段階4
+        divergence = 0;//回るところの定数初期化
+        turn = 0;//回るところの定数初期化
+        motorfunction(0, 0, 0);
     }
 
     if(divergence == 1){
