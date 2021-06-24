@@ -350,24 +350,21 @@ void loop() {
                 if (bg_y <= 102) {//goalからの距離で制限する
                   motorfunction(0, 0, 0);
                   dribbler1(100);
-                  while (true) {
-                    if (bg_x <= abs(5)) {
-                      dribbler1(0);
-                      digitalWrite(Kick_Dir, LOW);
-                      delay(500);
-                      digitalWrite(Kicker, HIGH);
-                      delay(1500);
-                      digitalWrite(Kicker, LOW);
-                      break;
-                    } else if (bg_x < -5) {
-                      dribbler1(100);
-                      turnCCW(20);
-                    } else {
-                      dribbler1(100);
-                      turnCW(20);
-                    }
+                  if (bg_x <= abs(5)) {
+                    dribbler1(0);
+                    digitalWrite(Kick_Dir, LOW);
+                    delay(500);
+                    digitalWrite(Kicker, HIGH);
+                    delay(1500);
+                    digitalWrite(Kicker, LOW);
+                    break;
+                  } else if (bg_x < -5) {
+                    dribbler1(100);
+                    turnCCW(20);
+                  } else {
+                    dribbler1(100);
+                    turnCW(20);
                   }
-
                 } else {
                   m = bg_x / (bg_y - 100); //真ん中(0, 100)に向かう
                   z = atan(m); // arc tangent of m
