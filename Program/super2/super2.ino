@@ -302,6 +302,10 @@ void loop() {
   Serial.print(bg_x);
   Serial.print(" bgoal_y=");
   Serial.print(bg_y);
+  Serial.print(" ygoal_x=");
+  Serial.print(yg_x);
+  Serial.print(" ygoal_y=");
+  Serial.print(yg_y);
   Serial.println();
 
   ball_back = ToF_back.readRangeSingleMillimeters();
@@ -336,7 +340,7 @@ void loop() {
 
 
     if (abs(gyro) < 20) {
-      if (bg_y < 100) {
+      if (bg_y < 103) {
         motorfunction(3.14, 0, -gyro);
       } else {
         digitalWrite(LED_BUILTIN, LOW);
@@ -347,10 +351,10 @@ void loop() {
               if ( b_sig == 0) {
                 motorfunction(0, power, -gyro);
               } else {
-                if (bg_y <= 102) {//goalからの距離で制限する
-                  motorfunction(0, 0, 0);
+                if (yg_y >= 32) {//goalからの距離で制限する
                   dribbler1(100);
                   if (bg_x <= abs(5)) {
+                    motorfunction(0, 0, 0);
                     dribbler1(0);
                     digitalWrite(Kick_Dir, LOW);
                     delay(500);
@@ -365,7 +369,7 @@ void loop() {
                     turnCW(20);
                   }
                 } else {
-                  m = bg_x / (bg_y - 100); //真ん中(0, 100)に向かう
+                  m = bg_x / (bg_y - 100); //真ん中(0, 102)に向かう
                   z = atan(m); // arc tangent of m
                   motorfunction(z, 30, -gyro);//abs(goal_x) / 10 + abs(goal_y)
                 }
@@ -376,7 +380,7 @@ void loop() {
           } else {
             m = x / (y - 30);//-?
             z = atan(m); // arc tangent of m
-            motorfunction(z, abs(x), -gyro);
+            motorfunction(z, abs(x) + 10, -gyro);
 
           }
         } else {
