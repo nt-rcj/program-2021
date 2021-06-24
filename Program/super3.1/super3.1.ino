@@ -291,11 +291,13 @@ void loop() {
   Serial.print(x);
   Serial.print(" ,y:");
   Serial.print(y);
-  Serial.print(" ,turn=");
-  Serial.print(turn);
-  Serial.print(" ,bluegoal_x=");//青ゴールのx座標
+  Serial.print(" ,ygoal_x=");//青ゴールのx座標
+  Serial.print(yg_x);
+  Serial.print(" ,ygoal_y="); //青ゴールのy座標
+  Serial.print(yg_y);
+  Serial.print(" ,bgoal_x=");//青ゴールのx座標
   Serial.print(bg_x);
-  Serial.print(" ,bluegoal_y="); //青ゴールのy座標
+  Serial.print(" ,bgoal_y="); //青ゴールのy座標
   Serial.print(bg_y);
   Serial.println();
 
@@ -331,96 +333,96 @@ void loop() {
 
     //----------------main-------------------
     r = 60;
-    if(progress == 0){//段階0
-      divergence = 0;//回らない
-      if(sig == 0 || 0 < x || y < 0){
-        motorfunction(-PI/8, 40, -gyro*3/2);//ボールが見えないときは、特定の方向に進む
-      }else{
-        m = atan2(x + r, (y + 7)*2);//ペットボトルの右側、少し奥側行くようにする
-        motorfunction(m, 30, -gyro*3/2);
-        find = 1;
-      }
-      if((abs(y) + 2) < 6 && find == 1){//近くに来たら次の段階に進む
-        progress = 1;
-      }
-    }else if(progress == 1){//段階1
-      divergence = 1;//回る
-      find = 0; //探すところの初期化
-      if(turn == 7){//7回目に突入したら次の段階に進む
-        progress = 2;
-      }
-    }else if(progress == 2){//段階2
-      divergence = 0;//回らない
-      quadrant = 0;//回るところの定数初期化
-      turn = 0;//回るところの定数初期化
-      motorfunction(PI, 20, -gyro*3/2);
-      if(y < -10){
-        find = 1;// yが十分負であるとき、次のペットボトルを見つけたとする
-      }
-      if(abs(y) < 6 && find == 1){//ペットボトルの横に到達し、次のペットボトルを見つけていたら次の段階に進む
-        progress = 3;
-      }
-    }else if(progress == 3){//段階3
-      divergence = 1;//回る
-      find = 0;//探すところの初期化
-      if(turn == 6){//6回目に突入したら次の段階に進む
-        progress = 4;
-      }
-    }else if(progress == 4) {//段階4
+    if(abs(gyro) < 4){
+      if(progress == 0){//段階0
+        divergence = 0;//回らない
+        if(sig == 0 || 0 < x || y < 0){
+          motorfunction(-PI/8, 40, -gyro);//ボールが見えないときは、特定の方向に進む
+        }else{
+          m = atan2(x + 60, (y + 7)*2);//ペットボトルの右側、少し奥側行くようにする
+          motorfunction(m, 20, -gyro);
+          find = 1;
+        }
+        if((abs(y) + 2) < 6 && find == 1){//近くに来たら次の段階に進む
+          progress = 1;
+        }
+      }else if(progress == 1){//段階1
+        divergence = 1;//回る
+        find = 0; //探すところの初期化
+          if(turn == 7){//7回目に突入したら次の段階に進む
+          progress = 2;
+        }
+      }else if(progress == 2){//段階2
         divergence = 0;//回らない
         quadrant = 0;//回るところの定数初期化
         turn = 0;//回るところの定数初期化
-        motorfunction(PI/2, 20, -gyro*3/2);
-        if(10 < x && x < 4000){
-          find = 1;//xが十分正で、見つけている(x≠4096)の時、次のペットボトルを見つけたとする
+        motorfunction(PI, 20, -gyro);
+        if(y < -10){
+          find = 1;// yが十分負であるとき、次のペットボトルを見つけたとする
         }
-        if(abs(x) < 6 && find == 1){//ペットボトルの横に到達し、次のペットボトルを見つけていたら次の段階に進む
-          progress = 5;
+        if(abs(y) < 6 && find == 1){//ペットボトルの横に到達し、次のペットボトルを見つけていたら次の段階に進む
+          progress = 3;
         }
-    }else if(progress == 5) {//段階5
-      divergence = 1;//回る
-      find = 0;//探すところの初期化
-      if(turn == 6){//6回目に突入したら次の段階に進む
-        progress = 6;
+      }else if(progress == 3){//段階3
+        divergence = 1;//回る
+        find = 0;//探すところの初期化
+        if(turn == 6){//6回目に突入したら次の段階に進む
+          progress = 4;
+        }
+      }else if(progress == 4) {//段階4
+          divergence = 0;//回らない
+          quadrant = 0;//回るところの定数初期化
+          turn = 0;//回るところの定数初期化
+          motorfunction(PI/2, 20, -gyro);
+          if(10 < x && x < 4000){
+            find = 1;//xが十分正で、見つけている(x≠4096)の時、次のペットボトルを見つけたとする
+          }
+          if(abs(x) < 6 && find == 1){//ペットボトルの横に到達し、次のペットボトルを見つけていたら次の段階に進む
+            progress = 5;
+          }
+      }else if(progress == 5) {//段階5
+        divergence = 1;//回る
+        find = 0;//探すところの初期化
+        if(turn == 6){//6回目に突入したら次の段階に進む
+          progress = 6;
+        }
+      }else if(progress == 6){//段階6
+        divergence = 0;//回らない
+        quadrant = 0;//回るところの定数初期化
+        turn = 0;//回るところの定数初期化
+        motorfunction(0, 40, -gyro);
+        if(10 < y && y != 4096){
+          find = 1;//yが十分正で、見つけている(y≠4096)の時、次のペットボトルを見つけたとする
+        }
+        if(abs(y) < 6 && find == 1){//ペットボトルの横に到達し、次のペットボトルを見つけていたら次の段階に進む
+          progress = 7;
+        }      
+      }else if(progress == 7){//段階7
+        divergence = 1;//回る
+        find = 0;//探すところの初期化
+        if(turn == 7){//6回目に突入したら次の段階に進む
+          progress = 8;
+        }
+      }else if(progress == 8){//段階8
+        divergence = 0;//回らない
+        quadrant = 0;//回るところの定数初期化
+        turn = 0;//回るところの定数初期化
+        m = -3*PI/4;
+        motorfunction(m, 40, -gyro);//真ん中に戻る
+        if(abs(yg_x) < 5){//真ん中に戻ったとする条件
+          progress == 9;//終わり
+        }
+      }else{
+        divergence = 0;//回らない
+        motorfunction(0, 0, 0);//停止
       }
-    }else if(progress == 6){//段階6
-      divergence = 0;//回らない
-      quadrant = 0;//回るところの定数初期化
-      turn = 0;//回るところの定数初期化
-      motorfunction(0, 20, -gyro*3/2);
-      if(10 < y && y != 4096){
-        find = 1;//yが十分正で、見つけている(y≠4096)の時、次のペットボトルを見つけたとする
-      }
-      if(abs(y) < 6 && find == 1){//ペットボトルの横に到達し、次のペットボトルを見つけていたら次の段階に進む
-        progress = 7;
-      }      
-    }else if(progress == 7){//段階7
-      divergence = 1;//回る
-      find = 0;//探すところの初期化
-      if(turn == 7){//6回目に突入したら次の段階に進む
-        progress = 8;
-      }
-    }else if(progress == 8){//段階8
-      divergence = 0;//回らない
-      quadrant = 0;//回るところの定数初期化
-      turn = 0;//回るところの定数初期化
-      m = atan2(1,1);
-      motorfunction(m, 20, -gyro*3/2);//真ん中に戻る
-      if(abs(x) < 1 && abs(y) < 1){//真ん中に戻ったとする条件
-        progress == 9;//終わり
-      }
-    }else{
-      divergence = 0;//回らない
-      motorfunction(0, 0, 0);//停止
-    }
-
-    if(divergence == 1){
-      if(abs(gyro) < 6){
+      
+      if(divergence == 1){
         if(sig == 0){
           motorfunction(0, 0, 0);
         }else{
           if(y <= 0 && x <= 0){
-            motorfunction(-PI/2*abs(y)/r, 20, -gyro*3/2);
+            motorfunction(-PI/2*abs(y)/r, 20, -gyro);
             digitalWrite(LED_R, HIGH);
             digitalWrite(LED_Y, LOW);
             digitalWrite(LED_G, LOW);
@@ -430,7 +432,7 @@ void loop() {
               quadrant = 1;
             }
           }else if(y <= 0 && 0 < x){
-            motorfunction(-PI/2*abs(x)/r - PI/2, 20, -gyro*3/2);
+            motorfunction(-PI/2*abs(x)/r - PI/2, 20, -gyro);
             digitalWrite(LED_R, LOW);
             digitalWrite(LED_Y, HIGH);
             digitalWrite(LED_G, LOW);
@@ -440,7 +442,7 @@ void loop() {
               quadrant = 2;
             }
           }else if(0 < y && 0 < x){
-            motorfunction(PI - PI/2*abs(y)/r, 20, -gyro*3/2);
+            motorfunction(PI - PI/2*abs(y)/r, 20, -gyro);
             digitalWrite(LED_R, LOW);
             digitalWrite(LED_Y, LOW);
             digitalWrite(LED_G, HIGH);
@@ -450,7 +452,7 @@ void loop() {
               quadrant = 3;
             }
           }else{
-            motorfunction(PI/2*(r - abs(x))/r, 20, -gyro*3/2);
+            motorfunction(PI/2*(r - abs(x))/r, 20, -gyro);
             digitalWrite(LED_R, LOW);
             digitalWrite(LED_Y, LOW);
             digitalWrite(LED_G, LOW);
@@ -461,16 +463,25 @@ void loop() {
             }
           }
         }
-      }  
-    }else{
-      digitalWrite(LED_R, LOW);
-      digitalWrite(LED_Y, LOW);
-      digitalWrite(LED_G, LOW);
-      digitalWrite(LED_B, LOW);
-    }
+      }else{
+        digitalWrite(LED_R, LOW);
+        digitalWrite(LED_Y, LOW);
+        digitalWrite(LED_G, LOW);
+        digitalWrite(LED_B, LOW);
+      }
   //
   // **** end of main loop ******************************************************
   //
+    }else{
+      digitalWrite(LED_BUILTIN, HIGH);
+      power = abs(gyro);   //  モーターの速度をgyroにする
+      if (gyro > 0) {         // Ball is 1st quadrant
+        turnCCW(power);
+      } else if (gyro < 0) {  // 2nd quadrant
+        turnCCW(-power);
+      } else {
+      }
+    }
   }else{
     motorFree();
     dribbler1(0);
