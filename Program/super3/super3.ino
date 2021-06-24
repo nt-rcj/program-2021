@@ -346,10 +346,21 @@ void loop() {
       if(turn == 7){
         progress = 2;
       }
+    }else if(progress == 2){
+        divergence = 0;
+        turn = 0;
+        if(y < -20){
+            m = atan2(x - r, (y - 7)*2);
+            motorfunction(m, 30, -gyro*3/2);
+        }else{
+            motorfunction(PI, 40, -gyro*3/2);
+        }
+        if(abs(x - r) < 5, abs(y - 7) < 5){
+          progress = 3;
+        }
     }else{
-      divergence = 0;
-      turn = 0;
-      motorfunction(0, 0, 0);
+        divergence = 0;
+        motorfunction(0, 0, 0);
     }
 
     if(divergence == 1){
