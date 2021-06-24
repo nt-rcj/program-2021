@@ -331,39 +331,43 @@ void loop() {
 
     //----------------main-------------------
     r = 60;
-    if(progress == 0){
-      divergence = 0;
+    if(progress == 0){//段階0
+      divergence = 0;//回らない
       if(sig == 0){
-        motorfunction(-PI/6, 40, -gyro*3/2);
+        motorfunction(-PI/8, 40, -gyro*3/2);//ボールが見えないときは、特定の方向に進む
       }else{
-        m = atan2(x + r, (y + 7)*2);
+        m = atan2(x + r, (y + 7)*2);//ペットボトルの右側、少し奥側行くようにする
         motorfunction(m, 30, -gyro*3/2);
-        if(abs(x + r) < 5, abs(y + 7) < 5){
+        if(abs(x + r) < 5, abs(y + 7) < 5){//近くに来たら次の段階に進む
           progress = 1;
         }
       }
-    }else if(progress == 1){
-      divergence = 1;
-      if(turn == 7){
+    }else if(progress == 1){//段階1
+      divergence = 1;//回る
+      if(turn == 7){//7回目に突入したら次の段階に進む
         progress = 2;
       }
-    }else if(progress == 2){
-        divergence = 0;
-        turn = 0;
-        if(y < -20){
-          find = 1;
-          m = atan2(x - r, (y - 7)*2);
-          motorfunction(m, 30, -gyro*3/2);
-        }else{
-          motorfunction(PI, 40, -gyro*3/2);
+    }else if(progress == 2){//段階2
+        divergence = 0;//回らない
+        quadrant = 0;//回るところの定数初期化
+        turn = 0;//回るところの定数初期化
+        motorfunction(PI, 20, -gyro*3/2);
+        if(y < -10){
+          find = 1;// yが十分負であるとき、次のペットボトルを見つけたとする
         }
-        if(abs(x - r) < 5 && abs(y - 7) < 5 && find == 1){
+        if(abs(y) < 6 && find == 1){//ペットボトルの横に到達し、次のペットボトルを見つけていたら次の段階に進む
           progress = 3;
         }
-    }else{
-        divergence = 0;
-        find = 0;
-        motorfunction(0, 0, 0);
+    }else if(progress = 3){//段階3
+        divergence = 1;//回る
+        find = 0;//探すところの初期化
+        if(turn == 6){//6回目に突入したら次の段階に進む
+          progress = 4;
+        }else{//段階4
+          divergence = 0;//回るところの定数初期化
+          turn = 0;//回るところの定数初期化
+          motorfunction(0, 0, 0);
+        }
     }
 
     if(divergence == 1){
