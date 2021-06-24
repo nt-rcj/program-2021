@@ -59,6 +59,7 @@ char buf[64];
 
 float r, quadrant, turn;
 float divergence, progress;
+float find;
 int pixel;
 uint32_t color;
 
@@ -333,7 +334,7 @@ void loop() {
     if(progress == 0){
       divergence = 0;
       if(sig == 0){
-        motorfunction(-PI/4, 40, -gyro*3/2);
+        motorfunction(-PI/6, 40, -gyro*3/2);
       }else{
         m = atan2(x + r, (y + 7)*2);
         motorfunction(m, 30, -gyro*3/2);
@@ -350,16 +351,18 @@ void loop() {
         divergence = 0;
         turn = 0;
         if(y < -20){
-            m = atan2(x - r, (y - 7)*2);
-            motorfunction(m, 30, -gyro*3/2);
+          find = 1;
+          m = atan2(x - r, (y - 7)*2);
+          motorfunction(m, 30, -gyro*3/2);
         }else{
-            motorfunction(PI, 40, -gyro*3/2);
+          motorfunction(PI, 40, -gyro*3/2);
         }
-        if(abs(x - r) < 5, abs(y - 7) < 5){
+        if(abs(x - r) < 5 && abs(y - 7) < 5 && find == 1){
           progress = 3;
         }
     }else{
         divergence = 0;
+        find = 0;
         motorfunction(0, 0, 0);
     }
 
