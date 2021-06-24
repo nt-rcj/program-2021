@@ -379,20 +379,37 @@ void loop() {
               } else {
                 if (goal_y <= 105) {//goalからの距離で制限する
                   dribbler1(100);
-                  if (goal_x <= abs(5)) {
+                    if (goal_x <= abs(2)) {
                     dribbler1(0);
                     digitalWrite(Kick_Dir, LOW);
                     delay(500);
                     digitalWrite(Kicker, HIGH);
                     delay(1500);
                     digitalWrite(Kicker, LOW);
-                  } else {
-                    if (goal_x < 0) {
+                    }else if (goal_x <= -2){
+                      dribbler1(100);  
                       turnCCW(20);
-                    } else {
+                      delay(500);
+                    dribbler1(0);
+                    digitalWrite(Kick_Dir, LOW);
+                    delay(500);
+                    digitalWrite(Kicker, HIGH);
+                    delay(1500);
+                    digitalWrite(Kicker, LOW);
+                    delay(1500);
+                    }else if (goal_x >= 2){
+                      dribbler1(100);  
                       turnCW(20);
+                      delay(500);
+                    dribbler1(0);
+                    digitalWrite(Kick_Dir, LOW);
+                    delay(500);
+                    digitalWrite(Kicker, HIGH);
+                    delay(1500);
+                    digitalWrite(Kicker, LOW);
+                    delay(1500);
+                    } else {
                     }
-                  }
                 } else {
                   if (goal_sig == 0) {
                     motorfunction(0, 70, -gyro);
