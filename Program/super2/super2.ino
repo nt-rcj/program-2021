@@ -343,9 +343,9 @@ void loop() {
         if (0 <= y && y <= 50) {//front
           dribbler1(100);
           if (abs(x) <= 5) {
-            if (y <= 45) {
+            if (y <= 45) { //ボールを保持
               if ( b_sig == 0) {
-                motorfunction(0, power, -gyro);
+                //motorfunction(0, power, -gyro);
               } else {
                 if (bg_y <= 102) {//goalからの距離で制限する
                   dribbler1(100);
@@ -370,7 +370,7 @@ void loop() {
 
                 } else {
                   if (b_sig == 0) {
-                    motorfunction(0, 50, -gyro);
+                    //motorfunction(0, 50, -gyro);
                   } else {
                     m = bg_x / bg_y;
                     z = atan(m); // arc tangent of m
