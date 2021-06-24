@@ -371,15 +371,16 @@ void loop() {
               motorfunction(0, 30, -gyro);
             }
           } else {
-            if (y >= 40) {
-              m = x / (y - 30);//-?
-              z = atan(m); // arc tangent of m
-              motorfunction(z, abs(x) + 10, -gyro);
-            } else {
-              m = x / (y - 30);
-              z = atan(m) + PI; // arc tangent of m
-              motorfunction(z, abs(y)+10, -gyro);
-            }
+            motorfunction(3.14,10,-gyro);
+            //if (y >= 40) {
+              //m = x / (y - 30);//-?
+              //z = atan(m); // arc tangent of m
+              //motorfunction(z, abs(x) + 10, -gyro);
+            //} else {
+              //m = x / (y - 30);
+              //z = atan(m) + PI; // arc tangent of m
+              //motorfunction(z, abs(y)+10, -gyro);
+            //}
           }
         } else {
           dribbler1(0);
