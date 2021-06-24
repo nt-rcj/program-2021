@@ -340,7 +340,7 @@ void loop() {
 
 
     if (abs(gyro) < 20) {
-      if (bg_y < 103) {
+      if (yg_y >= 36) {
         motorfunction(3.14, 30, -gyro);
       } else {
         digitalWrite(LED_BUILTIN, LOW);
