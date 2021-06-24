@@ -366,99 +366,105 @@ void loop() {
 
 
     if (abs(gyro) < 20) {
-      digitalWrite(LED_BUILTIN, LOW);
-      if (0 <= y && y <= 50) {//front
-        dribbler1(100);
-        if (abs(x) < 5) {
-          if (y <= 45) {
-            if ( goal_sig == 0) {
-              motorfunction(0, power, -gyro);
-            } else {
-              if (goal_y <= 105) {//goalからの距離で制限する
-                dribbler1(100);
-                if (goal_x <= abs(5)) {
-                  dribbler1(0);
-                  digitalWrite(Kick_Dir, LOW);
-                  delay(500);
-                  digitalWrite(Kicker, HIGH);
-                  delay(1500);
-                  digitalWrite(Kicker, LOW);
-                } else {
-                  turnCW(goal_x);
-                }
-             // } else if (goal_y <= 101.5) { //ストッパー
-                //motorStop();
-              } else {
-                if (goal_sig == 0) {
-                  motorfunction(0, 70, -gyro);
-                } else {
-                  m = (goal_x * 2) / goal_y;
-                  z = atan(m); // arc tangent of m
-                  motorfunction(z, 30, -gyro);//abs(goal_x) / 10 + abs(goal_y)
-                }
-              }
-            }
-          } else {
-            motorfunction(0, 30, -gyro);
-          }
-        } else {
-          m = x / (y - 30);//-?
-          z = atan(m); // arc tangent of m
-          motorfunction(z, abs(x), -gyro);
-
-        }
+      if (goal_y <= 102) {
+        motorfunction(3.14, 80, -gyro);
       } else {
-        dribbler1(0);
-        dribbler2(0);
-        if (sig == 0) {      // No Ball found
-          motorfunction(0, 0, 0);
-        } else {                // Ball find
-          if (y >= 70) {
-            motorfunction(0 , 80, -gyro);
-          } else {
-            if (y >= 25) {//普通に追いかける(前)
-              dribbler1(0);
-              m = x / (y - 30);//-?
-              z = atan(m); // arc tangent of m
-              motorfunction(z, abs(x) + 10, -gyro);
-            } else {
-              if (y < 0) {
-                if ( y <= -25) { //-25より後ろの場合
-                  dribbler1(0);
-                  if (x < 0) {
+        digitalWrite(LED_BUILTIN, LOW);
+        if (0 <= y && y <= 50) {//front
+          dribbler1(100);
+          if (abs(x) < 5) {
+            if (y <= 45) {
+              if ( goal_sig == 0) {
+                motorfunction(0, power, -gyro);
+              } else {
+                if (goal_y <= 105) {//goalからの距離で制限する
+                  dribbler1(100);
+                  if (goal_x <= abs(5)) {
                     dribbler1(0);
-                    m = (x + 50) / (y - 50);
-                    z = atan(m) + PI; // arc tangent of m
-                    motorfunction(z, abs(y) + 40, -gyro);
+                    digitalWrite(Kick_Dir, LOW);
+                    delay(500);
+                    digitalWrite(Kicker, HIGH);
+                    delay(1500);
+                    digitalWrite(Kicker, LOW);
                   } else {
-                    dribbler1(0);
-                    m = (x - 50) / (y - 50);
-                    z = atan(m) + PI; // arc tangent of m
-                    motorfunction(z, abs(y) + 40, -gyro);
+                    if (goal_x < 0) {
+                      turnCW(20);
+                    } else {
+                      turnCCW(20);
+                    }
                   }
                 } else {
-                  dribbler1(0);
+                  if (goal_sig == 0) {
+                    motorfunction(0, 70, -gyro);
+                  } else {
+                    m = (goal_x * 2) / goal_y;
+                    z = atan(m); // arc tangent of m
+                    motorfunction(z, 30, -gyro);//abs(goal_x) / 10 + abs(goal_y)
+                  }
+                }
+              }
+            } else {
+              motorfunction(0, 30, -gyro);
+            }
+          } else {
+            m = x / (y - 30);//-?
+            z = atan(m); // arc tangent of m
+            motorfunction(z, abs(x), -gyro);
+
+          }
+        } else {
+          dribbler1(0);
+          dribbler2(0);
+          if (sig == 0) {      // No Ball found
+            motorfunction(0, 0, 0);
+          } else {                // Ball find
+            if (y >= 70) {
+              motorfunction(0 , 80, -gyro);
+            } else {
+              if (y >= 25) {//普通に追いかける(前)
+                dribbler1(0);
+                m = x / (y - 30);//-?
+                z = atan(m); // arc tangent of m
+                motorfunction(z, abs(x) + 10, -gyro);
+              } else {
+                if (y < 0) {
+                  if ( y <= -25) { //-25より後ろの場合
+                    dribbler1(0);
+                    if (x < 0) {
+                      dribbler1(0);
+                      m = (x + 50) / (y - 50);
+                      z = atan(m) + PI; // arc tangent of m
+                      motorfunction(z, abs(y) + 40, -gyro);
+                    } else {
+                      dribbler1(0);
+                      m = (x - 50) / (y - 50);
+                      z = atan(m) + PI; // arc tangent of m
+                      motorfunction(z, abs(y) + 40, -gyro);
+                    }
+                  } else {//なんかおかしい？
+                    dribbler1(0);
+                    m = x / (y - 30);
+                    z = atan(m) ; // arc tangent of m
+                    motorfunction(z, abs(y), -gyro);
+                  }
+                } else {
+                  dribbler1(0);//なんかおかしい？
                   m = x / (y - 30);
                   z = atan(m) + PI; // arc tangent of m
                   motorfunction(z, abs(y), -gyro);
                 }
-              } else {
-                dribbler1(0);//なんかおかしい？
-                m = x / (y - 30);
-                z = atan(m) ; // arc tangent of m
-                motorfunction(z, abs(y), -gyro);
               }
             }
           }
         }
+        /*
+          dribbler1(0);
+          dribbler2(0);
+          m = x / y;
+          z = atan(m); // arc tangent of m
+          motorfunction(z, 30, -gyro);
+        */
       }
-      /*
-        dribbler1(0);
-        dribbler2(0);
-        m = x / y;
-        z = atan(m); // arc tangent of m
-        motorfunction(z, 30, -gyro);
-      */
     } else {
       digitalWrite(LED_BUILTIN, HIGH);
       power = abs(gyro);   //  モーターの速度をgyroにする
