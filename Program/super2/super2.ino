@@ -367,7 +367,7 @@ void loop() {
 
     if (abs(gyro) < 20) {
       if (goal_y <= 102) {
-        motorfunction(3.14, 80, -gyro);
+        motorfunction(3.14, 50, -gyro);
       } else {
         digitalWrite(LED_BUILTIN, LOW);
         if (0 <= y && y <= 50) {//front
@@ -388,9 +388,9 @@ void loop() {
                     digitalWrite(Kicker, LOW);
                   } else {
                     if (goal_x < 0) {
-                      turnCW(20);
-                    } else {
                       turnCCW(20);
+                    } else {
+                      turnCW(20);
                     }
                   }
                 } else {
