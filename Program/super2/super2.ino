@@ -349,7 +349,6 @@ void loop() {
               } else {
                 if (bg_y <= 102) {//goalからの距離で制限する
                   dribbler1(100);
-<<<<<<< HEAD
                   while (true) {
                     if (bg_x <= abs(5)) {
                       dribbler1(0);
@@ -367,24 +366,6 @@ void loop() {
                       turnCW(20);
                     } else {
                     }
-=======
-                  if (bg_x <= abs(10)) {
-                    dribbler1(0);
-                    digitalWrite(Kick_Dir, LOW);
-                    delay(500);
-                    digitalWrite(Kicker, HIGH);
-                    delay(1500);
-                    digitalWrite(Kicker, LOW);
-                  } else if (bg_x < -10) {
-                    dribbler1(100);
-                    turnCCW(20);
-
-                  } else if (bg_x > 10) {
-                    dribbler1(100);
-                    turnCW(20);
-                  } else {
-                    motorfunction(0,10,-gyro);
->>>>>>> 1f21f48b8638678ad67e7aad02c5c326dec2ad83
                   }
 
                 } else {
