@@ -344,7 +344,7 @@ void loop() {
         motorfunction(3.14, 30, -gyro);
       } else {
         digitalWrite(LED_BUILTIN, LOW);
-        if (45 <= y && y <= 50) {//front
+        if (40 <= y && y <= 50) {//front
           dribbler1(100);
           if (abs(x) <= 5) {
             if (y <= 43) { //ボールを保持
@@ -391,23 +391,23 @@ void loop() {
             if (y >= 70) {
               motorfunction(0 , 80, -gyro);
             } else {
-              if (y >= 25) {//普通に追いかける(前)
+              if (y >= 40) {//普通に追いかける(前)
                 dribbler1(0);
                 m = x / (y - 40);//-?
                 z = atan(m); // arc tangent of m
                 motorfunction(z, abs(x) + 10, -gyro);
               } else {
                 if (y < 0) {
-                  if ( y <= -25) { //-25より後ろの場合
+                  if ( y <= -40) { //-25より後ろの場合
                     dribbler1(0);
                     if (x < 0) {
                       dribbler1(0);
-                      m = (x + 50) / (y - 50);
+                      m = (x + 40) / (y - 40);
                       z = atan(m) + PI; // arc tangent of m
                       motorfunction(z, abs(y) + 40, -gyro);
                     } else {
                       dribbler1(0);
-                      m = (x - 50) / (y - 50);
+                      m = (x - 40) / (y - 40);
                       z = atan(m) + PI; // arc tangent of m
                       motorfunction(z, abs(y) + 40, -gyro);
                     }
