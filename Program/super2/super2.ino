@@ -342,7 +342,7 @@ void loop() {
         digitalWrite(LED_BUILTIN, LOW);
         if (0 <= y && y <= 50) {//front
           dribbler1(100);
-          if (abs(x) < 5) {
+          if (abs(x) <= 5) {
             if (y <= 45) {
               if ( b_sig == 0) {
                 motorfunction(0, power, -gyro);
@@ -364,6 +364,7 @@ void loop() {
                     dribbler1(100);
                     turnCW(20);
                   } else {
+                    motorfunction(0,10,-gyro);
                   }
                 } else {
                   if (b_sig == 0) {
