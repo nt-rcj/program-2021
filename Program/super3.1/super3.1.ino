@@ -332,7 +332,7 @@ void loop() {
 
 
     //----------------main-------------------
-    r = 60;
+    r = 45;
     if(abs(gyro) < 4){
       if(progress == 0){//段階0
         divergence = 0;//回らない
@@ -390,7 +390,7 @@ void loop() {
         divergence = 0;//回らない
         quadrant = 0;//回るところの定数初期化
         turn = 0;//回るところの定数初期化
-        motorfunction(0, 40, -gyro);
+        motorfunction(PI/10, 40, -gyro);
         if(10 < y && y != 4096){
           find = 1;//yが十分正で、見つけている(y≠4096)の時、次のペットボトルを見つけたとする
         }
@@ -422,7 +422,7 @@ void loop() {
           motorfunction(0, 0, 0);
         }else{
           if(y <= 0 && x <= 0){
-            motorfunction(-PI/2*abs(y)/r, 20, -gyro);
+            motorfunction(-PI/2*abs(y)/r, 60, -gyro);
             digitalWrite(LED_R, HIGH);
             digitalWrite(LED_Y, LOW);
             digitalWrite(LED_G, LOW);
@@ -432,7 +432,7 @@ void loop() {
               quadrant = 1;
             }
           }else if(y <= 0 && 0 < x){
-            motorfunction(-PI/2*abs(x)/r - PI/2, 20, -gyro);
+            motorfunction(-PI/2*abs(x)/r - PI/2, 60, -gyro);
             digitalWrite(LED_R, LOW);
             digitalWrite(LED_Y, HIGH);
             digitalWrite(LED_G, LOW);
@@ -442,7 +442,7 @@ void loop() {
               quadrant = 2;
             }
           }else if(0 < y && 0 < x){
-            motorfunction(PI - PI/2*abs(y)/r, 20, -gyro);
+            motorfunction(PI - PI/2*abs(y)/r, 60, -gyro);
             digitalWrite(LED_R, LOW);
             digitalWrite(LED_Y, LOW);
             digitalWrite(LED_G, HIGH);
@@ -452,7 +452,7 @@ void loop() {
               quadrant = 3;
             }
           }else{
-            motorfunction(PI/2*(r - abs(x))/r, 20, -gyro);
+            motorfunction(PI/2*(r - abs(x))/r, 60, -gyro);
             digitalWrite(LED_R, LOW);
             digitalWrite(LED_Y, LOW);
             digitalWrite(LED_G, LOW);
