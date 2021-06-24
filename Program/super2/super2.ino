@@ -344,7 +344,7 @@ void loop() {
         motorfunction(3.14, 30, -gyro);
       } else {
         digitalWrite(LED_BUILTIN, LOW);
-        if (0 <= y && y <= 50) {//front
+        if (40 <= y && y <= 50) {//front
           dribbler1(100);
           if (abs(x) <= 5) {
             if (y <= 43) { //ボールを保持
@@ -414,7 +414,7 @@ void loop() {
                 } else {
                   dribbler1(0);//なんかおかしい？
                   m = x / (y - 40);
-                  z = atan(m); // arc tangent of m
+                  z = atan(m) + PI; // arc tangent of m
                   motorfunction(z, abs(y), -gyro);
                 }
               }
