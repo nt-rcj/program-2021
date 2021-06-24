@@ -357,7 +357,6 @@ void loop() {
                     digitalWrite(Kicker, HIGH);
                     delay(1500);
                     digitalWrite(Kicker, LOW);
-                    break;
                   } else if (bg_x < -5) {
                     dribbler1(100);
                     turnCCW(20);
