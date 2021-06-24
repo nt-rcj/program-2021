@@ -12,8 +12,8 @@
 SoftwareSerial xbeeSerial(10, 11); // メインCPUに繋がるシリアルポート
 
 int led = 4;
-uint8_t me = 0;
-uint8_t you = 0;
+uint8_t mydata = 0;
+
 void setup() {
   Serial.begin(9600); // Xbee向けのシリアルポートを初期化
   xbeeSerial.begin(9600); //　メインCPU向けのシリアルポートを初期化
@@ -31,8 +31,8 @@ void setup() {
 void loop() {
   if (xbeeSerial.available() > 0) { //Is there date from maincpu?
     digitalWrite(led, HIGH);
-    my date =  xbeeSerial.read();//xbeeSerial.read = from maincpu
-    Serial.write(my date);  // メインCPUから来たデータをXbeeに送り出す。
+    mydata =  xbeeSerial.read();//xbeeSerial.read = from maincpu
+    Serial.write(mydata);  // メインCPUから来たデータをXbeeに送り出す。
     digitalWrite(led, LOW);
   }
 }
