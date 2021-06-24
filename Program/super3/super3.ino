@@ -345,10 +345,10 @@ void loop() {
       divergence = 1;
       if(turn == 7){
         progress = 2;
-        turn = 0;
       }
     }else{
       divergence = 0;
+      turn = 0;
       motorfunction(0, 0, 0);
     }
 
