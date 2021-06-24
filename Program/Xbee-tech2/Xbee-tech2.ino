@@ -1,8 +1,11 @@
 /*
-   ロボット側(SofrwareSerial)から来た
-   データをそのままxbee(HardwareSerial)
-   に送り出す。
-   23.nov.2020 by H.Saeki
+  RCJ 2021 WORLDWIDE
+  Technical Challenge 2
+  Team NT
+  ロボット側(SofrwareSerial)から来た
+  データをそのままxbee(HardwareSerial)
+  に送り出す。
+  25.june.2021 by A.Saeki
 */
 
 #include <SoftwareSerial.h>
