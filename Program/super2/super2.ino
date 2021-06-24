@@ -274,7 +274,7 @@ void loop() {
     yg_y = yg_y - 172;
   }
   if (b_sig != 0) {
-    bg_x = 160 - bg_x;
+    bg_x = 155 - bg_x;
     bg_y = bg_y - 172;
   }
 
@@ -379,17 +379,17 @@ void loop() {
               } else {
                 if (goal_y <= 105) {//goalからの距離で制限する
                   dribbler1(100);
-                    if (goal_x <= abs(2)) {
+                    if (goal_x <= abs(10)) {
                     dribbler1(0);
                     digitalWrite(Kick_Dir, LOW);
-                    delay(500);
+                    delay(50);
                     digitalWrite(Kicker, HIGH);
                     delay(1500);
                     digitalWrite(Kicker, LOW);
-                    }else if (goal_x <= -2){
+                    }else if (goal_x <= -10){
                       dribbler1(100);  
                       turnCCW(20);
-                      delay(500);
+                      delay(50);
                     dribbler1(0);
                     digitalWrite(Kick_Dir, LOW);
                     delay(500);
@@ -397,7 +397,7 @@ void loop() {
                     delay(1500);
                     digitalWrite(Kicker, LOW);
                     delay(1500);
-                    }else if (goal_x >= 2){
+                    }else if (goal_x >= 10){
                       dribbler1(100);  
                       turnCW(20);
                       delay(500);
