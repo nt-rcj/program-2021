@@ -274,7 +274,7 @@ void loop() {
     yg_y = yg_y - 172;
   }
   if (b_sig != 0) {
-    bg_x = 155 - bg_x;
+    bg_x = 160 - bg_x;
     bg_y = bg_y - 172;
   }
 
@@ -290,6 +290,9 @@ void loop() {
     bg_x = -(bg_x * 211800) / (140200 + 708 * sqrt(bg_x * bg_x + 28900));
     bg_y = (bg_y * 194600) / (140200 + 708 * sqrt(bg_y * bg_y + 28900));
   }
+
+      bg_x = -bg_x;
+      bg_y = -bg_y;
 
   Serial.print("ball_x:");
   Serial.print(x);
@@ -330,39 +333,6 @@ void loop() {
       }
     }
 
-    //digitalWrite(LINE_LED, HIGH); // ラインセンサのLEDを点灯
-    if (lineflag == true) {
-      //lineflag = false;
-    }
-    if (digitalRead(GoalSW)) { // GoalSWはHighなら「青ゴール」を認識する。
-      goal_sig = b_sig;
-      goal_x = -bg_x;
-      goal_y = -bg_y;
-    } else {
-      goal_sig = y_sig;
-      goal_x = -yg_x;
-      goal_y = -yg_y;
-    }
-
-
-
-    Serial.print(" Sig=");  //  openMVのデータを出力する
-    Serial.print(sig);
-    Serial.print(" X=");
-    Serial.print(x);
-    Serial.print(" Y=");
-    Serial.print(y);
-    Serial.print(" goal_x=");
-    Serial.print(goal_x);
-    Serial.print(" goal_y=");
-    Serial.print(goal_y);
-    Serial.print(" ball_front=");
-    Serial.print(ball_front);
-    Serial.print(" arctan=");
-    Serial.print(atan2(x, 30 - yg_y));
-    Serial.print(" gyro=");
-    Serial.print(gyro);
-    Serial.println();
 
 
     if (abs(gyro) < 20) {
@@ -377,19 +347,19 @@ void loop() {
               if ( goal_sig == 0) {
                 motorfunction(0, power, -gyro);
               } else {
-                if (goal_y <= 105) {//goalからの距離で制限する
+                if (bg_y <= 105) {//goalからの距離で制限する
                   dribbler1(100);
-                    if (goal_x <= abs(10)) {
+                  if (goal_x <= abs(10)) {
                     dribbler1(0);
                     digitalWrite(Kick_Dir, LOW);
+                    delay(500);
+                    digitalWrite(Kicker, HIGH);
+                    delay(1500);
+                    digitalWrite(Kicker, LOW);
+                  } else if (bg_x < -10) {
+                    dribbler1(100);
+                    turnCCW(20);
                     delay(50);
-                    digitalWrite(Kicker, HIGH);
-                    delay(1500);
-                    digitalWrite(Kicker, LOW);
-                    }else if (goal_x <= -10){
-                      dribbler1(100);  
-                      turnCCW(20);
-                      delay(50);
                     dribbler1(0);
                     digitalWrite(Kick_Dir, LOW);
                     delay(500);
@@ -397,10 +367,11 @@ void loop() {
                     delay(1500);
                     digitalWrite(Kicker, LOW);
                     delay(1500);
-                    }else if (goal_x >= 10){
-                      dribbler1(100);  
-                      turnCW(20);
-                      delay(500);
+
+                  } else if (bg_x > 10) {
+                    dribbler1(100);
+                    turnCW(20);
+                    delay(50);
                     dribbler1(0);
                     digitalWrite(Kick_Dir, LOW);
                     delay(500);
@@ -408,13 +379,13 @@ void loop() {
                     delay(1500);
                     digitalWrite(Kicker, LOW);
                     delay(1500);
-                    } else {
-                    }
-                } else {
-                  if (goal_sig == 0) {
-                    motorfunction(0, 70, -gyro);
                   } else {
-                    m = (goal_x * 2) / goal_y;
+                  }
+                } else {
+                  if (b_sig == 0) {
+                    motorfunction(0, 50, -gyro);
+                  } else {
+                    m = (bg_x * 2) / goal_y;
                     z = atan(m); // arc tangent of m
                     motorfunction(z, 30, -gyro);//abs(goal_x) / 10 + abs(goal_y)
                   }
