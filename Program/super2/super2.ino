@@ -291,8 +291,8 @@ void loop() {
     bg_y = (bg_y * 194600) / (140200 + 708 * sqrt(bg_y * bg_y + 28900));
   }
 
-      bg_x = -bg_x;
-      bg_y = -bg_y;
+  bg_x = -bg_x;
+  bg_y = -bg_y;
 
   Serial.print("ball_x:");
   Serial.print(x);
@@ -349,22 +349,25 @@ void loop() {
               } else {
                 if (bg_y <= 102) {//goalからの距離で制限する
                   dribbler1(100);
-                  if (bg_x <= abs(10)) {
-                    dribbler1(0);
-                    digitalWrite(Kick_Dir, LOW);
-                    delay(500);
-                    digitalWrite(Kicker, HIGH);
-                    delay(1500);
-                    digitalWrite(Kicker, LOW);
-                  } else if (bg_x < -10) {
-                    dribbler1(100);
-                    turnCCW(20);
-
-                  } else if (bg_x > 10) {
-                    dribbler1(100);
-                    turnCW(20);
-                  } else {
+                  while (true) {
+                    if (bg_x <= abs(5)) {
+                      dribbler1(0);
+                      digitalWrite(Kick_Dir, LOW);
+                      delay(500);
+                      digitalWrite(Kicker, HIGH);
+                      delay(1500);
+                      digitalWrite(Kicker, LOW);
+                      break;
+                    } else if (bg_x < -5) {
+                      dribbler1(100);
+                      turnCCW(20);
+                    } else if (bg_x > 5) {
+                      dribbler1(100);
+                      turnCW(20);
+                    } else {
+                    }
                   }
+
                 } else {
                   if (b_sig == 0) {
                     motorfunction(0, 50, -gyro);
