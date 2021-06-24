@@ -352,15 +352,15 @@ void loop() {
                 motorfunction(0, power, -gyro);
               } else {
                 if (yg_y >= 36) {//goalからの距離で制限する
-                    dribbler1(100);
-                    motorfunction(0, 0, 0);
-                    delay(500);
-                    dribbler1(0);
-                    digitalWrite(Kick_Dir, LOW);
-                    delay(500);
-                    digitalWrite(Kicker, HIGH);
-                    delay(1500);
-                    digitalWrite(Kicker, LOW);
+                  dribbler1(100);
+                  motorfunction(0, 0, 0);
+                  delay(600);
+                  dribbler1(0);
+                  digitalWrite(Kick_Dir, LOW);
+                  delay(500);
+                  digitalWrite(Kicker, HIGH);
+                  delay(1500);
+                  digitalWrite(Kicker, LOW);
                 } else {
                   m = bg_x / (bg_y - 100); //真ん中(0, 102)に向かう
                   z = atan(m); // arc tangent of m
@@ -371,10 +371,15 @@ void loop() {
               motorfunction(0, 30, -gyro);
             }
           } else {
-            m = x / (y - 40);//-?
-            z = atan(m); // arc tangent of m
-            motorfunction(z, abs(x) + 10, -gyro);
-
+            if (y >= 45) {
+              m = x / (y - 40);//-?
+              z = atan(m); // arc tangent of m
+              motorfunction(z, abs(x) + 10, -gyro);
+            } else {
+              m = x / (y - 40);
+              z = atan(m) + PI; // arc tangent of m
+              motorfunction(z, abs(y), -gyro);
+            }
           }
         } else {
           dribbler1(0);
