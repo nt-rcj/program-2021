@@ -359,26 +359,10 @@ void loop() {
                   } else if (bg_x < -10) {
                     dribbler1(100);
                     turnCCW(20);
-                    delay(50);
-                    dribbler1(0);
-                    digitalWrite(Kick_Dir, LOW);
-                    delay(500);
-                    digitalWrite(Kicker, HIGH);
-                    delay(1500);
-                    digitalWrite(Kicker, LOW);
-                    delay(1500);
 
                   } else if (bg_x > 10) {
                     dribbler1(100);
                     turnCW(20);
-                    delay(50);
-                    dribbler1(0);
-                    digitalWrite(Kick_Dir, LOW);
-                    delay(500);
-                    digitalWrite(Kicker, HIGH);
-                    delay(1500);
-                    digitalWrite(Kicker, LOW);
-                    delay(1500);
                   } else {
                   }
                 } else {
