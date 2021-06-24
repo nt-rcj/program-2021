@@ -370,7 +370,7 @@ void loop() {
                   if (b_sig == 0) {
                     motorfunction(0, 50, -gyro);
                   } else {
-                    m = (bg_x * 2) / goal_y;
+                    m = bg_x / bg_y;
                     z = atan(m); // arc tangent of m
                     motorfunction(z, 30, -gyro);//abs(goal_x) / 10 + abs(goal_y)
                   }
