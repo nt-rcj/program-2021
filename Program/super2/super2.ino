@@ -408,13 +408,13 @@ void loop() {
                   } else {//なんかおかしい？
                     dribbler1(0);
                     m = x / (y - 40);
-                    z = atan(-m); // arc tangent of m
+                    z = atan(m) + PI; // arc tangent of m
                     motorfunction(z, abs(y), -gyro);
                   }
                 } else {
                   dribbler1(0);//なんかおかしい？
                   m = x / (y - 40);
-                  z = atan(m) + PI; // arc tangent of m
+                  z = atan(-m) + PI; // arc tangent of m
                   motorfunction(z, abs(y), -gyro);
                 }
               }
