@@ -21,10 +21,10 @@ void setup() {
 
   // initialize the digital pin as an output.
   pinMode(led, OUTPUT);
-  //Serial.println(" Ready!");  // Xbeeに文字を出力
-  //digitalWrite(led, HIGH);   // turn the LED on (HIGH is the voltage level)
-  //delay(100);
-  //digitalWrite(led, LOW);   // turn the LED off (LOW is the voltage level)
+  Serial.println(" Ready!");  // Xbeeに文字を出力
+  digitalWrite(led, HIGH);   // turn the LED on (HIGH is the voltage level)
+  delay(100);
+  digitalWrite(led, LOW);   // turn the LED off (LOW is the voltage level)
   xbeeSerial.listen();  // メインCPUからのデータを受信する
 
 }
