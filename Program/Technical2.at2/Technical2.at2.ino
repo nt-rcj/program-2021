@@ -57,8 +57,8 @@ int blocks;
 int ball_x, ball_y;
 char buf[64];
 
-int progress, pass, kickd;
-int reach;
+int progress, pass, reach;
+uint8_t kickd;
 int pixel;
 uint32_t color;
 
