@@ -57,8 +57,8 @@ int blocks;
 int ball_x, ball_y;
 char buf[64];
 
-int progress, pass, kickd;
-int reach;
+int progress, pass, reach;
+uint8_t kickd;
 int pixel;
 uint32_t color;
 
@@ -348,6 +348,7 @@ void loop() {
           dribbler1(100);
           if(y < 32 || sig == 0){//ボールを持っている
             if(digitalRead(LINE4D) == HIGH){//ライン(4D)検出まで
+              Serial1.write(1);
               motorfunction(0, 0, 0);
               dribbler1(0);
               digitalWrite(Kick_Dir, LOW);
@@ -357,10 +358,9 @@ void loop() {
               digitalWrite(Kicker, LOW);
               progress = 1;
               pass = pass + 1;
-              Serial1.write(1);
             }else{
               m = atan2(-53 - goal_x, 30 - goal_y);//ボールを渡すところへ行く
-              motorfunction(m, abs(-53 - goal_x) * 5, -gyro*3/2);
+              motorfunction(m, 15 + abs(-53 - goal_x) * 3, -gyro*3/2);
             }
           }else{//ボールを持っていない
             motorfunction(0, 50, -gyro*3/2);
@@ -374,7 +374,7 @@ void loop() {
           if(sig == 0){//ボールがなければ停止
             motorfunction(0, 0, 0);
           }else{
-            if(abs(x) < 12){
+            if(abs(x) < 15){
               if(abs(x) < 4){
                 motorfunction(0, 0, 0);//十分受け取れる位置なので停止
                 if(kickd == 1){//ボールが送り出された
@@ -392,9 +392,9 @@ void loop() {
                 }
               }else{//ボールのx座標を合わせる
                 if(0 < x){
-                  motorfunction(PI/2, abs(x) * 3 / 2, -gyro*3/2);
+                  motorfunction(PI/2, abs(x) * 3, -gyro);
                 }else{
-                  motorfunction(-PI/2, abs(x) * 3 / 2, -gyro*3/2);
+                  motorfunction(-PI/2, abs(x) * 3, -gyro);
                 }
               }
             }else{//ボールが来るのを待つ
@@ -408,6 +408,7 @@ void loop() {
       }else{//ボールを所持している
         if(digitalRead(LINE4D) == HIGH){//ボールを渡す場所にいる(ライン(4D)が反応している)
           motorfunction(0, 0, 0);
+          Serial1.write(1);
           dribbler1(0);
           digitalWrite(Kick_Dir, LOW);
           delay(500);
@@ -416,7 +417,6 @@ void loop() {
           digitalWrite(Kicker, LOW);
           progress = 1;
           pass = pass + 1;
-          Serial1.write(1);
         }else{
           m = atan2(-46 - goal_x, 28 - goal_y);//ボールを渡すところへ行く
           motorfunction(m, 20 + (goal_x + 50)*8/9, -gyro*4);      

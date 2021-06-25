@@ -6,6 +6,7 @@
 //           Ver 4.1 Nov.14.2020
 //           Ver 4.2 Dec.06.2020
 //           Ver 4.3 Dec.23.2020
+//           Ver 4.4 Jan.05.2021
 //           By Saeki Hidekazu
 //		  for Teensy 3.5
 //　ロボット本体をランダムな方向に動かしながら、ラインから出ないようにする。
@@ -22,7 +23,7 @@
 
 const float VolLimit = 13.5;  // 限界電圧値(for LiPo)
 
-static int  power = 70;   // 移動速度を保持する
+static int  power = 60;   // 移動速度を保持する
 static int  robot_dir;		// 移動方向を保持する
 static boolean emergency; // 故障フラグ
 static int  lineflag;     // check out of bounds flag
@@ -79,8 +80,8 @@ void setup() {
   randomSeed(0);      // 乱数を初期化する
 
   Serial2.begin(115200);  // 方位センサのインターフェースを設定
-  Serial.begin(9600);
-  Serial.print("Starting...\n");
+  Serial1.begin(9600);
+  Serial1.print("Starting...\n");
 
   // 最初は０の方向（正面）へpowerで進む
   robot_dir = 0;
@@ -109,6 +110,68 @@ void loop() {
   // put your main code here, to run repeatedly:
   // check line and reverse
 
+    batt = checkvoltage(VolLimit);  // 電池の電圧のチェックする
+    Serial1.print("  Time = ");
+    Serial1.print(millis());
+
+    level = analogRead(LINE1A); // get potential data
+    data = digitalRead(LINE1D);
+    Serial1.print(" LINE1 ");
+    Serial1.print(level);
+    Serial1.print(" ");
+    Serial1.print(data);
+    Serial1.print(" ");
+    level = analogRead(LINE2A); // get potential data
+    data = digitalRead(LINE2D);
+    Serial1.print(" LINE2 ");
+    Serial1.print(level);
+    Serial1.print(" ");
+    Serial1.print(data);
+    Serial1.print(" ");
+    level = analogRead(LINE3A); // get potential data
+    data = digitalRead(LINE3D);
+    Serial1.print(" LINE3 ");
+    Serial1.print(level);
+    Serial1.print(" ");
+    Serial1.print(data);
+    Serial1.print(" ");
+    level = analogRead(LINE4A); // get potential data
+    data = digitalRead(LINE4D);
+    Serial1.print(" LINE4 ");
+    Serial1.print(level);
+    Serial1.print(" ");
+    Serial1.print(data);
+    Serial1.print(" ");
+    level = analogRead(LINE5A); // get potential data
+    data = digitalRead(LINE5D);
+    Serial1.print(" LINE5 ");
+    Serial1.print(level);
+    Serial1.print(" ");
+    Serial1.print(data);
+    Serial1.print(" ");
+
+    data = digitalRead(INT_29);
+    Serial1.print(" INT5 ");
+    Serial1.print(data);
+    Serial1.print(" ");
+
+    if (Serial2.available() > 0)
+      while (Serial2.available() != 0) { //Gyroの方位データをgyroに取り込む
+        gyro = Serial2.read();
+      }
+    Serial1.print("  BATT = ");
+    Serial1.print(batt, 4);
+    Serial1.print("  Gyro=");
+    Serial1.print(gyro);
+    Serial1.print("  GoalSW=");
+    Serial1.print(digitalRead(GoalSW));
+    Serial1.print("  Aux1=");
+    Serial1.print(digitalRead(Aux1));
+    Serial1.print("  Aux2=");
+    Serial1.print(digitalRead(Aux2));
+    Serial1.println(" ");
+    delay(20);
+
   if ( digitalRead(StartSW) == LOW) {    // StartSW がONなら
     digitalWrite(SWG, LOW);
     digitalWrite(SWR, HIGH);
@@ -119,26 +182,28 @@ void loop() {
       lineflag = false;             // lineflagをクリアする。
       delay(300);
     }
+    /*
     if (Serial2.available() > 0)
       while (Serial2.available() != 0) { //Gyroの方位データをgyroに取り込む
         gyro = Serial2.read();
       }
+      */
     gyro = -gyro ;  // ロボットが右(gyro > 0)を向いているときはCCWに回転
     azimuth = robot_dir * 3.14159 / 4.0;  // 方位をradianに変換
     motorfunction(azimuth, power, gyro);  // robot_dirの方向に進ませる
 
     batt = checkvoltage(VolLimit);  // 電池の電圧のチェックする
-    Serial.print("  Time = ");
-    Serial.print(millis());
-    Serial.print("  BATT = ");
-    Serial.print(batt, 4);
-    Serial.print("  Gyro=");
-    Serial.println(gyro);
+    Serial1.print("  Time = ");
+    Serial1.print(millis());
+    Serial1.print("  BATT = ");
+    Serial1.print(batt, 4);
+    Serial1.print("  Gyro=");
+    Serial1.println(gyro);
     delay(20);
 
     if ( emergency == true ) {
-      Serial.println("");
-      Serial.println("  Battery Low!");
+      Serial1.println("");
+      Serial1.println("  Battery Low!");
       doOutofbound();    //  故障なのでコートの外へ
     }
   }
@@ -146,65 +211,68 @@ void loop() {
     motorFree(); //  停止（スイッチが切られた）
     digitalWrite(SWG, HIGH);
     digitalWrite(SWR, LOW);
+    /*
     batt = checkvoltage(VolLimit);  // 電池の電圧のチェックする
-    Serial.print("  Time = ");
-    Serial.print(millis());
+    Serial1.print("  Time = ");
+    Serial1.print(millis());
 
     level = analogRead(LINE1A); // get potential data
     data = digitalRead(LINE1D);
-    Serial.print(" LINE1 ");
-    Serial.print(level);
-    Serial.print(" ");
-    Serial.print(data);
-    Serial.print(" ");
+    Serial1.print(" LINE1 ");
+    Serial1.print(level);
+    Serial1.print(" ");
+    Serial1.print(data);
+    Serial1.print(" ");
     level = analogRead(LINE2A); // get potential data
     data = digitalRead(LINE2D);
-    Serial.print(" LINE2 ");
-    Serial.print(level);
-    Serial.print(" ");
-    Serial.print(data);
-    Serial.print(" ");
+    Serial1.print(" LINE2 ");
+    Serial1.print(level);
+    Serial1.print(" ");
+    Serial1.print(data);
+    Serial1.print(" ");
     level = analogRead(LINE3A); // get potential data
     data = digitalRead(LINE3D);
-    Serial.print(" LINE3 ");
-    Serial.print(level);
-    Serial.print(" ");
-    Serial.print(data);
-    Serial.print(" ");
+    Serial1.print(" LINE3 ");
+    Serial1.print(level);
+    Serial1.print(" ");
+    Serial1.print(data);
+    Serial1.print(" ");
     level = analogRead(LINE4A); // get potential data
     data = digitalRead(LINE4D);
-    Serial.print(" LINE4 ");
-    Serial.print(level);
-    Serial.print(" ");
-    Serial.print(data);
-    Serial.print(" ");
+    Serial1.print(" LINE4 ");
+    Serial1.print(level);
+    Serial1.print(" ");
+    Serial1.print(data);
+    Serial1.print(" ");
     level = analogRead(LINE5A); // get potential data
     data = digitalRead(LINE5D);
-    Serial.print(" LINE5 ");
-    Serial.print(level);
-    Serial.print(" ");
-    Serial.print(data);
-    Serial.print(" ");
+    Serial1.print(" LINE5 ");
+    Serial1.print(level);
+    Serial1.print(" ");
+    Serial1.print(data);
+    Serial1.print(" ");
 
     data = digitalRead(INT_29);
-    Serial.print(" INT5 ");
-    Serial.print(data);
-    Serial.print(" ");
+    Serial1.print(" INT5 ");
+    Serial1.print(data);
+    Serial1.print(" ");
 
     if (Serial2.available() > 0)
       while (Serial2.available() != 0) { //Gyroの方位データをgyroに取り込む
         gyro = Serial2.read();
       }
-    Serial.print("  BATT = ");
-    Serial.print(batt, 4);
-    Serial.print("  Gyro=");
-    Serial.print(gyro);
-    Serial.print("  Aux1=");
-    Serial.print(digitalRead(Aux1));
-    Serial.print("  Aux2=");
-    Serial.print(digitalRead(Aux2));
-
-    Serial.println(" ");
+    Serial1.print("  BATT = ");
+    Serial1.print(batt, 4);
+    Serial1.print("  Gyro=");
+    Serial1.print(gyro);
+    Serial1.print("  GoalSW=");
+    Serial1.print(digitalRead(GoalSW));
+    Serial1.print("  Aux1=");
+    Serial1.print(digitalRead(Aux1));
+    Serial1.print("  Aux2=");
+    Serial1.print(digitalRead(Aux2));
+    Serial1.println(" ");
+    */
     delay(100);
   }
 }

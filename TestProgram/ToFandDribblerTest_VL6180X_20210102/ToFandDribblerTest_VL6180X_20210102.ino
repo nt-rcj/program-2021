@@ -1,3 +1,5 @@
+#include <PCF8574.h>
+
 /* This minimal example shows how to get single-shot Short range
   measurements from the VL6180X.
 
@@ -38,6 +40,7 @@ void setup()
   // Set PCF8574pinMode to OUTPUT
   for ( i = 0; i < 8; i++)
     pcf8574.pinMode(i, OUTPUT);
+  pcf8574.begin();
   for ( pin = 0; pin < 8; pin++)
     pcf8574.digitalWrite(pin, LOW);   //deactivate(reset) ToF_front,ToF_back
 
@@ -47,22 +50,22 @@ void setup()
   */
 
   Serial.println("  Start02 ");
-  
+
   delay(10);
-  pcf8574.digitalWrite(5 - 1, HIGH); //Activate ToF_front VL6180X
+  pcf8574.digitalWrite(1 - 1, HIGH); //Activate ToF_front VL6180X
   delay(10);
   ToF_front.init();
   ToF_front.configureDefault();
-  ToF_front.setAddress(TOF_5);  //好きなアドレスに設定
-  ToF_front.setTimeout(100);
+  ToF_front.setAddress(TOF_1);  //好きなアドレスに設定
+  ToF_front.setTimeout(10);
   delay(10);
 
-  pcf8574.digitalWrite(6 - 1, HIGH); //Activate ToF_back VL6180X
+  pcf8574.digitalWrite(2 - 1, HIGH); //Activate ToF_back VL6180X
   delay(10);
   ToF_back.init();
   ToF_back.configureDefault();
-  ToF_back.setAddress(TOF_6);  //好きなアドレスに設定
-  ToF_back.setTimeout(100);
+  ToF_back.setAddress(TOF_2);  //好きなアドレスに設定
+  ToF_back.setTimeout(10);
   delay(10);
 
   Serial.println("  Start03 ");
@@ -80,13 +83,6 @@ void loop()
   digitalWrite(SWG, LOW);
   digitalWrite(SWR, HIGH);
 
-  Serial.print(" ToF_front=");
-  ball_front = ToF_front.readRangeSingleMillimeters();  // 前方ToFの値を読む
-  Serial.print(ball_front);
-  if (ToF_front.timeoutOccurred()) {
-    Serial.print(" ToF_front TIMEOUT");
-    ball_front = 1000;
-  }
   Serial.print(" ToF_back=");
   ball_back = ToF_back.readRangeSingleMillimeters();   // 後方ToFの値を読む
   Serial.print(ball_back);
@@ -94,6 +90,14 @@ void loop()
     Serial.print(" ToF_back TIMEOUT");
     ball_back = 1000;
   }
+  Serial.print(" ToF_front=");
+  ball_front = ToF_front.readRangeSingleMillimeters();  // 前方ToFの値を読む
+  Serial.print(ball_front);
+  if (ToF_front.timeoutOccurred()) {
+    Serial.print(" ToF_front TIMEOUT");
+    ball_front = 1000;
+  }
+
   Serial.println();
 
   if ( ball_front < 50) { // 前方ToFの値が50mm以下なら前方ドリブラを回す
