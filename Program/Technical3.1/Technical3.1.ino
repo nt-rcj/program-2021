@@ -57,8 +57,8 @@ int blocks;
 int ball_x, ball_y;
 char buf[64];
 
-int progress, pass, reach;
-uint8_t kickd;
+int progress, reach, pros;
+uint8_t finish;
 int pixel;
 uint32_t color;
 
@@ -235,7 +235,7 @@ void loop() {
   //Xbeeからの信号を読む
   if (Serial1.available() > 0)
     while (Serial1.available() > 0) {
-      kickd = Serial1.read();
+      finish = Serial1.read();
     }
   // openMVのデーターを変換
 
@@ -259,7 +259,7 @@ void loop() {
   yg_area = yg_w * yg_h;      // 認識したブロックの面
 
   if (sig != 0) { //中心補正
-    x = 162 - x;
+    x = 152 - x;
     y = 120 - y;
   }
   if (y_sig != 0) {
@@ -271,10 +271,10 @@ void loop() {
     bg_y = bg_y - 172;
   }
 
-  if (sig != 0) { //補正
+  /*if (sig != 0) { //補正
     x = (x * 211800) / (140200 + 708 * sqrt(x * x + 28900));
     y = (y * 194600) / (140200 + 708 * sqrt(y * y + 28900));
-  }
+  }*/
   if (y_sig != 0) {
     yg_x = -(yg_x * 211800) / (140200 + 708 * sqrt(yg_x * yg_x + 28900));
     yg_y = (yg_y * 194600) / (140200 + 708 * sqrt(yg_y * yg_y + 28900));
@@ -343,86 +343,51 @@ void loop() {
 
     //----------------main-------------------
     if(abs(gyro) < 6){
-      if(progress == 0){//最初
-        if((0 < y && y < 50) || sig == 0){//近くにある場合
-          dribbler1(100);
-          if(y < 32 || sig == 0){//ボールを持っている
-            if(digitalRead(LINE4D) == HIGH){//ライン(4D)検出まで
-              Serial1.write("1");
-              motorfunction(0, 0, 0);
-              dribbler1(0);
-              digitalWrite(Kick_Dir, LOW);
-              delay(500);
-              digitalWrite(Kicker, HIGH);
-              delay(1500);
-              digitalWrite(Kicker, LOW);
-              progress = 1;
-              pass = pass + 1;
-            }else{
-              m = atan2(-53 - goal_x, 30 - goal_y);//ボールを渡すところへ行く
-              motorfunction(m, 15 + abs(-53 - goal_x) * 3, -gyro*3/2);
-            }
-          }else{//ボールを持っていない
-            motorfunction(0, 50, -gyro*3/2);
-          }
-        }else{//近くにない
-          motorfunction(0, 0, 0);
-        }
-      }else if(progress == 1){//ボール未所持
-        if(digitalRead(LINE2D) == HIGH || reach == 1){//ボールを受け取る場所にいる(ライン(2D)が反応している)
-          reach = 1;
-          if(sig == 0){//ボールがなければ停止
-            motorfunction(0, 0, 0);
-          }else{
-            if(abs(x) < 20){
-              if(abs(x) < 6){
-                motorfunction(0, 0, 0);//十分受け取れる位置なので停止
-                if(kickd == 128){//ボールが送り出された
-                  dribbler1(100);
-                  if(y < 32){ //ボールを持っている
-                    progress = 2;
-                    reach = 0;
-                    kickd = 0;
-                    pass = pass + 1;
-                  }else{
-                    motorfunction(0, 0, 0);//ボールが来るのを待つ
-                  }
-                }else{//ボールの位置が遠いので停止
-                  motorfunction(0, 0, 0);
-                }
-              }else{//ボールのx座標を合わせる
-                if(0 < x){
-                  motorfunction(PI/2, abs(x) * 2, -gyro);
-                }else{
-                  motorfunction(-PI/2, abs(x) * 2, -gyro);
-                }
+      if(progress == 0){
+        dribbler2(100);
+        if((abs(x) < 6 && y < 38) || sig == 0){ //持っている
+          if(digitalRead(LINE3D) == HIGH || pros == 1){
+            pros = 1;
+            if((digitalRead(LINE1D) == LOW && digitalRead(LINE2D) == LOW && digitalRead(LINE3D) == LOW && digitalRead(LINE4D) == LOW && digitalRead(LINE5D) == LOW) || 1 <= reach){
+              reach = 1;
+              digitalWrite(LED_Y, HIGH);
+              if(digitalRead(LINE4D) == HIGH){
+                motorfunction(0, 0, 0);
+                dribbler2(2);
+                digitalWrite(Kick_Dir, LOW);
+                delay(500);
+                digitalWrite(Kicker, HIGH);
+                delay(1500);
+                dribbler2(0);
+                digitalWrite(Kicker, LOW);
+                progress = 1;
+                reach = 0;
+              }else{
+                motorfunction(-PI/2, 20, -gyro);
               }
-            }else{//ボールが来るのを待つ
-              motorfunction(0, 0, 0);
+            }else{
+              motorfunction(-PI/4, 20, -gyro);
             }
+          }else{
+            motorfunction(-PI/4, 40, -gyro);
           }
         }else{
-          m = atan2(60 - goal_x, 28 - goal_y);//ボールを渡すところへ行く
-          motorfunction(m, 25 + (50 - goal_x)*8/9, -gyro*3/2);
+          m = atan2(x, y - 30);
+          motorfunction(m, abs(y), -gyro);
         }
-      }else{//ボールを所持している
-        if(digitalRead(LINE4D) == HIGH){//ボールを渡す場所にいる(ライン(4D)が反応している)
-          motorfunction(0, 0, 0);
-          Serial1.write("1");
-          dribbler1(0);
-          digitalWrite(Kick_Dir, LOW);
-          delay(500);
-          digitalWrite(Kicker, HIGH);
-          delay(1500);
-          digitalWrite(Kicker, LOW);
-          progress = 1;
-          pass = pass + 1;
+      }else if(progress == 1){
+        if(digitalRead(LINE2D) == HIGH || reach == 1){
+          reach = 1;
+          if(digitalRead(LINE2D) == LOW){
+            motorfunction(0, 0, 0);
+            Serial1.write("1");
+          }else{
+            motorfunction(-PI/2, 40, -gyro);
+          }
         }else{
-          m = atan2(-46 - goal_x, 28 - goal_y);//ボールを渡すところへ行く
-          motorfunction(m, 20 + (goal_x + 50)*8/9, -gyro*4);      
+          motorfunction(-PI/2, 40, -gyro);
         }
       }
-      
   //
   // **** end of main loop ******************************************************
   //
@@ -443,9 +408,10 @@ void loop() {
     digitalWrite(LINE_LED, LOW); // ラインセンサのLEDを消灯
     digitalWrite(SWR, LOW);
     digitalWrite(SWG, HIGH);
+    digitalWrite(LED_Y, LOW);
     progress = 0;
-    pass = 0;
     reach = 0;
+    pros = 0;
   }
 }
 
