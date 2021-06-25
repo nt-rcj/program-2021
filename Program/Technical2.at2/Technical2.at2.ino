@@ -399,11 +399,26 @@ void loop() {
             }
           }
         }else{
-              m = atan2(50 - goal_x, 30 - goal_y);//ボールを渡すところへ行く
-              motorfunction(m, 20 + (50 - goal_x)*8/9, -gyro);
+          m = atan2(50 - goal_x, 30 - goal_y);//ボールを渡すところへ行く
+          motorfunction(m, 20 + (50 - goal_x)*8/9, -gyro);
         }
       }else{//ボールを所持している
-        motorfunction(0, 0, 0);
+        if(digitalRead(LINE2D) == HIGH){//ボールを渡す場所にいる(ライン(2D)が反応している)
+          dribbler1(0);
+          digitalWrite(Kick_Dir, LOW);
+          delay(500);
+          digitalWrite(Kicker, HIGH);
+          delay(1500);
+          digitalWrite(Kicker, LOW);
+          progress = 1;
+          pass = pass + 1;
+          //while(get == 0){
+          //  motorfunction(0, 0, 0);
+          //}
+        }else{
+          m = atan2(50 - goal_x, 30 - goal_y);//ボールを渡すところへ行く
+          motorfunction(m, 20 + (goal_x + 50)*8/9, -gyro);      
+        }
       }
       
   //
