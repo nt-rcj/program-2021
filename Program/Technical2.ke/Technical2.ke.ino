@@ -341,11 +341,14 @@ void loop() {
     //----------------main-------------------
     if(abs(gyro) < 4){
       if(progress == 0){//最初
-        m = atan2(-43.5 - goal_x, 30 - goal_y);//ボールを渡すところへ行く
-        motorfunction(m, abs(-43.5 - goal_x) * 5, -gyro);
+        if( goal_x < 35){
+          m = atan2(33 - goal_x, 30 - goal_y);//ボールを渡すところへ行く
+          motorfunction(m, abs(33 - goal_x) * 5, -gyro);
+        }else{
+          motorfunction(0, 0, 0);
         }
       }else{//下ループ
-        motorfunction(0, 0, 0);
+      motorfunction(0, 0, 0);
       }
       
   //
