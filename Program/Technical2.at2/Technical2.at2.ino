@@ -416,7 +416,7 @@ void loop() {
           //  motorfunction(0, 0, 0);
           //}
         }else{
-          m = atan2(50 - goal_x, 30 - goal_y);//ボールを渡すところへ行く
+          m = atan2(-43.5 - goal_x, 30 - goal_y);//ボールを渡すところへ行く
           motorfunction(m, 20 + (goal_x + 50)*8/9, -gyro);      
         }
       }
