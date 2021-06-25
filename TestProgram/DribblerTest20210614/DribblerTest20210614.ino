@@ -43,7 +43,7 @@ void loop() {
 
     Serial.println(" foward");
     drbspeed = 1000;
-    for ( i = 0; i < 4; i++) {
+    for ( i = 0; i < 5; i++) {
       dribbler1(i * 10);
       dribbler2(i * 10);
       Serial.println(i * 10);
@@ -53,7 +53,7 @@ void loop() {
     dribbler2(0);
     Serial.println(" Stop");
     delay(300);
-
+/*
     digitalWrite(Kick_Dir, LOW);    // Set Front Kicker
     delay(20);
     digitalWrite(Kicker, HIGH);     //  キック
@@ -65,7 +65,7 @@ void loop() {
     digitalWrite(Kicker, HIGH);     //  キック
     delay(100);
     digitalWrite(Kicker, LOW);
-
+*/
   } else {
     digitalWrite(SWG, HIGH);
     digitalWrite(SWR, LOW);

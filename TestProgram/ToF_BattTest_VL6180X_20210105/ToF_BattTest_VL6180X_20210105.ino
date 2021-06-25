@@ -14,13 +14,12 @@
 #include <VL6180X.h>
 
 PCF8574 pcf8574(I2C_PCF8574);
-
 VL6180X ToF_front;  // create front ToF object
 VL6180X ToF_back;   // create back ToF object
 
 const int drbspeed = 50;
 const int Vlow = 13.0;  // Low limit voltage 1.1*12 = 13.2
-const float Vstep = 0.01811;  // Voltage step 15.3V/845 = 0.01811
+const float Vstep = 0.018;  // Voltage step 15.3V/845 = 0.01811
 
 void setup()
 {
@@ -29,19 +28,10 @@ void setup()
   //StartSWのLEDpinを初期化する
   pinMode(SWR, OUTPUT);
   pinMode(SWG, OUTPUT);
-  pinMode(LED_R, OUTPUT);
-  pinMode(LED_G, OUTPUT);
-  pinMode(LED_Y, OUTPUT);
-  pinMode(LED_B, OUTPUT);
-
   pinMode(Vbatt, INPUT);
 
   digitalWrite(SWG, LOW);
   digitalWrite(SWR, LOW);
-  digitalWrite(LED_R, LOW);
-  digitalWrite(LED_G, LOW);
-  digitalWrite(LED_Y, LOW);
-  digitalWrite(LED_B, LOW);
 
   Serial.begin(9600);
   Wire.begin();
@@ -53,9 +43,6 @@ void setup()
   for ( i = 0; i < 8; i++)
     pcf8574.pinMode(i, OUTPUT);
   pcf8574.begin();
-  for ( pin = 0; pin < 8; pin++)
-    pcf8574.digitalWrite(pin, HIGH);   //deactivate(reset)ToF_front,ToF_back
-  delay(10);
   for ( pin = 0; pin < 8; pin++)
     pcf8574.digitalWrite(pin, LOW);   //deactivate(reset)ToF_front,ToF_back
 
@@ -96,45 +83,34 @@ void loop()
   int ball_front, ball_back;
   float v;
 
-  digitalWrite(SWG, HIGH);
-  digitalWrite(SWR, LOW);
+  digitalWrite(SWG, LOW);
+  digitalWrite(SWR, HIGH);
 
-  ball_back = ToF_back.readRangeSingleMillimeters();   // 後方ToFの値を読む
-  ball_front = ToF_front.readRangeSingleMillimeters(); // 前方ToFの値を読む
-
-  Serial.print(" ToF_front=");
-  Serial.print(ball_front);
-  if (ToF_front.timeoutOccurred()) {
-    Serial.print(" ToF_front TIMEOUT");
-    digitalWrite(LED_G, HIGH);
-    ball_front = 1000;
-  } else {
-    digitalWrite(LED_G, LOW);
-  }
+//ToFの読み出しは[Back]→[Front]の順で読む。
+//ToFのFrontとBackは必ず両方読み出す。
+//逆順ではFrontのToFがTimeOutする。
+//
 
   Serial.print(" ToF_back=");
+  ball_back = ToF_back.readRangeSingleMillimeters();   // 後方ToFの値を読む
   Serial.print(ball_back);
   if (ToF_back.timeoutOccurred()) {
     Serial.print(" ToF_back TIMEOUT");
-    digitalWrite(LED_Y, HIGH);
     ball_back = 1000;
-  } else {
-    digitalWrite(LED_Y, LOW);
   }
 
-  if (ball_front < 100) {
-    digitalWrite(LED_R, HIGH);
-  } else {
-    digitalWrite(LED_R, LOW);
+  Serial.print(" ToF_front=");
+  ball_front = ToF_front.readRangeSingleMillimeters(); // 前方ToFの値を読む
+  Serial.print(ball_front);
+  if (ToF_front.timeoutOccurred()) {
+    Serial.print(" ToF_front TIMEOUT");
+    ball_front = 1000;
   }
-  if (ball_back < 100) {
-    digitalWrite(LED_B, HIGH);
-  } else {
-    digitalWrite(LED_B, LOW);
-  }
+
   v = analogRead(Vbatt) * Vstep;;
   Serial.print(" Vbatt=");
   Serial.println(v, 4);
   Serial.println();
+
   delay(100);
 }
