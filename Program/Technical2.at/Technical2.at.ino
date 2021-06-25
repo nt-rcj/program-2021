@@ -57,6 +57,7 @@ int blocks;
 int ball_x, ball_y;
 char buf[64];
 
+int progress;
 int pixel;
 uint32_t color;
 
@@ -327,10 +328,45 @@ void loop() {
       }
     }
 
+    if (digitalRead(GoalSW)) {  // 青色の場合
+      goal_sig = y_sig;
+      goal_x = yg_x;
+      goal_y = yg_y;
+    } else {                     // 黄色の場合
+      goal_sig = b_sig;
+      goal_x = bg_x;
+      goal_y = bg_y;
+    }
 
     //----------------main-------------------
     if(abs(gyro) < 4){
-
+      if(progress == 0){//最初
+        if((0 < y && y < 50) || sig == 0){//近くにある場合
+          dribbler1(100);
+          if(y < 32 || sig == 0){//ボールを持っている
+            if(goal_x <= -43.5){//x座標が-42以下になったらキックする
+              motorfunction(0, 0, 0);
+              dribbler1(0);
+              digitalWrite(Kick_Dir, LOW);
+              delay(500);
+              digitalWrite(Kicker, HIGH);
+              delay(1500);
+              digitalWrite(Kicker, LOW);
+              progress = 1;
+            }else{
+              m = atan2(-43.5 - goal_x, 30 - goal_y);//ボールを渡すところへ行く
+              motorfunction(m, abs(-43.5 - goal_x) * 5, -gyro);
+            }
+          }else{//ボールを持っていない
+            motorfunction(0, 50, -gyro);
+          }
+        }else{//近くにない
+          motorfunction(0, 0, 0);
+        }
+      }else{//下ループ
+        motorfunction(0, 0, 0);
+      }
+      
   //
   // **** end of main loop ******************************************************
   //
@@ -351,12 +387,7 @@ void loop() {
     digitalWrite(LINE_LED, LOW); // ラインセンサのLEDを消灯
     digitalWrite(SWR, LOW);
     digitalWrite(SWG, HIGH);
-    digitalWrite(LED_R, LOW);
-    digitalWrite(LED_Y, LOW);
-    digitalWrite(LED_G, LOW);
-    digitalWrite(LED_B, LOW);
     progress = 0;
-    turn = 0;
   }
 }
 
