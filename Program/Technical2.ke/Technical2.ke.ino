@@ -162,10 +162,10 @@ void setup() {
   Serial.println("Initialize 2 ...");
 
   delay(1000);  //  ドリブラ・キッカーの動作チェック
-  dribbler1(100);
+  dribbler2(100);
   dribbler2(100);
   delay(1000);
-  dribbler1(0);
+  dribbler2(0);
   dribbler2(0);
   delay(100);
   digitalWrite(Kick_Dir, LOW);
@@ -355,8 +355,8 @@ void loop() {
               if(abs(x) < 3){
                 motorfunction(0, 0, 0);//十分受け取れる位置なので停止
                 if(kickd == 128){//ボールがキックされた
-                  dribbler1(100);
-                  if(y < 26){ //ボールを持っている
+                  dribbler2(100);
+                  if(y < 28){ //ボールを持っている
                     reach = 0;
                     progress = 1;
                     kickd = 0;
@@ -383,16 +383,16 @@ void loop() {
           }
         }else{
           if(pros == 0){;//ボールを貰うところへ行く
-            motorfunction(PI/5*2, 13 + (50 + goal_x)*4/9, -gyro );
+            motorfunction(PI/5*2, 15 + (50 + goal_x)*4/9, -gyro );
           }else{
-            m = atan2(52 - goal_x, 27 - goal_y);//ボールを貰うところへ行く
+            m = atan2(53 - goal_x, 24 - goal_y);//ボールを貰うところへ行く
             motorfunction(m, 30 + (50 - goal_x)*5/9, -gyro - 3);
           }
         }
       }else{//ボール所持
         if(digitalRead(LINE4D) == HIGH){//ボールを渡す場所にいる(ライン(4D)が反応している)
           motorfunction(0, 0, 0);
-          dribbler1(0);
+          dribbler2(0);
           Serial1.write("1");
           digitalWrite(Kick_Dir, LOW);
           delay(500);
@@ -403,7 +403,7 @@ void loop() {
           pass = pass + 1;
         }else{
           m = atan2(-48 - goal_x, 31 - goal_y);//ボールを渡すところへ行く
-          motorfunction(m, 30 + (goal_x + 50)*5/9, -gyro * 3);      
+          motorfunction(m, 15 + (goal_x + 50)*5/9, -gyro * 3);      
         }
       }
   //
@@ -421,7 +421,7 @@ void loop() {
     }
   }else{
     motorFree();
-    dribbler1(0);
+    dribbler2(0);
     dribbler2(0);
     digitalWrite(LINE_LED, LOW); // ラインセンサのLEDを消灯
     digitalWrite(SWR, LOW);
