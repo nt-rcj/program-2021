@@ -57,7 +57,7 @@ int blocks;
 int ball_x, ball_y;
 char buf[64];
 
-int progress;
+int progress, pass, get;
 int pixel;
 uint32_t color;
 
@@ -340,17 +340,59 @@ void loop() {
 
     //----------------main-------------------
     if(abs(gyro) < 4){
-      if(progress == 0){//最初
-        if( goal_x < 35){
-          m = atan2(33 - goal_x, 30 - goal_y);//ボールを渡すところへ行く
-          motorfunction(m, abs(33 - goal_x) * 5, -gyro);
+      if(progress == 0){//ボール未所持
+        if(digitalRead(LINE2D) == HIGH){//ボールを受け取る場所にいる(ライン(2D)が反応している)
+          if(sig == 0){//ボールがなければ停止
+            motorfunction(0, 0, 0);
+          }else{
+            if(abs(x) < 12){
+              if(abs(x) < 4){
+                motorfunction(0, 0, 0);//十分受け取れる位置なので停止
+                if(0 < y && y < 50){//ボールが特定距離内
+                  dribbler1(100);
+                  if(y < 32){ //ボールを持っている
+                    progress = 1;
+                    //Serial1.write(1);
+                    pass = pass + 1;
+                  }else{
+                    motorfunction(0, 0, 0);//ボールが来るのを待つ
+                  }
+                }else{//ボールの位置が遠いので停止
+                  motorfunction(0, 0, 0);
+                }
+              }else{//ボールのx座標を合わせる
+                if(0 < x){
+                  motorfunction(PI/2, abs(x), -gyro);
+                }else{
+                  motorfunction(-PI/2, abs(x), -gyro);
+                }
+              }
+            }else{//ボールが来るのを待つ
+              motorfunction(0, 0, 0);
+            }
+          }
         }else{
-          motorfunction(0, 0, 0);
+          m = atan2(33 - goal_x, 28 - goal_y);//ボールを貰うところへ行く
+          motorfunction(m, 20 + (33 - goal_x)*8/9, -gyro);
         }
-      }else{//下ループ
-      motorfunction(0, 0, 0);
+      }else{//ボール所持
+        if(digitalRead(LINE4D) == HIGH){//ボールを渡す場所にいる(ライン(4D)が反応している)
+          dribbler1(0);
+          digitalWrite(Kick_Dir, LOW);
+          delay(500);
+          digitalWrite(Kicker, HIGH);
+          delay(1500);
+          digitalWrite(Kicker, LOW);
+          progress = 1;
+          pass = pass + 1;
+          //while(get == 0){
+          //  motorfunction(0, 0, 0);
+          //}
+        }else{
+          m = atan2(-43.5 - goal_x, 30 - goal_y);//ボールを渡すところへ行く
+          motorfunction(m, 20 + (goal_x + 50)*8/9, -gyro);      
+        }
       }
-      
   //
   // **** end of main loop ******************************************************
   //
