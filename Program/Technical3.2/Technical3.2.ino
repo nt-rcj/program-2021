@@ -315,14 +315,14 @@ void loop() {
   ball_front = ToF_front.readRangeSingleMillimeters();
   ball_Long1 = ToF_Long1.readRangeSingleMillimeters();
 
+  Serial.print(" ToF_Long1=");
+  Serial.print(ball_Long1);
   if (ToF_Long1.timeoutOccurred()){
-    Serial.print("ToF_Long1 TIMEOUT");
+    Serial.print(" ,ToF_Long1 TIMEOUT");
     digitalWrite(LED_Y, HIGH);
     ball_Long1 = 1000;
   } else {
     digitalWrite(LED_Y, LOW);
-    Serial.print("ToF_Long1=");
-    Serial.print(ball_Long1);
   }
 
 
