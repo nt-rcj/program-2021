@@ -269,7 +269,7 @@ void loop() {
   yg_area = yg_w * yg_h;      // 認識したブロックの面
 
   if (sig != 0) { //中心補正
-    x = 152 - x;
+    x = 163 - x;
     y = 120 - y;
   }
   if (y_sig != 0) {
@@ -277,14 +277,14 @@ void loop() {
     yg_y = yg_y - 172;
   }
   if (b_sig != 0) {
-    bg_x = 160 - bg_x;
-    bg_y = bg_y - 172;
+    bg_x = 168 - bg_x;
+    bg_y = bg_y - 68;
   }
 
-  /*if (sig != 0) { //補正
+  if (sig != 0) { //補正
     x = (x * 211800) / (140200 + 708 * sqrt(x * x + 28900));
     y = (y * 194600) / (140200 + 708 * sqrt(y * y + 28900));
-  }*/
+  }
   if (y_sig != 0) {
     yg_x = -(yg_x * 211800) / (140200 + 708 * sqrt(yg_x * yg_x + 28900));
     yg_y = (yg_y * 194600) / (140200 + 708 * sqrt(yg_y * yg_y + 28900));
@@ -374,10 +374,10 @@ void loop() {
         motorfunction(0, 0, 0);
       }else if(progress == 1){//
           if(yg_x > -35){//ペットボトルのとこ
-            if(digitalRead(LINE2D)){//初期位置
-              motorfunction(0, 10, -gyro);
+            if(yg_x > 70){//初期位置
+              motorfunction(-PI/4, 20, -gyro);
             } else {//横移動
-              motorfunction(0, 0, 0);
+              motorfunction(-PI/2, 40, -gyro);
             }
           } else {//ペットボトルをでる
             progress = 2;
@@ -389,17 +389,19 @@ void loop() {
           if(0 < y && y < 50){//一定距離(y)内でドリブラーを回す
             dribbler1(100);
             if(abs(x) < 4){//ボールとx座標が大体同じ
-              if(y < 38){//持っている
-                if(abs(bg_x) < 4){//キックする
+              if(y < 42){//持っている
+                if(abs(bg_x) < 6){//キックする
+                  motorfunction(0, 0, 0);
+                  dribbler2(0);
                   digitalWrite(Kick_Dir, LOW);
                   delay(500);
                   digitalWrite(Kicker, HIGH);
                   delay(1500);
-                  dribbler2(0);
                   digitalWrite(Kicker, LOW);
                   progress = 0;
+                  finish = 0;
                 }else{
-                  m = atan2(bg_x, bg_y);
+                  m = atan2(bg_x, -33 - bg_y);
                   motorfunction(m, abs(bg_x), -gyro);
                 }
               }else{
@@ -407,13 +409,13 @@ void loop() {
               }
             }else{
               m = atan2(x, y - 30);
-              motorfunction(m ,abs(y)/2 + abs(x)/2, -gyro);//ボールの前へ(ドリブラーあり)
+              motorfunction(m ,abs(x)*2, -gyro);//ボールの前へ(ドリブラーあり)
             }
           }else if(y < 0){
             motorfunction(0, 0, 0);//後ろにボールがあるなら停止
           }else{
             m = atan2(x, y - 30);
-            motorfunction(m, abs(y)/2 + abs(x)/2, -gyro);//前ならボールの前へ(ドリブラーなし)
+            motorfunction(m, abs(x)*2, -gyro);//前ならボールの前へ(ドリブラーなし)
           }
         }
       }
