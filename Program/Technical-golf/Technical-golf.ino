@@ -350,9 +350,6 @@ void loop() {
           dribbler2(100);
           if (abs(x) <= 5) {
             if (ball_front <= 35) { //ボールを保持
-              if ( b_sig == 0) {
-                motorfunction(0, power, -gyro);
-              } else {
                 if (yg_y >= 34) {//goalからの距離で制限する
                   dribbler2(100);
                   motorfunction(0, 0, 0);
@@ -368,7 +365,6 @@ void loop() {
                   z = atan(m); // arc tangent of m
                   motorfunction(z, 50, -gyro);//abs(goal_x) / 10 + abs(goal_y)
                 }
-              }
             } else {
               motorfunction(0, 30, -gyro);
             }
