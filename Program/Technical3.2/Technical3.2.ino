@@ -365,7 +365,7 @@ void loop() {
 
     //----------------main-------------------
 
-    if(progress == 0){
+    if(finish == 128){
       progress = 1;
     }
 
