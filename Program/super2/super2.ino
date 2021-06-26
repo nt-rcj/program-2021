@@ -344,10 +344,10 @@ void loop() {
         motorfunction(3.14, 30, -gyro);
       } else {
         digitalWrite(LED_BUILTIN, LOW);
-        if (40 <= y && y <= 50) {//front
+        if (0 <= y && y <= 40) {//front
           dribbler1(100);
           if (abs(x) <= 5) {
-            if (y <= 43) { //ボールを保持
+            if (y <= 38) { //ボールを保持
               if ( b_sig == 0) {
                 motorfunction(0, power, -gyro);
               } else {
