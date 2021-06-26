@@ -364,9 +364,15 @@ void loop() {
     }
 
     //----------------main-------------------
+
+    if(progress == 0){
+      progress = 1;
+    }
+
     if(abs(gyro) < 6){
-      if(progress == 0){//
-        if(finish == 1){
+      if(progress == 0){
+        motorfunction(0, 0, 0);
+      }else if(progress == 1){//
           if(yg_x > -35){//ペットボトルのとこ
             if(digitalRead(LINE2D)){//初期位置
               motorfunction(0, 10, -gyro);
@@ -374,12 +380,9 @@ void loop() {
               motorfunction(0, 0, 0);
             }
           } else {//ペットボトルをでる
-            progress == 1;
+            progress = 2;
           }
-        }else{
-          motorfunction(0, 0, 0);//信号なし
-        }
-      }else if(progress == 1){//とってゴールに入れる
+      }else{//とってゴールに入れる
         if(sig == 0){
           motorfunction(0, 20, -gyro);//ボールを見つけるために前に行く
         }else{
@@ -438,6 +441,7 @@ void loop() {
     digitalWrite(SWG, HIGH);
     digitalWrite(LED_Y, LOW);
     progress = 0;
+    finish = 0;
   }
 }
 
