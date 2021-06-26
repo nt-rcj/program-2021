@@ -13,10 +13,12 @@
 #include <Wire.h>
 #include <PCF8574.h>
 #include <VL6180X.h>
+#include <VL53L0X.h>
 
 PCF8574 pcf8574(I2C_PCF8574);
 VL6180X ToF_front;  // create front ToF object
 VL6180X ToF_back;   // create back ToF object
+VL53L0X ToF_Long1;
 
 //const int angle = 0;
 const int Vlow = 13.5;  // Low limit voltage 1.1*12 = 13.2
@@ -48,7 +50,7 @@ float bg_x, bg_y;
 float yg_x, yg_y;
 float goal_x, goal_y;
 float y_sig, b_sig, goal_sig;
-int ball_front, ball_back;
+int ball_front, ball_back, ball_Long1;
 
 int level, data;
 uint8_t role;
@@ -57,7 +59,7 @@ int blocks;
 int ball_x, ball_y;
 char buf[64];
 
-int progress, reach, pros;
+int progress;
 uint8_t finish;
 int pixel;
 uint32_t color;
@@ -153,6 +155,14 @@ void setup() {
   ToF_back.setAddress(TOF_2);  //好きなアドレスに設定
   ToF_back.setTimeout(10);
   delay(10);
+  
+  pcf8574.digitalWrite(3 - 1, HIGH); //Activate ToF_Long1 
+  delay(10);
+  ToF_Long1.init();
+  ToF_Long1.setAddress(TOF_3);  //好きなアドレスに設定
+  ToF_Long1.setTimeout(10);
+  delay(10);
+  
 
   Serial.println("Initialize 1 ...");
 
@@ -286,7 +296,7 @@ void loop() {
 
   //Serial1.write(xbee_date);// xbeeへ出力
 
-  Serial.print("x:");
+  Serial.print(" ,x:");
   Serial.print(x);
   Serial.print(" ,y:");
   Serial.print(y);
@@ -300,8 +310,20 @@ void loop() {
   Serial.print(bg_y);
   Serial.println();
 
+
   ball_back = ToF_back.readRangeSingleMillimeters();
   ball_front = ToF_front.readRangeSingleMillimeters();
+  ball_Long1 = ToF_Long1.readRangeSingleMillimeters();
+
+  if (ToF_Long1.timeoutOccurred()){
+    Serial.print("ToF_Long1 TIMEOUT");
+    digitalWrite(LED_Y, HIGH);
+    ball_Long1 = 1000;
+  } else {
+    digitalWrite(LED_Y, LOW);
+    Serial.print("ToF_Long1=");
+    Serial.print(ball_Long1);
+  }
 
 
   if (digitalRead(StartSW) == LOW) { // STartSW == Lowでスタート
@@ -343,50 +365,24 @@ void loop() {
 
     //----------------main-------------------
     if(abs(gyro) < 6){
-      if(progress == 0){
-        dribbler2(100);
-        if((abs(x) < 6 && y < 38) || sig == 0){ //持っている
-          if(digitalRead(LINE3D) == HIGH || pros == 1){
-            pros = 1;
-            if((digitalRead(LINE1D) == LOW && digitalRead(LINE2D) == LOW && digitalRead(LINE3D) == LOW && digitalRead(LINE4D) == LOW && digitalRead(LINE5D) == LOW) || 1 <= reach){
-              reach = 1;
-              digitalWrite(LED_Y, HIGH);
-              if(digitalRead(LINE4D) == HIGH){
-                motorfunction(0, 0, 0);
-                dribbler2(2);
-                digitalWrite(Kick_Dir, LOW);
-                delay(500);
-                digitalWrite(Kicker, HIGH);
-                delay(1500);
-                dribbler2(0);
-                digitalWrite(Kicker, LOW);
-                progress = 1;
-                reach = 0;
-              }else{
-                motorfunction(-PI/2, 20, -gyro);
-              }
-            }else{
-              motorfunction(-PI/4, 20, -gyro);
+      if(progress ==0){//
+        if(finish == 1){
+          if(yg_x > -35){//ペットボトルのとこ
+            if(digitalRead(LINE2D)){//初期位置
+              motorfunction(0, 10, -gyro);
+            } else {//横移動
+              motorfunction(0, 0, 0);
             }
-          }else{
-            motorfunction(-PI/4, 40, -gyro);
+          } else {//ペットボトルをでる
+            progress == 1;
           }
         }else{
-          m = atan2(x, y - 30);
-          motorfunction(m, abs(y), -gyro);
+          motorfunction(0, 0, 0);//信号なし
         }
-      }else if(progress == 1){
-        if(digitalRead(LINE2D) == HIGH || reach == 1){
-          reach = 1;
-          if(digitalRead(LINE2D) == LOW){
-            motorfunction(0, 0, 0);
-            Serial1.write("1");
-          }else{
-            motorfunction(-PI/2, 40, -gyro);
-          }
-        }else{
-          motorfunction(-PI/2, 40, -gyro);
-        }
+      }else if(progress == 1){//とってゴールに入れる
+        motorfunction(0, 0, 0);
+      }else{//止まる
+        motorfunction(0, 0, 0);
       }
   //
   // **** end of main loop ******************************************************
@@ -410,8 +406,6 @@ void loop() {
     digitalWrite(SWG, HIGH);
     digitalWrite(LED_Y, LOW);
     progress = 0;
-    reach = 0;
-    pros = 0;
   }
 }
 
