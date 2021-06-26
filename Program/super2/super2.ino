@@ -306,6 +306,8 @@ void loop() {
   Serial.print(yg_x);
   Serial.print(" ygoal_y=");
   Serial.print(yg_y);
+  Serial.print(" ball_ToF");
+  Serial.print(ball_front);
   Serial.println();
 
   ball_back = ToF_back.readRangeSingleMillimeters();
@@ -344,15 +346,15 @@ void loop() {
         motorfunction(3.14, 30, -gyro);
       } else {
         digitalWrite(LED_BUILTIN, LOW);
-        if (0 <= y && y <= 40) {//front
-          dribbler1(100);
+        if (0 <= y && y <= 50) {//front
+          dribbler2(100);
           if (abs(x) <= 5) {
-            if (y <= 38) { //ボールを保持
+            if (ball_front <= 35) { //ボールを保持
               if ( b_sig == 0) {
                 motorfunction(0, power, -gyro);
               } else {
                 if (yg_y >= 34) {//goalからの距離で制限する
-                  dribbler1(100);
+                  dribbler2(100);
                   motorfunction(0, 0, 0);
                   delay(600);
                   dribbler1(0);
