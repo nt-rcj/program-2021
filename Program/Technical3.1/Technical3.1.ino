@@ -349,11 +349,15 @@ void loop() {
           if(digitalRead(LINE3D) == HIGH || pros == 1){
             pros = 1;
             if((digitalRead(LINE1D) == LOW && digitalRead(LINE2D) == LOW && digitalRead(LINE3D) == LOW && digitalRead(LINE4D) == LOW && digitalRead(LINE5D) == LOW) || 1 <= reach){
-              reach = 1;
+              if(reach == 0){
+                motorfunction(0, 20, -gyro);
+                delay(100);
+                reach = 1;
+              }
               digitalWrite(LED_Y, HIGH);
               if(digitalRead(LINE4D) == HIGH){
                 motorfunction(0, 0, 0);
-                dribbler2(2);
+                dribbler2(4);
                 digitalWrite(Kick_Dir, LOW);
                 delay(500);
                 digitalWrite(Kicker, HIGH);

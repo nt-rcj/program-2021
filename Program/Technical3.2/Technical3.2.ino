@@ -365,7 +365,7 @@ void loop() {
 
     //----------------main-------------------
     if(abs(gyro) < 6){
-      if(progress ==0){//
+      if(progress == 0){//
         if(finish == 1){
           if(yg_x > -35){//ペットボトルのとこ
             if(digitalRead(LINE2D)){//初期位置
@@ -380,7 +380,39 @@ void loop() {
           motorfunction(0, 0, 0);//信号なし
         }
       }else if(progress == 1){//とってゴールに入れる
-        motorfunction(0, 0, 0);
+        if(sig == 0){
+          motorfunction(0, 20, -gyro);//ボールを見つけるために前に行く
+        }else{
+          if(0 < y && y < 50){//一定距離(y)内でドリブラーを回す
+            dribbler1(100);
+            if(abs(x) < 4){//ボールとx座標が大体同じ
+              if(y < 38){//持っている
+                if(abs(bg_x) < 4){//キックする
+                  digitalWrite(Kick_Dir, LOW);
+                  delay(500);
+                  digitalWrite(Kicker, HIGH);
+                  delay(1500);
+                  dribbler2(0);
+                  digitalWrite(Kicker, LOW);
+                  progress = 0;
+                }else{
+                  m = atan2(bg_x, bg_y);
+                  motorfunction(m, abs(bg_x), -gyro);
+                }
+              }else{
+                motorfunction(0, 30, -gyro);//直進(ドリブラーあり)
+              }
+            }else{
+              m = atan2(x, y - 30);
+              motorfunction(m ,abs(y)/2 + abs(x)/2, -gyro);//ボールの前へ(ドリブラーあり)
+            }
+          }else if(y < 0){
+            motorfunction(0, 0, 0);//後ろにボールがあるなら停止
+          }else{
+            m = atan2(x, y - 30);
+            motorfunction(m, abs(y)/2 + abs(x)/2, -gyro);//前ならボールの前へ(ドリブラーなし)
+          }
+        }
       }else{//止まる
         motorfunction(0, 0, 0);
       }
