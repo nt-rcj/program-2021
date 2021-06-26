@@ -416,8 +416,6 @@ void loop() {
             motorfunction(m, abs(y)/2 + abs(x)/2, -gyro);//前ならボールの前へ(ドリブラーなし)
           }
         }
-      }else{//止まる
-        motorfunction(0, 0, 0);
       }
   //
   // **** end of main loop ******************************************************
