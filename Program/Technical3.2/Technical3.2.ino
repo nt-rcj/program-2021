@@ -308,6 +308,8 @@ void loop() {
   Serial.print(bg_x);
   Serial.print(" ,bgoal_y="); //青ゴールのy座標
   Serial.print(bg_y);
+  Serial.print(" ,progress=");
+  Serial.print(progress);
   Serial.println();
 
 
@@ -375,12 +377,14 @@ void loop() {
       }else if(progress == 1){//
           if(yg_x > -35){//ペットボトルのとこ
             if(yg_x > 70){//初期位置
-              motorfunction(-PI/5, 20, -gyro);
+              motorfunction(-PI/3, 20, -gyro);
             } else {//横移動
               motorfunction(-PI/2, 30, -gyro);
             }
           } else {//ペットボトルをでる
             progress = 2;
+            finish = 0;
+            motorfunction(0, 0, 0);
           }
       }else{//とってゴールに入れる
         if(sig == 0){
@@ -390,8 +394,10 @@ void loop() {
             dribbler1(100);
             if(abs(x) < 4){//ボールとx座標が大体同じ
               if(y < 33){//持っている
-                if(abs(bg_x) < 6){//キックする
+                if(abs(bg_x) < 10){//キックする
+                  dribbler1(100);
                   motorfunction(0, 0, 0);
+                  delay(600);
                   dribbler1(0);
                   digitalWrite(Kick_Dir, LOW);
                   delay(500);
@@ -401,7 +407,7 @@ void loop() {
                   progress = 0;
                   finish = 0;
                 }else{
-                  m = PI/4;
+                  m = PI/3;
                   motorfunction(m, abs(bg_x)*2, -gyro);
                 }
               }else{
@@ -409,13 +415,13 @@ void loop() {
               }
             }else{
               m = atan2(x, y - 25);
-              motorfunction(m ,abs(x)*2, -gyro);//ボールの前へ(ドリブラーあり)
+              motorfunction(m ,abs(x) + 10 , -gyro);//ボールの前へ(ドリブラーあり)
             }
           }else if(y < 0){
             motorfunction(0, 0, 0);//後ろにボールがあるなら停止
           }else{
             m = atan2(x, y - 25);
-            motorfunction(m, abs(y)*2, -gyro);//前ならボールの前へ(ドリブラーなし)
+            motorfunction(m, abs(y) + 10, -gyro);//前ならボールの前へ(ドリブラーなし)
           }
         }
       }
