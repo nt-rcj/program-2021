@@ -51,8 +51,8 @@ float y_sig, b_sig, goal_sig;
 int ball_front, ball_back;
 
 int level, data;
-uint8_t role;
-int xbee_date, xbee_x, xbee_y;
+float xbee_date, xbee_x, xbee_y;
+float p_ball;
 int blocks;
 int ball_x, ball_y;
 char buf[64];
@@ -243,7 +243,7 @@ void loop() {
   //Xbeeからの信号を読む
   if (Serial1.available() > 0)
     while (Serial1.available() > 0) {
-      role = Serial1.read();
+      p_ball = Serial1.read();
     }
   // openMVのデーターを変換
 
@@ -280,15 +280,15 @@ void loop() {
   }
 
   /*if (sig != 0) { //補正
-  }
-  if (y_sig != 0) {
+    }
+    if (y_sig != 0) {
     yg_x = -(yg_x * 211800) / (140200 + 708 * sqrt(yg_x * yg_x + 28900));
     yg_y = (yg_y * 194600) / (140200 + 708 * sqrt(yg_y * yg_y + 28900));
-  }
-  if (b_sig != 0) {
+    }
+    if (b_sig != 0) {
     bg_x = -(bg_x * 211800) / (140200 + 708 * sqrt(bg_x * bg_x + 28900));
     bg_y = (bg_y * 194600) / (140200 + 708 * sqrt(bg_y * bg_y + 28900));
-  }*/
+    }*/
 
   if (sig != 0) { //xbeedate生成
     xbee_x = x;
@@ -314,7 +314,7 @@ void loop() {
   Serial.print(bg_x);
   Serial.print(" ,bluegoal_y="); //青ゴールのy座標
   Serial.print(bg_y);
-  Serial.print(" ,role="); 
+  Serial.print(" ,role=");
   Serial.print(role);
   Serial.println();
 
@@ -357,7 +357,7 @@ void loop() {
     } else if (digitalRead(Aux2) == LOW) {
       keeper();
     } else {
-      if (role == 50) {
+      if ( p_ball <= xbee_date) { //どちらがボールに近いか
         keeper();
       } else {
         attacker();
@@ -488,16 +488,16 @@ void attacker() {
   Serial.println();
 
 
-  if(abs(gyro) < 20){
+  if (abs(gyro) < 20) {
     digitalWrite(LED_BUILTIN, LOW);
-    if(0 <= y && y <= 50){//front
+    if (0 <= y && y <= 50) { //front
       dribbler1(100);
-      if(abs(x) < 4){
-        if(ball_front <= 40){
-          if(goal_sig == 0){
+      if (abs(x) < 4) {
+        if (ball_front <= 40) {
+          if (goal_sig == 0) {
             motorfunction(0, 70, -gyro);
-          }else{
-            if(goal_y <= (90 - abs(goal_x) / 5)){
+          } else {
+            if (goal_y <= (90 - abs(goal_x) / 5)) {
               dribbler1(100);
               digitalWrite(Kick_Dir, LOW);
               dribbler1(0);
@@ -505,37 +505,37 @@ void attacker() {
               digitalWrite(Kicker, HIGH);
               delay(1500);
               digitalWrite(Kicker, LOW);
-            }else{
+            } else {
               z = atan2(goal_x * 2, goal_y);
-              motorfunction(z, abs(goal_x)/10 + abs(goal_y), -gyro);
+              motorfunction(z, abs(goal_x) / 10 + abs(goal_y), -gyro);
             }
           }
-        }else{
+        } else {
           motorfunction(0, 70, -gyro);
         }
-      }else{
+      } else {
         z = atan2(x, y);
-        motorfunction(z, sqrt(x*x + y*y/4), -gyro);
+        motorfunction(z, sqrt(x * x + y * y / 4), -gyro);
       }
-    }else if(y <= 0){ // 後ろにボールがあるとき
-      if(abs(x) < 10){
-        if(0 < x){
+    } else if (y <= 0) { // 後ろにボールがあるとき
+      if (abs(x) < 10) {
+        if (0 < x) {
           z = atan2(x + 30, y);
-          motorfunction(z, sqrt(x*x + y*y/4), -gyro);
-        }else{
+          motorfunction(z, sqrt(x * x + y * y / 4), -gyro);
+        } else {
           z = atan2(x - 30, y);
-          motorfunction(z, sqrt(x*x + y*y/4), -gyro);
+          motorfunction(z, sqrt(x * x + y * y / 4), -gyro);
         }
-      }else{
+      } else {
         z = atan2(x, y);
-        motorfunction(z, sqrt(x*x + y*y/4), -gyro);
+        motorfunction(z, sqrt(x * x + y * y / 4), -gyro);
       }
-    }else{// 50 < y になるとき
+    } else { // 50 < y になるとき
       dribbler1(0);
       dribbler2(0);
-      if(sig == 0){      // ボールがないとき(y = 4096)
+      if (sig == 0) {    // ボールがないとき(y = 4096)
         motorfunction(0, 0, 0);
-      }else{                // ボールがあるとき
+      } else {               // ボールがあるとき
         motorfunction(0, 80, -gyro);
       }
     }
