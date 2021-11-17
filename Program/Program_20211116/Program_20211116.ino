@@ -51,7 +51,8 @@ float y_sig, b_sig, goal_sig;
 int ball_front, ball_back;
 
 int level, data;
-float xbee_date, xbee_x, xbee_y;
+float xbee_x, xbee_y;
+uint8_t xbee_date;
 float p_ball;
 int blocks;
 int ball_x, ball_y;
@@ -63,6 +64,7 @@ float goal_dist;
 float angle, inroot;
 float divergence, RtoBdist;
 float speed, ballback;
+float wrap;
 int pixel;
 uint32_t color;
 
@@ -313,7 +315,7 @@ void loop() {
   Serial.print(" ,bluegoal_y="); //青ゴールのy座標
   Serial.print(bg_y);
   Serial.print(" ,tan="); 
-  Serial.print(atan2(-bg_x, -bg_y));
+  Serial.print(atan2(x - 800, y * 4));
   Serial.println();
 
   ball_back = ToF_back.readRangeSingleMillimeters();
@@ -368,10 +370,12 @@ void loop() {
     digitalWrite(LINE_LED, LOW); // ラインセンサのLEDを消灯
     digitalWrite(SWR, LOW);
     digitalWrite(SWG, HIGH);
+    wrap = 0;
   }
 
 
 }
+//////////// main ////////////
 
 void keeper() {
   if (digitalRead(GoalSW)) {  // 青色の場合
@@ -455,7 +459,7 @@ void keeper() {
 }
 
 void attacker() {
-  if (digitalRead(GoalSW)) { // GoalSWはHighなら「青ゴール」を認識する。
+  if (digitalRead(GoalSW)) { // GoalSWは攻める方向をスイッチに入れる, 相手ゴールの座標は機体中心
     goal_sig = b_sig;
     goal_x = -bg_x;
     goal_y = -bg_y;
@@ -467,7 +471,7 @@ void attacker() {
 
 
 
-  Serial.print(" Sig=");  //  openMVのデータを出力する
+  Serial.print(" Sig=");  //  データを出力する
   Serial.print(sig);
   Serial.print(" X=");
   Serial.print(x);
@@ -488,14 +492,17 @@ void attacker() {
 
   if (abs(gyro) < 20) {
     digitalWrite(LED_BUILTIN, LOW);
-    if (0 <= y && y <= 50) { //front
+    if (0 <= y && y <= 50) { //ボールが前(0≦y≦50)にあるとき
       dribbler1(100);
+      wrap = 0;
       if(abs(x) < 4){
         if(y <= 2){
           if(goal_sig == 0){
             motorfunction(0, 70, -gyro);
           }else{
-            if(abs(goal_y) <= 30 && abs(goal_x) < 2){
+            if(abs(goal_y) <= 20 && abs(goal_x) < 10){
+              motorfunction(0, 0, 0);
+              delay(70);
               dribbler1(100);
               digitalWrite(Kick_Dir, LOW);
               dribbler1(0);
@@ -503,56 +510,58 @@ void attacker() {
               digitalWrite(Kicker, HIGH);
               delay(1500);
               digitalWrite(Kicker, LOW);
+            }else if(goal_y < 5){
+              motorfunction(PI, 50, -gyro);
             }else{
               z = atan2(goal_x, goal_y);
-              motorfunction(z, abs(goal_x)/10 + abs(goal_y), -gyro);
+              motorfunction(z, abs(goal_x) + abs(goal_y)*3, -gyro);
             }
           }
         } else {
-          motorfunction(0, 70, -gyro);
+          motorfunction(0, 50, -gyro);
         }
       } else {
         z = atan2(x, y);
-        motorfunction(z, sqrt(x*x + y*y), -gyro);
+        motorfunction(z, sqrt(x*x + y*y) + 10, -gyro);
       }
     } else if (y <= 0) { // 後ろにボールがあるとき
-      if (abs(x) < 10) {
-        if (0 < x) {
-          z = atan2(x + 30, y);
-          motorfunction(z, sqrt(x*x + y*y), -gyro);
+      dribbler1(0);
+      if(abs(x) < 20 && y >= -88){
+        motorfunction(0, 50, -gyro);
+        wrap = 0;
+      }else if(abs(x) < 5 + abs(y) / 5){
+        if(goal_x > 0 || wrap == 1){
+          z = atan2(x + 800, y * 3);
+          motorfunction(z, sqrt(x*x + y*y) + 10, -gyro);
+          wrap = 1;
         }else{
-          z = atan2(x - 30, y);
-          motorfunction(z, sqrt(x*x + y*y), -gyro);
+          z = atan2(x - 800, y * 3);
+          motorfunction(z, sqrt(x*x + y*y) + 10, -gyro);
+          wrap = 0;
         }
-      } else {
-        z = atan2(x, y);
-        motorfunction(z, sqrt(x*x + y*y), -gyro);
+      }else{
+        wrap = 0;
+        z = atan2(x, y * 3);
+        motorfunction(z, sqrt(x*x + y*y) + 10, -gyro);
       }
     } else { // 50 < y になるとき
       dribbler1(0);
       dribbler2(0);
-      if (sig == 0) {    // ボールがないとき(y = 4096)
+      wrap = 0;
+      if (sig == 0) { // ボールがないとき(y = 4096)
         motorfunction(0, 0, 0);
-      } else {               // ボールがあるとき
+      } else { // ボールがあるとき
         motorfunction(0, 80, -gyro);
       }
     }
-    /*
-      dribbler1(0);
-      dribbler2(0);
-      m = x / y;
-      z = atan(m); // arc tangent of m
-      motorfunction(z, 30, -gyro);
-    */
   } else {
     digitalWrite(LED_BUILTIN, HIGH);
     power = abs(gyro);   //  モーターの速度をgyroにする
-    if (gyro > 0) {         // Ball is 1st quadrant
+    if (gyro > 0) {         // 時計回りに回りすぎているとき
       turnCCW(power);
-    } else if (gyro < 0) {  // 2nd quadrant
+    } else if (gyro < 0) {  // 反時計回りに回りすぎているとき
       turnCCW(-power);
     } else {
-
     }
   }
 }
