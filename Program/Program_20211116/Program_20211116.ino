@@ -23,10 +23,6 @@ const int Vlow = 13.5;  // Low limit voltage 1.1*12 = 13.2
 //Mi-NHなら13.0,Li-poなら13.5(Li-poは過放電するので注意！)
 const float Vstep = 0.01811;  // Voltage step 15.3V/845 = 0.01811
 
-int led = 4;
-uint8_t me = 0;
-uint8_t you = 0;
-
 int blob_count, i;
 static int openMV[39];
 static int x_data_ball, y_data_ball, w_data_ball, h_data_ball;
@@ -195,15 +191,6 @@ void setup() {
   Serial2.begin(115200);   // WT901 IMU Sener
   Serial1.begin(9600); //xbee
 
-  // initialize the digital pin as an output.
-  pinMode(led, OUTPUT);
-  //Serial.println(" Ready!");  // Xbeeに文字を出力
-  //digitalWrite(led, HIGH);   // turn the LED on (HIGH is the voltage level)
-  //delay(100);
-  digitalWrite(led, LOW);   // turn the LED off (LOW is the voltage level)
-  Serial1.listen();  // メインCPUからのデータを受信する
-
-
   lineflag = false;   //reset outofbounds　flag
   for ( i = 0; i < 4; i++ )
     line[i] = false;
@@ -292,7 +279,7 @@ void loop() {
     bg_y = bg_y - 172;
   }
 
-  if (sig != 0) { //補正
+  /*if (sig != 0) { //補正
   }
   if (y_sig != 0) {
     yg_x = -(yg_x * 211800) / (140200 + 708 * sqrt(yg_x * yg_x + 28900));
@@ -301,7 +288,7 @@ void loop() {
   if (b_sig != 0) {
     bg_x = -(bg_x * 211800) / (140200 + 708 * sqrt(bg_x * bg_x + 28900));
     bg_y = (bg_y * 194600) / (140200 + 708 * sqrt(bg_y * bg_y + 28900));
-  }
+  }*/
 
   if (sig != 0) { //xbeedate生成
     xbee_x = x;
@@ -501,16 +488,16 @@ void attacker() {
   Serial.println();
 
 
-  if (abs(gyro) < 20) {
+  if(abs(gyro) < 20){
     digitalWrite(LED_BUILTIN, LOW);
-    if (0 <= y && y <= 50) {//front
+    if(0 <= y && y <= 50){//front
       dribbler1(100);
-      if (abs(x) < 5) {
-        if (y <= 40) {
-          if ( goal_sig == 0) {
-            motorfunction(0, power, -gyro);
-          } else {
-            if (goal_y <= (90 - abs(goal_x) / 5)) {
+      if(abs(x) < 4){
+        if(ball_front <= 40){
+          if(goal_sig == 0){
+            motorfunction(0, 70, -gyro);
+          }else{
+            if(goal_y <= (90 - abs(goal_x) / 5)){
               dribbler1(100);
               digitalWrite(Kick_Dir, LOW);
               dribbler1(0);
@@ -518,95 +505,38 @@ void attacker() {
               digitalWrite(Kicker, HIGH);
               delay(1500);
               digitalWrite(Kicker, LOW);
-            } else {
-              if (goal_sig == 0) {
-                motorfunction(0, 70, -gyro);
-              } else {
-                m = (goal_x * 2) / goal_y;
-                z = atan(m); // arc tangent of m
-                motorfunction(z, abs(goal_x)/10 + abs(goal_y), -gyro);
-              }
+            }else{
+              z = atan2(goal_x * 2, goal_y);
+              motorfunction(z, abs(goal_x)/10 + abs(goal_y), -gyro);
             }
           }
-        } else {
+        }else{
           motorfunction(0, 70, -gyro);
         }
-      } else {
-        m = x / (y - 30);//-?
-        z = atan(m); // arc tangent of m
-        motorfunction(z, abs(x), -gyro);
-
+      }else{
+        z = atan2(x, y);
+        motorfunction(z, sqrt(x*x + y*y/4), -gyro);
       }
-    } else if (-55 <= y && y <= 0) { // backドリブラの直近にボールがあればドリブラを回す
-      dribbler2(100);
-      if (abs(x) < 5) {
-        if (y >= -45) {//つかんでいる
-          if ( goal_sig == 0) {//ゴールが見えないので前に持ってくる
-            //dribbler2(100);
-            motorfunction(0, power, -gyro);
-          } else {
-            if (goal_y <= (95 - abs(goal_x) / 5)) {//goal_sig追加
-              turnCW(100);
-              delay(50);
-              //digitalWrite(Kick_Dir, HIGH);
-              //delay(400);
-              //digitalWrite(Kicker, HIGH);
-              motorfunction(0, 0, 0);
-              dribbler2(0);
-              delay(1500);
-              digitalWrite(Kicker, LOW);
-              digitalWrite(Kick_Dir, LOW);
-            } else {
-              dribbler2(100);
-              m = ((goal_x + 30) * 2) / goal_y;
-              z = atan(m); // arc tangent of m
-              motorfunction(z, abs(goal_x)/10 + (abs(goal_y) - 80)*2, -gyro);
-            }
-          }
-        } else {
-          motorfunction(3.14, 20, -gyro);
+    }else if(y <= 0){ // 後ろにボールがあるとき
+      if(abs(x) < 10){
+        if(0 < x){
+          z = atan2(x + 30, y);
+          motorfunction(z, sqrt(x*x + y*y/4), -gyro);
+        }else{
+          z = atan2(x - 30, y);
+          motorfunction(z, sqrt(x*x + y*y/4), -gyro);
         }
-      } else {
-        dribbler1(0);
-        m = x / (y - 30);
-        z = atan(m) + PI; // arc tangent of m
-        motorfunction(z, 20 + abs(y)/2, -gyro);
+      }else{
+        z = atan2(x, y);
+        motorfunction(z, sqrt(x*x + y*y/4), -gyro);
       }
-    } else {
+    }else{// 50 < y になるとき
       dribbler1(0);
       dribbler2(0);
-      if (sig == 0) {      // No Ball found
+      if(sig == 0){      // ボールがないとき(y = 4096)
         motorfunction(0, 0, 0);
-      } else {                // Ball find
-        if (y >= 70) {
-          motorfunction(0 , 80, -gyro);
-        } else {
-          if (y >= 25) {//普通に追いかける(前)
-            dribbler1(0);
-            m = x / (y - 30);//-?
-            z = atan(m); // arc tangent of m
-            motorfunction(z, abs(x)+10, -gyro);
-          } else {
-            if (y < 0) {
-              if ( y <= -25) { //-25より後ろの場合
-                dribbler1(0);
-                m = x / (y + 40);
-                z = atan(m) + PI; // arc tangent of m
-                motorfunction(z, abs(x) + abs(y)*2/3, -gyro);
-              } else {
-                dribbler1(0);
-                m = x / (y - 30);
-                z = atan(m) + PI; // arc tangent of m
-                motorfunction(z, abs(y), -gyro);
-              }
-            } else {
-              dribbler1(0);
-              m = x / (y - 30);
-              z = atan(m) + PI; // arc tangent of m
-              motorfunction(z, abs(y), -gyro);
-            }
-          }
-        }
+      }else{                // ボールがあるとき
+        motorfunction(0, 80, -gyro);
       }
     }
     /*
