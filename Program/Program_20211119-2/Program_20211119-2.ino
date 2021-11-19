@@ -250,19 +250,19 @@ void loop() {
   yg_area = yg_w * yg_h;      // 認識したブロックの面
 
   if (sig != 0) { //中心補正
-    x = 153 - x;
-    y = 86 - y;
+    x = 164 - x;
+    y = 78 - y;
   }
   if (y_sig != 0) {
-    yg_x = 136 - yg_x;
-    yg_y = yg_y - 182;
+    yg_x = 153 - yg_x;
+    yg_y = yg_y - 186;
   }
   if (b_sig != 0) {
-    bg_x = 153 - bg_x;
-    bg_y = bg_y - 66;
+    bg_x = 173 - bg_x;
+    bg_y = bg_y - 63;
   }
 
-  /*if (sig != 0) { //補正
+  if (sig != 0) { //補正
   }
   if (y_sig != 0) {
     yg_x = -(yg_x * 211800) / (140200 + 708 * sqrt(yg_x * yg_x + 28900));
@@ -271,7 +271,7 @@ void loop() {
     if (b_sig != 0) {
     bg_x = -(bg_x * 211800) / (140200 + 708 * sqrt(bg_x * bg_x + 28900));
     bg_y = (bg_y * 194600) / (140200 + 708 * sqrt(bg_y * bg_y + 28900));
-  }*/
+  }
 
   if (sig != 0) { //xbeedate生成
     xbee_x = x;
@@ -291,10 +291,10 @@ void loop() {
   Serial.print(y);
   Serial.print(" ,tof_front=");
   Serial.print(ball_front);
-  Serial.print(" ,bluegoal_x=");//青ゴールのx座標
-  Serial.print(bg_x);
-  Serial.print(" ,bluegoal_y="); //青ゴールのy座標
-  Serial.print(bg_y);
+  Serial.print(" ,yellowgoal_x=");//青ゴールのx座標
+  Serial.print(yg_x);
+  Serial.print(" ,yellowgoal_y="); //青ゴールのy座標
+  Serial.print(yg_y);
   Serial.print(" , p_ball="); 
   Serial.print(p_ball);
   Serial.println();
@@ -337,7 +337,7 @@ void loop() {
     } else if (digitalRead(Aux2) == LOW) {
       keeper();
     } else {
-      if ( p_ball <= xbee_date) { //どちらがボールに近いか
+      if (p_ball <= xbee_date) { //どちらがボールに近いか
         keeper();
       } else {
         attacker();
@@ -392,7 +392,6 @@ void keeper() {
 
   if (abs(gyro) <= 10) {
     digitalWrite(LED_BUILTIN, LOW);
-    if (sig == 0) {
       if (goal_y > 23) {
         z = atan2(goal_x, goal_y - 23) + 3.14;
         motorfunction(z, 45, -gyro * 3 / 2);
@@ -408,10 +407,6 @@ void keeper() {
       }else{
         motorfunction(0, 0, 0);
       }
-    } else {
-      az = atan2(x, sqrt(y));
-      motorfunction(az, sqrt(x * x + y * y / 4), -gyro * 3 / 2);
-    }
   } else {
     digitalWrite(LED_BUILTIN, HIGH);
     power = abs(gyro);   //  モーターの速度をgyroにする
@@ -460,15 +455,15 @@ void attacker() {
 
   if (abs(gyro) < 20) {
     digitalWrite(LED_BUILTIN, LOW);
-    if (-5 <= y && y <= 50) { //ボールが前(-5≦y≦50)にあるとき
+    if (0 <= y && y <= 50) { //ボールが前(0≦y≦50)にあるとき
       dribbler1(100);
       wrap = 0;
       if(abs(x) < 4){
-        if(y <= 0){
+        if(y <= 2){
           if(goal_sig == 0){
             motorfunction(0, 70, -gyro);
           }else{
-            if(goal_y <= 35 && abs(goal_x) < 10){
+            if(goal_y <= 20 && abs(goal_x) < 10){
               motorfunction(0, 0, 0);
               delay(70);
               dribbler1(100);

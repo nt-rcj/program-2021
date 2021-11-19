@@ -392,7 +392,6 @@ void keeper() {
 
   if (abs(gyro) <= 10) {
     digitalWrite(LED_BUILTIN, LOW);
-    if (sig == 0) {
       if (goal_y > 23) {
         z = atan2(goal_x, goal_y - 23) + 3.14;
         motorfunction(z, 45, -gyro * 3 / 2);
@@ -408,10 +407,6 @@ void keeper() {
       }else{
         motorfunction(0, 0, 0);
       }
-    } else {
-      az = atan2(x, sqrt(y));
-      motorfunction(az, sqrt(x * x + y * y / 4), -gyro * 3 / 2);
-    }
   } else {
     digitalWrite(LED_BUILTIN, HIGH);
     power = abs(gyro);   //  モーターの速度をgyroにする
