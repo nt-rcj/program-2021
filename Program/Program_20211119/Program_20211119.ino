@@ -295,8 +295,8 @@ void loop() {
   Serial.print(bg_x);
   Serial.print(" ,bluegoal_y="); //青ゴールのy座標
   Serial.print(bg_y);
-  Serial.print(" ,tan="); 
-  Serial.print(atan2(x - 800, y * 4));
+  Serial.print(" , p_ball="); 
+  Serial.print(p_ball);
   Serial.println();
 
   ball_front = ToF_front.readRangeSingleMillimeters();
@@ -358,70 +358,26 @@ void loop() {
 //////////// main ////////////
 
 void keeper() {
-  if (digitalRead(GoalSW)) {  // 青色の場合
-    goal_sig = y_sig;
-    goal_x = yg_x;
-    goal_y = yg_y;
-  } else {                     // 黄色の場合
-    goal_sig = b_sig;
-    goal_x = bg_x;
-    goal_y = bg_y;
-  }
-  /*
-    goal_x = goal_x - 138 ;
-    goal_y = goal_y - 165 ;
-  */
-  k = 0.01;
-  angle = atan(goal_x / goal_y);
-  goal_dist = sqrt(goal_x * goal_x + goal_y * goal_y);
-
-  // Convert coordinates data
-  if (sig != 0) {
-    /*
-      x = 160 - x;
-      y = 81 - y;
-    */
-    ball_y = goal_y + y;
-  }
-
-  Serial.print(" Sig=");  //  openMVのデータを出力する
-  Serial.print(sig);
-  Serial.print(" X=");
-  Serial.print(x);
-  Serial.print(" Y=");
-  Serial.print(y);
-  Serial.print(" goal_x=");
-  Serial.print(goal_x);
-  Serial.print(" goal_y=");
-  Serial.print(goal_y);
-  Serial.print(" goal_dist=");
-  Serial.print(goal_dist);
-  Serial.print(" RtoBdist=");
-  Serial.print(RtoBdist);
-  Serial.print(" ball_front=");
-  Serial.print(ball_front);
-  Serial.println();
-
-  Serial.print(" gyro=");
-  Serial.print(gyro);
-  Serial.println();
-
-
   if (abs(gyro) <= 10) {
     digitalWrite(LED_BUILTIN, LOW);
     if (sig == 0) {
-      if (goal_y > 18) {
-        z = atan2(goal_x, goal_y - 18) + 3.14;
+      if (goal_y > 23) {
+        z = atan2(goal_x, goal_y - 23) + 3.14;
         motorfunction(z, 45, -gyro * 3 / 2);
-      } else {
+      }else if(goal_y < 23 && goal_y > 15 && abs(goal_x) > 33){
+        z = atan2(goal_x, goal_y - 23) + 3.14;
+        motorfunction(z, 45, -gyro * 3 / 2);
+      } else if (goal_y < 15){
+        if(goal_x > 0){
+          motorfunction(-0.60, 60, 0);
+        }else{
+          motorfunction(0.60, 60, 0);
+        }
+      }else{
         motorfunction(0, 0, 0);
       }
     } else {
-      distance = y + 22;
-      if (distance > 32) {
-        distance = 32;
-      }
-      az = atan2(x * 2 / 3, distance - goal_y);
+      az = atan2(x, sqrt(y) );
       motorfunction(az, sqrt(x * x + y * y / 4), -gyro * 3 / 2);
     }
   } else {
