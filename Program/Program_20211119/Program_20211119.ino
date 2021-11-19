@@ -506,18 +506,27 @@ void attacker() {
       }
     } else if (y <= 0) { // 後ろにボールがあるとき
       dribbler1(0);
-      if(abs(x) < 20 && y >= -88){
-        motorfunction(0, 50, -gyro);
-        wrap = 0;
-      }else if(abs(x) < 5 + abs(y) / 5){
-        if(goal_x > 0 || wrap == 1){
-          z = atan2(x + 800, y * 3);
-          motorfunction(z, sqrt(x*x + y*y) + 10, -gyro);
-          wrap = 1;
-        }else{
-          z = atan2(x - 800, y * 3);
-          motorfunction(z, sqrt(x*x + y*y) + 10, -gyro);
+      if(abs(x) < 30){
+        if(y >= -88){
+          motorfunction(0, 50, -gyro);
           wrap = 0;
+        }else if(y <= -115){
+          motorfunction(PI, abs(y) / 2.4, -gyro);
+          wrap = 0;
+        }else if(abs(x) < 5 + abs(y) / 10){
+          if(goal_x > 0 || wrap == 1){
+            z = atan2(x + 800, y * 3);
+            motorfunction(z, sqrt(x*x + y*y) + 10, -gyro);
+            wrap = 1;
+          }else{
+            z = atan2(x - 800, y * 3);
+            motorfunction(z, sqrt(x*x + y*y) + 10, -gyro);
+            wrap = 0;
+          }
+        }else{
+          wrap = 0;
+          z = atan2(x, y * 3);
+          motorfunction(z, sqrt(x*x + y*y) + 10, -gyro);
         }
       }else{
         wrap = 0;
