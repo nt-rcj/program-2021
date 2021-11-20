@@ -1,4 +1,4 @@
-//
+ //
 // Robot main program
 //           Ver 1.0 Dec.19.2019
 //           By Higaki Shuta
@@ -56,7 +56,7 @@ int blocks;
 int ball_x, ball_y;
 char buf[64];
 
-float az, AZ, d, k, O;
+float az, AZ, d, k;
 float targetP, distance, pointP;
 float goal_dist;
 float angle, inroot;

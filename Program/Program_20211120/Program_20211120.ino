@@ -1,7 +1,7 @@
 //
 // Robot main program
 //           Ver 1.0 Dec.19.2019
-//           By Higaki Shuta
+//           By Hiroya Hashimoto
 //           Ver 1.1 Jan.10.2021
 //             Based on 20201221 ver.
 //
@@ -56,7 +56,7 @@ int blocks;
 int ball_x, ball_y;
 char buf[64];
 
-float az, AZ, d, k, O;
+float az, AZ, d, k;
 float targetP, distance, pointP;
 float goal_dist;
 float angle, inroot;
@@ -250,16 +250,16 @@ void loop() {
   yg_area = yg_w * yg_h;      // 認識したブロックの面
 
   if (sig != 0) { //中心補正
-    x = 153 - x;
-    y = 86 - y;
+    x = 164 - x;
+    y = 78 - y;
   }
   if (y_sig != 0) {
-    yg_x = 136 - yg_x;
-    yg_y = yg_y - 182;
+    yg_x = 153 - yg_x;
+    yg_y = yg_y - 186;
   }
   if (b_sig != 0) {
-    bg_x = 153 - bg_x;
-    bg_y = bg_y - 66;
+    bg_x = 173 - bg_x;
+    bg_y = bg_y - 63;
   }
 
   if (sig != 0) { //補正
@@ -291,10 +291,10 @@ void loop() {
   Serial.print(y);
   Serial.print(" ,tof_front=");
   Serial.print(ball_front);
-  Serial.print(" ,bluegoal_x=");//青ゴールのx座標
-  Serial.print(bg_x);
-  Serial.print(" ,bluegoal_y="); //青ゴールのy座標
-  Serial.print(bg_y);
+  Serial.print(" ,yellowgoal_x=");//青ゴールのx座標
+  Serial.print(yg_x);
+  Serial.print(" ,yellowgoal_y="); //青ゴールのy座標
+  Serial.print(yg_y);
   Serial.print(" , p_ball="); 
   Serial.print(p_ball);
   Serial.println();
@@ -337,7 +337,7 @@ void loop() {
     } else if (digitalRead(Aux2) == LOW) {
       keeper();
     } else {
-      if ( p_ball <= xbee_date) { //どちらがボールに近いか
+      if (p_ball <= xbee_date) { //どちらがボールに近いか
         keeper();
       } else {
         attacker();
@@ -460,15 +460,15 @@ void attacker() {
 
   if (abs(gyro) < 20) {
     digitalWrite(LED_BUILTIN, LOW);
-    if (-5 <= y && y <= 50) { //ボールが前(-5≦y≦50)にあるとき
+    if (0 <= y && y <= 50) { //ボールが前(0≦y≦50)にあるとき
       dribbler1(100);
       wrap = 0;
       if(abs(x) < 4){
-        if(y <= 0){
+        if(y <= 2){
           if(goal_sig == 0){
             motorfunction(0, 70, -gyro);
           }else{
-            if(goal_y <= 35 && abs(goal_x) < 10){
+            if(goal_y <= 20 && abs(goal_x) < 10){
               motorfunction(0, 0, 0);
               delay(70);
               dribbler1(100);
