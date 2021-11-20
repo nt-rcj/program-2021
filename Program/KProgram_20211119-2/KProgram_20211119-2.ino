@@ -262,7 +262,7 @@ void loop() {
     bg_y = bg_y - 66;
   }
 
-  /*if (sig != 0) { //補正
+  if (sig != 0) { //補正
   }
   if (y_sig != 0) {
     yg_x = -(yg_x * 211800) / (140200 + 708 * sqrt(yg_x * yg_x + 28900));
@@ -271,7 +271,7 @@ void loop() {
     if (b_sig != 0) {
     bg_x = -(bg_x * 211800) / (140200 + 708 * sqrt(bg_x * bg_x + 28900));
     bg_y = (bg_y * 194600) / (140200 + 708 * sqrt(bg_y * bg_y + 28900));
-  }*/
+  }
 
   if (sig != 0) { //xbeedate生成
     xbee_x = x;
