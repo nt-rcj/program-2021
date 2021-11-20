@@ -56,7 +56,7 @@ int blocks;
 int ball_x, ball_y;
 char buf[64];
 
-float az, AZ, d, k;
+float az, AZ, d, k, O;
 float targetP, distance, pointP;
 float goal_dist;
 float angle, inroot;
@@ -291,10 +291,12 @@ void loop() {
   Serial.print(y);
   Serial.print(" ,tof_front=");
   Serial.print(ball_front);
-  Serial.print(" ,bluegoal_x=");//青ゴールのx座標
-  Serial.print(bg_x);
-  Serial.print(" ,bluegoal_y="); //青ゴールのy座標
-  Serial.print(bg_y);
+  Serial.print(" ,yellowgoal_x=");//青ゴールのx座標
+  Serial.print(yg_x);
+  Serial.print(" ,yellowgoal_y="); //青ゴールのy座標
+  Serial.print(yg_y);
+  Serial.print(" , tan="); 
+  Serial.print(atan2(- yg_x, - yg_y + 23));
   Serial.print(" , p_ball="); 
   Serial.print(p_ball);
   Serial.println();
@@ -358,6 +360,8 @@ void loop() {
 //////////// main ////////////
 
 void keeper() {
+  dribbler1(0);
+
   if (digitalRead(GoalSW)) {  // 青色の場合
     goal_sig = y_sig;
     goal_x = yg_x;
@@ -390,9 +394,11 @@ void keeper() {
   Serial.print(gyro);
   Serial.println();
 
+    O = sqrt(xbee_x * xbee_x + xbee_y * xbee_y);
+
   if (abs(gyro) <= 10) {
     digitalWrite(LED_BUILTIN, LOW);
-    if(xbee_date - p_ball < 60){      //ボールとの距離の差が近い、ボールを任せてゴール前に帰る
+    if(O - p_ball < 60 || sig == 0){      //ボールとの距離の差が近い、ボールを任せてゴール前に帰る
       if(goal_y > 23) {      //ゴールから遠い
         z = atan2(goal_x, goal_y - 23) + 3.14;
         motorfunction(z, 45, -gyro * 3 / 2);
@@ -461,7 +467,7 @@ void attacker() {
   if (abs(gyro) < 20) {
     digitalWrite(LED_BUILTIN, LOW);
     if (-5 <= y && y <= 50) { //ボールが前(-5≦y≦50)にあるとき
-      dribbler1(100);
+      dribbler1(0);
       wrap = 0;
       if(abs(x) < 4){
         if(y <= 0){
