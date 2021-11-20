@@ -358,6 +358,7 @@ void loop() {
 //////////// main ////////////
 
 void keeper() {
+  dribbler1(0);
   if (digitalRead(GoalSW)) {  // 青色の場合
     goal_sig = y_sig;
     goal_x = yg_x;
