@@ -6,8 +6,6 @@
 //             Based on 20201221 ver.
 //
 
-//test
-
 //Motor control program
 #include "NT_Robot202111.h" // Header file for Teensy 3.5
 #include "motorDRV5.h" //  モーター制御のプログラムを読み込む
