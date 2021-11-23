@@ -16,7 +16,7 @@
 VL6180X ToF_front;  // create front ToF object
 
 //const int angle = 0;
-const int Vlow = 13.5;  // Low limit voltage 1.1*12 = 13.2
+const int Vlow = 13.6;  // Low limit voltage 1.1*12 = 13.2
 //Mi-NHなら13.0,Li-poなら13.5(Li-poは過放電するので注意！)
 const float Vstep = 0.01811;  // Voltage step 15.3V/845 = 0.01811
 
