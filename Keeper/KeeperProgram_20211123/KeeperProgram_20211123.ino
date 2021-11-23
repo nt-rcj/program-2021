@@ -431,7 +431,7 @@ void attacker() {
               dribbler1(0);
               delay(100);
               digitalWrite(Kicker, HIGH);
-              delay(1500);
+              delay(3000);
               digitalWrite(Kicker, LOW);
             }else if(goal_y < 5){
               motorfunction(PI, 50, -gyro);

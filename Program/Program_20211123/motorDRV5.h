@@ -299,3 +299,11 @@ void dribbler(int power) {
   dribbler1(power);
   return;
 }
+
+void LED_Init() {
+  // initialize digital pin LED_BUILTIN as an output.
+  pinMode(LED_B, OUTPUT);
+  pinMode(LED_G, OUTPUT);
+  pinMode(LED_Y, OUTPUT);
+  pinMode(LED_R, OUTPUT);
+}
