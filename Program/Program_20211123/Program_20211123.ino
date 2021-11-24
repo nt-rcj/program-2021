@@ -142,8 +142,8 @@ void setup() {
   Serial.println("Initialize 2 ...");
 
   delay(1000);  //  ドリブラ・キッカーの動作チェック
-  dribbler1(100);
-  dribbler2(100);
+  dribbler1(0);
+  dribbler2(0);
   delay(1000);
   dribbler1(0);
   dribbler2(0);
@@ -243,19 +243,19 @@ void loop() {
   yg_area = yg_w * yg_h;      // 認識したブロックの面
 
   if (sig != 0) { //中心補正
-    x = 164 - x;
-    y = 78 - y;
+    x = 144 - x;
+    y = 60 - y;
   }
   if (y_sig != 0) {
-    yg_x = 153 - yg_x;
-    yg_y = yg_y - 186;
+    yg_x = 164 - yg_x;
+    yg_y = yg_y - 188;
   }
   if (b_sig != 0) {
     bg_x = 173 - bg_x;
     bg_y = bg_y - 63;
   }
 
-  if (sig != 0) { //補正
+  /*if (sig != 0) { //補正
   }
   if (y_sig != 0) {
     yg_x = -(yg_x * 211800) / (140200 + 708 * sqrt(yg_x * yg_x + 28900));
@@ -264,7 +264,7 @@ void loop() {
     if (b_sig != 0) {
     bg_x = -(bg_x * 211800) / (140200 + 708 * sqrt(bg_x * bg_x + 28900));
     bg_y = (bg_y * 194600) / (140200 + 708 * sqrt(bg_y * bg_y + 28900));
-  }
+  }*/
 
   if (sig != 0) { //xbeedate生成
     xbee_x = x;
@@ -358,7 +358,7 @@ void keeper() {
 
   if (digitalRead(GoalSW)) {  // 青色の場合
     goal_sig = y_sig;
-    goal_x = yg_x;
+    goal_x = -yg_x;
     goal_y = yg_y;
   } else {                     // 黄色の場合
     goal_sig = b_sig;
@@ -415,8 +415,8 @@ void attacker() {
 
   if (abs(gyro) < 20) {
     digitalWrite(LED_BUILTIN, LOW);
-    if (0 <= y && y <= 50) { //ボールが前(0≦y≦50)にあるとき
-      dribbler1(100);
+    if (0 <= y && y <= 30) { //ボールが前(0≦y≦30)にあるとき
+      dribbler1(0);
       wrap = 0;
       if(abs(x) < 4){
         if(y <= 2){
@@ -426,7 +426,7 @@ void attacker() {
             if(goal_y <= 20 && abs(goal_x) < 10){
               motorfunction(0, 0, 0);
               delay(70);
-              dribbler1(100);
+              dribbler1(0);
               digitalWrite(Kick_Dir, LOW);
               dribbler1(0);
               delay(100);
@@ -450,13 +450,13 @@ void attacker() {
     } else if (y <= 0) { // 後ろにボールがあるとき
       dribbler1(0);
       if(abs(x) < 30){
-        if(y >= -88){
+        if(y >= -129){
           motorfunction(0, 50, -gyro);
           wrap = 0;
-        }else if(y <= -115){
+        }else if(y <= -150){
           motorfunction(PI, abs(y) / 2.4, -gyro);
           wrap = 0;
-        }else if(abs(x) < 5 + abs(y) / 10){
+        }else if(abs(x) < 5 + abs(y) / 5){
           if(goal_x > 0 || wrap == 1){
             z = atan2(x + 800, y * 3);
             motorfunction(z, sqrt(x*x + y*y) + 10, -gyro);
