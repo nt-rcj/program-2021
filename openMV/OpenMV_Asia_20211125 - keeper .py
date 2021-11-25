@@ -81,7 +81,7 @@ while(True):
 #            print(" ball_x=%d" % x_data_ball, end="")
 #            print(" ball_y=%d" % y_data_ball)
     if i_o != 0:
-        green_led.on()
+        green_led.off()
     else:
         green_led.off()
         x_data_ball=-1
