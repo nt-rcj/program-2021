@@ -100,8 +100,8 @@ void setup() {
 
   digitalWrite(Kick1, LOW);
   digitalWrite(Kick_Dir, LOW);
-  digitalWrite(SWR, LOW);
-  digitalWrite(SWG, LOW);
+  digitalWrite(SWR, HIGH);
+  digitalWrite(SWG, HIGH);
 
   // initialize digital pin LED_BUILTIN as an output.
   pinMode(LED_BUILTIN, OUTPUT);
@@ -142,8 +142,8 @@ void setup() {
   Serial.println("Initialize 2 ...");
 
   delay(1000);  //  ドリブラ・キッカーの動作チェック
-  dribbler1(0);
-  dribbler2(0);
+  dribbler1(100);
+  dribbler2(100);
   delay(1000);
   dribbler1(0);
   dribbler2(0);
@@ -154,12 +154,12 @@ void setup() {
   delay(100);
   digitalWrite(Kicker, LOW);
   delay(100);
-  digitalWrite(Kick_Dir, HIGH);
+  /*digitalWrite(Kick_Dir, HIGH);
   delay(100);
   digitalWrite(Kicker, HIGH);
   delay(100);
   digitalWrite(Kicker, LOW);
-  delay(100);
+  delay(100);*/
 
   Serial.println("Initialize 3 ...");
 
@@ -183,7 +183,7 @@ void setup() {
   digitalWrite(LED_G, LOW);  // LED_G消灯
   digitalWrite(LED_B, LOW);  // LED_B消灯
 
-  digitalWrite(SWR, LOW);
+  digitalWrite(SWR, HIGH);
   digitalWrite(SWG, HIGH);
   Serial.println("Initialize end");
 }
@@ -299,7 +299,7 @@ void loop() {
 
   if (digitalRead(StartSW) == LOW) { // STartSW == Lowでスタート
     digitalWrite(SWR, HIGH);
-    digitalWrite(SWG, LOW);
+    digitalWrite(SWG, HIGH);
 
     //checkvoltage(Vlow);  //  電池の電圧をチェック
     if ( emergency == true ) {
@@ -343,7 +343,7 @@ void loop() {
     dribbler1(0);
     dribbler2(0);
     digitalWrite(LINE_LED, LOW); // ラインセンサのLEDを消灯
-    digitalWrite(SWR, LOW);
+    digitalWrite(SWR, HIGH);
     digitalWrite(SWG, HIGH);
     wrap = 0;
   }
@@ -416,7 +416,7 @@ void attacker() {
   if (abs(gyro) < 20) {
     digitalWrite(LED_BUILTIN, LOW);
     if (0 <= y && y <= 30) { //ボールが前(0≦y≦30)にあるとき
-      dribbler1(0);
+      dribbler1(100);
       wrap = 0;
       if(abs(x) < 4){
         if(y <= 2){
@@ -426,7 +426,7 @@ void attacker() {
             if(goal_y <= 20 && abs(goal_x) < 10){
               motorfunction(0, 0, 0);
               delay(70);
-              dribbler1(0);
+              dribbler1(100);
               digitalWrite(Kick_Dir, LOW);
               dribbler1(0);
               delay(100);
@@ -558,7 +558,7 @@ void intHandle() {  // Lineを踏んだらlineflagをセットして止まる。
 
 void back_Line1(int power) {             // Lineセンサ1が反応しなくなるまで後ろに進む
   float azimuth;
-  digitalWrite(LED_R, HIGH);  // LED_R点灯
+  digitalWrite(LED_R, LOW);  // LED_R点灯
   while ((digitalRead(LINE1D) == HIGH) || (digitalRead(LINE5D) == HIGH) || (digitalRead(LINE3D) == HIGH)) {
     if (digitalRead(LINE4D) == HIGH) {
       azimuth = 3.14159 * 3.0 / 4.0;   // 後ろ方向(1+4)をradianに変換
@@ -575,7 +575,7 @@ void back_Line1(int power) {             // Lineセンサ1が反応しなくな�
 
 void back_Line2(int power) {             // Lineセンサ2が反応しなくなるまで左に進む
   float azimuth;
-  digitalWrite(LED_Y, HIGH);  // LED_Y点灯
+  digitalWrite(LED_Y, LOW);  // LED_Y点灯
   while ((digitalRead(LINE2D) == HIGH) || (digitalRead(LINE5D) == HIGH) || (digitalRead(LINE4D) == HIGH)) {
     if (digitalRead(LINE1D) == HIGH) {
       azimuth = 3.14159 * 5.0 / 4.0;   // 後ろ方向(2+1)をradianに変換
@@ -592,7 +592,7 @@ void back_Line2(int power) {             // Lineセンサ2が反応しなくな�
 
 void back_Line3(int power) {             // Lineセンサ3が反応しなくなるまで前に進む
   float azimuth;
-  digitalWrite(LED_G, HIGH);  // LED_G点灯
+  digitalWrite(LED_G, LOW);  // LED_G点灯
   while ((digitalRead(LINE3D) == HIGH) || (digitalRead(LINE5D) == HIGH) || (digitalRead(LINE1D) == HIGH)) {
     if (digitalRead(LINE4D) == HIGH) {
       azimuth = 3.14159 * 1.0 / 4.0;   // 後ろ方向(3+4)をradianに変換
@@ -609,7 +609,7 @@ void back_Line3(int power) {             // Lineセンサ3が反応しなくな�
 
 void back_Line4(int power) {             // Lineセンサ4が反応しなくなるまで右に進む
   float azimuth;
-  digitalWrite(LED_B, HIGH);  // LED_B点灯
+  digitalWrite(LED_B, LOW);  // LED_B点灯
   while ((digitalRead(LINE4D) == HIGH) || (digitalRead(LINE5D) == HIGH) || (digitalRead(LINE2D) == HIGH)) {
     if (digitalRead(LINE3D) == HIGH) {
       azimuth = 3.14159 * 1.0 / 4.0;   // 後ろ方向(4+3)をradianに変換
@@ -640,8 +640,8 @@ float checkvoltage(float Vlow) {  // 電池電圧を監視する。
   voltage = analogRead(Vbatt); // Get Volatge
   if ( voltage < limit ) {      // 電圧が　Vlow以下であればemergencyをセットする。
     emergency = true;
-    digitalWrite(SWG, LOW);
-    digitalWrite(SWR, LOW);
+    digitalWrite(SWG, HIGH);
+    digitalWrite(SWR, HIGH);
 
   }
   return voltage * 0.01811;
