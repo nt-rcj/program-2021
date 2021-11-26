@@ -10,8 +10,8 @@ from pyb import LED
 
 # Color Tracking Thresholds (L Min, L Max, A Min, A Max, B Min, B Max)
 obj_color_orange =   [(32, 75, 18, 68, 2, 127)]      # Orange Ball
-obj_color_yellow =   [(60, 76, -8, 14, 22, 127)]      # Yellow Goal
-obj_color_blue   =   [(20, 29, -14, 10, -57, -11)]     # Blue Goal
+obj_color_yellow =   [(51, 74, -8, 14, 21, 127)]      # Yellow Goal
+obj_color_blue   =   [(7, 17, -17, 10, -33, -8)]     # Blue Goal
 
 # You may pass up to 16 thresholds above. However, it's not really possible to segment any
 # scene with 16 thresholds before color thresholds start to overlap heavily.
@@ -47,7 +47,7 @@ sensor.reset()
 sensor.set_pixformat(sensor.RGB565)
 sensor.set_framesize(sensor.QVGA) #320x240
 sensor.skip_frames(time = 56)
-sensor.set_auto_gain(False, gain_db = 22) # must be turned off for color tracking
+sensor.set_auto_gain(False, gain_db = 21) # must be turned off for color tracking
 sensor.set_auto_whitebal(False, rgb_gain_db = (63.49, 60.21, 64.32)) # must be turned off for color tracking
 clock = time.clock()
 uart = UART(3, 19200, timeout_char = 1000)
