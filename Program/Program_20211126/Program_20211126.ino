@@ -185,6 +185,7 @@ void setup() {
 
   digitalWrite(SWR, HIGH);
   digitalWrite(SWG, HIGH);
+  p_ball = 255;
   Serial.println("Initialize end");
 }
 
@@ -243,16 +244,27 @@ void loop() {
   yg_area = yg_w * yg_h;      // 認識したブロックの面
 
   if (sig != 0) { //中心補正
-    x = 144 - x;
-    y = 60 - y;
+    x = 155 - x;
+    y = 58 - y;
   }
-  if (y_sig != 0) {
-    yg_x = 164 - yg_x;
-    yg_y = yg_y - 188;
-  }
-  if (b_sig != 0) {
-    bg_x = 173 - bg_x;
-    bg_y = bg_y - 63;
+  if (digitalRead(GoalSW)) {  //　青色ゴールをする場合
+    if (y_sig != 0) {
+      yg_x = 114 - yg_x;
+      yg_y = yg_y - 162;
+    }
+    if (b_sig != 0) {
+      bg_x = 151 - bg_x;
+      bg_y = bg_y - 58;
+    }
+  } else {                     // 黄色ゴールをする場合
+    if (y_sig != 0) {
+      yg_x = 151 - yg_x;
+      yg_y = yg_y - 57;
+    }
+    if (b_sig != 0) {
+      bg_x = 152 - bg_x;
+      bg_y = bg_y - 189;
+    }
   }
 
   /*if (sig != 0) { //補正
@@ -290,8 +302,8 @@ void loop() {
   Serial.print(yg_x);
   Serial.print(" ,yellowgoal_y="); //青ゴールのy座標
   Serial.print(yg_y);
-  Serial.print(" ,p_ball="); 
-  Serial.print(p_ball);
+  Serial.print(" ,tan="); 
+  Serial.print(atan2(bg_x, -bg_y));
   Serial.println();
 
   ball_front = ToF_front.readRangeSingleMillimeters();
@@ -415,29 +427,27 @@ void attacker() {
 
   if (abs(gyro) < 20) {
     digitalWrite(LED_BUILTIN, LOW);
-    if (0 <= y && y <= 30) { //ボールが前(0≦y≦30)にあるとき
+    if (-5 <= y && y <= 30) { //ボールが前(0≦y≦30)にあるとき
       dribbler1(100);
       wrap = 0;
       if(abs(x) < 4){
-        if(y <= 2){
+        if(ball_front <= 25){
           if(goal_sig == 0){
             motorfunction(0, 70, -gyro);
           }else{
-            if(goal_y <= 20 && abs(goal_x) < 10){
-              motorfunction(0, 0, 0);
-              delay(70);
-              dribbler1(100);
+            if(goal_y <= 33 && abs(goal_x) < 17){
               digitalWrite(Kick_Dir, LOW);
               dribbler1(0);
-              delay(100);
               digitalWrite(Kicker, HIGH);
-              delay(3000);
+              delay(1000);
+              motorfunction(0, 0, 0);
+              delay(2000);
               digitalWrite(Kicker, LOW);
             }else if(goal_y < 5){
               motorfunction(PI, 50, -gyro);
             }else{
               z = atan2(goal_x, goal_y);
-              motorfunction(z, abs(goal_x) + abs(goal_y)*2.5, -gyro);
+              motorfunction(z, abs(goal_x) + abs(goal_y)*2.5 + 10, -gyro);
             }
           }
         } else {
@@ -445,7 +455,7 @@ void attacker() {
         }
       } else {
         z = atan2(x, y);
-        motorfunction(z, sqrt(x*x + y*y) + 10, -gyro);
+        motorfunction(z, abs(y) + 10, -gyro);
       }
     } else if (y <= 0) { // 後ろにボールがあるとき
       dribbler1(0);
