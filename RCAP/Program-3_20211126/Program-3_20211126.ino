@@ -191,6 +191,7 @@ void setup() {
 }
 
 void loop() {
+  digitalWrite(LED_B, LOW);
   blob_count = get_openMV_coordinate();
   x_data_ball = (openMV[5] & 0b0000000000111111) +
                 ((openMV[6] & 0b0000000000111111) << 6);
@@ -365,6 +366,7 @@ void loop() {
       }
     } else {
       digitalWrite(LED_BUILTIN, HIGH);
+      digitalWrite(LED_B, HIGH);
       power = abs(gyro) / 2 + 5;  //  モーターの速度をgyroにする
 
       if (gyro > 0) {  // Ball is 1st quadrant

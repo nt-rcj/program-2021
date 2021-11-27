@@ -27,7 +27,7 @@ static int x_data_yellowgoal, y_data_yellowgoal, w_data_yellowgoal,
     h_data_yellowgoal;
 static int x_data_bluegoal, y_data_bluegoal, w_data_bluegoal, h_data_bluegoal;
 
-static int8_t gyro;
+static int8_t gyro_o;
 static int robot_dir, power;
 
 static int emergency;
@@ -44,7 +44,6 @@ float x, y;
 float bg_x, bg_y;
 float yg_x, yg_y;
 float goal_x, goal_y;
-float another_x, another_y;
 float y_sig, b_sig, goal_sig;
 int ball_front;
 
@@ -60,6 +59,8 @@ float az, ball_dist, wrap;
 float angle;
 int pixel;
 uint32_t color;
+
+float gyro;
 
 void setup() {
   int pin;
@@ -174,8 +175,7 @@ void setup() {
 
   // Caution D29 -> Interrupt5
 
-  
-  attachInterrupt(INT_29, intHandle, RISING);
+  //attachInterrupt(INT_29, intHandle, RISING);
 
   // LEDを初期化する
   LED_Init();
@@ -226,8 +226,11 @@ void loop() {
   // get gyro data
   if (Serial2.available() > 0)
     while (Serial2.available() != 0) {  //  Gyroの方位データをgyroに取り込む
-      gyro = Serial2.read();
+      gyro_o = Serial2.read();
     }
+
+  gyro = gyro_o * 0.8;
+
   // Xbeeからの信号を読む
   if (Serial1.available() > 0)
     while (Serial1.available() > 0) {
@@ -255,8 +258,8 @@ void loop() {
   yg_area = yg_w * yg_h;  // 認識したブロックの面
 
   if (sig != 0) {  //中心補正
-    x = 160 - x;
-    y = 65 - y;
+    x = 156 - x;
+    y = 67 - y;
   }
   if (digitalRead(GoalSW)) {  //　青色ゴールをする場合
     if (y_sig != 0) {
@@ -343,21 +346,32 @@ void loop() {
         delay(300);
       }
     }
-
-    digitalWrite(LINE_LED, HIGH);  // ラインセンサのLEDを点灯
-    if (lineflag == true) {
-      lineflag = false;
-    }
-    //役割判定
-    if (digitalRead(Aux1) == LOW) {
-      attacker();
-    } else if (digitalRead(Aux2) == LOW) {
-      keeper();
-    } else {
-      if (p_ball <= xbee_date) {  //どちらがボールに近いか
+    if (abs(gyro) <= 5) {
+      digitalWrite(LINE_LED, HIGH);  // ラインセンサのLEDを点灯
+      if (lineflag == true) {
+        lineflag = false;
+      }
+      //役割判定
+      if (digitalRead(Aux1) == LOW) {
+        attacker();
+      } else if (digitalRead(Aux2) == LOW) {
         keeper();
       } else {
-        attacker();
+        if (p_ball <= xbee_date) {  //どちらがボールに近いか
+          keeper();
+        } else {
+          attacker();
+        }
+      }
+    } else {
+      digitalWrite(LED_BUILTIN, HIGH);
+      power = abs(gyro) / 2 + 5;  //  モーターの速度をgyroにする
+
+      if (gyro > 0) {  // Ball is 1st quadrant
+        turnCCW(power);
+      } else if (gyro < 0) {  // 2nd quadrant
+        turnCCW(-power);
+      } else {
       }
     }
   } else {  // ロボット停止
@@ -386,42 +400,30 @@ void keeper() {
     goal_y = bg_y;
   }
 
-  if (abs(gyro) <= 10) {
-    digitalWrite(LED_BUILTIN, LOW);
-    if (ball_dist - p_ball < 60 ||
-        sig == 0) {  //ボールとの距離の差が近い、ボールを任せてゴール前に帰る
-      if(goal_sig == 0){
-        motorfunction(PI, 100, -gyro);
-      }else if (goal_y > 23) {  //ゴールから遠い
-        z = atan2(goal_x, goal_y - 23) + 3.14;
-        motorfunction(z, 100, -gyro * 3 / 2);
-      } else if (goal_y < 23 && goal_y > 15 &&
-                 abs(goal_x) > 33) {  // x座標が０から遠い
-        z = atan2(goal_x, goal_y - 23) + 3.14;
-        motorfunction(z, 100, -gyro * 3 / 2);
-      } else if (goal_y < 15) {  //ゴールエリアの横にいるとき
-        if (goal_x > 0) {
-          motorfunction(-0.60, 60, 0);
-        } else {
-          motorfunction(0.60, 60, 0);
-        }
-      } else {  //ゴール前にいるとき
-        motorfunction(0, 0, 0);
+  digitalWrite(LED_BUILTIN, LOW);
+  if (ball_dist - p_ball < 60 ||
+      sig == 0) {  //ボールとの距離の差が近い、ボールを任せてゴール前に帰る
+    if (goal_sig == 0) {
+      motorfunction(PI, 100, -gyro);
+    } else if (goal_y > 30) {  //ゴールから遠い
+      z = atan2(goal_x, goal_y - 30) + 3.14;
+      motorfunction(z, 100, -gyro * 3 / 2);
+    } else if (goal_y < 30 && goal_y > 15 &&
+               abs(goal_x) > 33) {  // x座標が０から遠い
+      z = atan2(goal_x, goal_y - 30) + 3.14;
+      motorfunction(z, 100, -gyro * 3 / 2);
+    } else if (goal_y < 15) {  //ゴールエリアの横にいるとき
+      if (goal_x > 0) {
+        motorfunction(-0.60, 60, 0);
+      } else {
+        motorfunction(0.60, 60, 0);
       }
-    } else {  //ボールとの距離の差が遠い、自ら近づく
-      az = atan2(x, sqrt(y));
-      motorfunction(az, sqrt(x * x + y * y / 4), -gyro * 3 / 2);
+    } else {  //ゴール前にいるとき
+      motorfunction(0, 0, 0);
     }
-  } else {
-    digitalWrite(LED_BUILTIN, HIGH);
-    power = abs(gyro);  //  モーターの速度をgyroにする
-
-    if (gyro > 0) {  // Ball is 1st quadrant
-      turnCCW(power);
-    } else if (gyro < 0) {  // 2nd quadrant
-      turnCCW(-power);
-    } else {
-    }
+  } else {  //ボールとの距離の差が遠い、自ら近づく
+    az = atan2(x, sqrt(y));
+    motorfunction(az, sqrt(x * x + y * y / 4), -gyro * 3 / 2);
   }
 }
 
@@ -431,102 +433,85 @@ void attacker() {
     goal_sig = b_sig;
     goal_x = bg_x;
     goal_y = -bg_y;
-    another_x = -yg_x;
-    another_y = yg_y;
   } else {
     goal_sig = y_sig;
     goal_x = yg_x;
     goal_y = -yg_y;
-    another_x = -bg_x;
-    another_y = bg_y;
   }
 
-  if (abs(gyro) < 20) {
-    digitalWrite(LED_BUILTIN, LOW);
-    if (-5 <= y && y <= 30) {  //ボールが前(0≦y≦30)にあるとき
-      dribbler1(100);
-      wrap = 0;
-      if (abs(x) < 5) {
-        if (ball_front <= 60) {
-          if (ball_front <= 25) {
-            if(goal_sig == 0){
-              motorfunction(0, 80, -gyro * 4 / 3);
-            }else if (goal_y <= 33 && abs(goal_x) < 17) {
-              digitalWrite(Kick_Dir, LOW);
-              dribbler1(0);
-              digitalWrite(Kicker, HIGH);
-              delay(200);
-              motorfunction(0, 0, 0);
-              delay(800);
-              digitalWrite(Kicker, LOW);
-            } else if (goal_y < 5) {
-              motorfunction(PI, 100, -gyro * 4 / 3);
-            } else {
-              z = atan2(goal_x, goal_y);
-              motorfunction(z, abs(goal_x) + abs(goal_y) + 40, -gyro * 4 / 3);
-            }
+  digitalWrite(LED_BUILTIN, LOW);
+  if(abs(y) > 70 || abs(x) < 70){
+    motorfunction(0, 0, 0);
+  }else if (-5 <= y && y <= 30) {  //ボールが前(0≦y≦30)にあるとき
+    dribbler1(0);
+    wrap = 0;
+    if (abs(x) < 5) {
+      if (y <= 6) {
+        if (y <= 2) {
+          if (goal_sig == 0) {
+            motorfunction(0, 80, -gyro * 4 / 3);
+          } else if (goal_y <= 33 && abs(goal_x) < 17) {
+            digitalWrite(Kick_Dir, LOW);
+            dribbler1(0);
+            digitalWrite(Kicker, HIGH);
+            delay(200);
+            motorfunction(0, 0, 0);
+            delay(800);
+            digitalWrite(Kicker, LOW);
+          } else if (goal_y < 5) {
+            motorfunction(PI, 100, -gyro * 4 / 3);
           } else {
-            motorfunction(0, 30, -gyro * 4 / 3);
+            z = atan2(goal_x, goal_y);
+            motorfunction(z, abs(goal_x) + abs(goal_y) + 40, -gyro * 4 / 3);
           }
         } else {
-          z = atan2(x, y*y);
-          motorfunction(z, abs(x) + abs(y) + 20, -gyro * 4 / 3);
+          motorfunction(0, 70, -gyro * 4 / 3);
         }
       } else {
-        z = atan2(x, y);
+        z = atan2(x, y * y);
         motorfunction(z, abs(x) + abs(y) + 20, -gyro * 4 / 3);
       }
-    } else if (y <= 0) {  // 後ろにボールがあるとき
-      dribbler1(0);
-      if(another_y < 25){ 
-        motorfunction(0, 50, -gyro);
-      }else{
-        if (abs(x) < 30) {
-          if (y >= -129) {
-            motorfunction(0, 50, -gyro * 4 / 3);
-            wrap = 0;
-          } else if (y <= -150) {
-            motorfunction(PI, abs(y) / 2.4, -gyro * 4 / 3);
-            wrap = 0;
-          } else if (abs(x) < 5 + abs(y) / 5) {
-          if (goal_x > 0 || wrap == 1) {
-            z = atan2(x + 800, y * 3);
-            motorfunction(z, sqrt(x * x + y * y) + 10, -gyro * 4 / 3);
-            wrap = 1;
-            } else {
-              z = atan2(x - 800, y * 3);
-              motorfunction(z, sqrt(x * x + y * y) + 10, -gyro * 4 / 3);
-              wrap = 0;
-            }
-          } else {
-            wrap = 0;
-            z = atan2(x, y * 3);
-            motorfunction(z, sqrt(x * x + y * y) + 10, -gyro * 4 / 3);
-          } 
-        } else {
-          wrap = 0;
-          z = atan2(x, y * 4);
-          motorfunction(z, sqrt(x * x + y * y) + 10, -gyro * 4 / 3);
-        }
-      }
-    } else {  // 50 < y になるとき
-      dribbler1(0);
-      dribbler2(0);
-      wrap = 0;
-      if (sig == 0) {  // ボールがないとき(y = 4096)
-        motorfunction(0, 0, 0);
-      } else {  // ボールがあるとき
-        motorfunction(0, 80, -gyro * 4 / 3);
-      }
-    }
-  } else {
-    digitalWrite(LED_BUILTIN, HIGH);
-    power = abs(gyro) / 2;  //  モーターの速度をgyroにする
-    if (gyro > 0) {         // 時計回りに回りすぎているとき
-      turnCCW(power);
-    } else if (gyro < 0) {  // 反時計回りに回りすぎているとき
-      turnCCW(-power);
     } else {
+      z = atan2(x, y);
+      motorfunction(z, abs(x) + abs(y) + 20, -gyro * 4 / 3);
+    }
+  } else if (y <= 0) {  // 後ろにボールがあるとき
+    dribbler1(0);
+    if (abs(x) < 30) {
+      if (y >= -129) {
+        motorfunction(0, 50, -gyro * 4 / 3);
+        wrap = 0;
+      } else if (y <= -150) {
+        motorfunction(PI, abs(y) / 2.4, -gyro * 4 / 3);
+        wrap = 0;
+      } else if (abs(x) < 5 + abs(y) / 5) {
+        if (goal_x > 0 || wrap == 1) {
+          z = atan2(x + 800, y * 3);
+          motorfunction(z, sqrt(x * x + y * y) + 10, -gyro * 4 / 3);
+          wrap = 1;
+        } else {
+          z = atan2(x - 800, y * 3);
+          motorfunction(z, sqrt(x * x + y * y) + 10, -gyro * 4 / 3);
+          wrap = 0;
+        }
+      } else {
+        wrap = 0;
+        z = atan2(x, y * 3);
+        motorfunction(z, sqrt(x * x + y * y) + 10, -gyro * 4 / 3);
+      }
+    } else {
+      wrap = 0;
+      z = atan2(x, y * 4);
+      motorfunction(z, sqrt(x * x + y * y) + 10, -gyro * 4 / 3);
+    }
+  } else {  // 50 < y になるとき
+    dribbler1(0);
+    dribbler2(0);
+    wrap = 0;
+    if (sig == 0) {  // ボールがないとき(y = 4096)
+      motorfunction(0, 0, 0);
+    } else {  // ボールがあるとき
+      motorfunction(0, 80, -gyro * 4 / 3);
     }
   }
 }
