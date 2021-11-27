@@ -347,7 +347,6 @@ void loop() {
         delay(300);
       }
     }
-    if (abs(gyro) <= 5) {
       digitalWrite(LINE_LED, HIGH);  // ラインセンサのLEDを点灯
       if (lineflag == true) {
         lineflag = false;
@@ -364,18 +363,7 @@ void loop() {
           attacker();
         }
       }
-    } else {
-      digitalWrite(LED_BUILTIN, HIGH);
-      digitalWrite(LED_B, HIGH);
-      power = abs(gyro) / 2 + 5;  //  モーターの速度をgyroにする
-
-      if (gyro > 0) {  // Ball is 1st quadrant
-        turnCCW(power);
-      } else if (gyro < 0) {  // 2nd quadrant
-        turnCCW(-power);
-      } else {
-      }
-    }
+      
   } else {  // ロボット停止
     motorFree();
     dribbler1(0);
@@ -546,6 +534,8 @@ int getOpenMV() {  // get serial data from openMV
 
 void intHandle() {  // Lineを踏んだらlineflagをセットして止まる。
   int power;
+  digitalWrite(LED_B, HIGH);
+
 
   if (digitalRead(StartSW) == HIGH)  // スイッチがOFFなら何もしない。
     return;
@@ -564,8 +554,13 @@ void intHandle() {  // Lineを踏んだらlineflagをセットして止まる。
     } else if (digitalRead(LINE4D) == HIGH) {
       back_Line4(power);
       lineflag = true;  // set lineflag
+    }else{
+      digitalWrite(LED_R, HIGH);
     }
   }
+
+  digitalWrite(LED_B, LOW);
+  digitalWrite(LED_R, LOW);
 
   if (lineflag == false)  // センサーの反応がない場合は何もしない
     return;
