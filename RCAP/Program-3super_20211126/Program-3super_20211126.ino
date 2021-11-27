@@ -255,8 +255,8 @@ void loop() {
   yg_area = yg_w * yg_h;  // 認識したブロックの面
 
   if (sig != 0) {  //中心補正
-    x = 156 - x;
-    y = 67 - y;
+    x = 160 - x;
+    y = 65 - y;
   }
   if (digitalRead(GoalSW)) {  //　青色ゴールをする場合
     if (y_sig != 0) {

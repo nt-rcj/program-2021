@@ -460,7 +460,7 @@ void attacker() {
               motorfunction(z, abs(goal_x) + abs(goal_y) + 40, -gyro * 4 / 3);
             }
           } else {
-            motorfunction(0, 30, -gyro * 4 / 3);
+            motorfunction(0, 60, -gyro * 4 / 3);
           }
         } else {
           z = atan2(x, y*y);
