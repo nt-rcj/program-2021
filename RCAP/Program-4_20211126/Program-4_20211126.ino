@@ -253,8 +253,8 @@ void loop() {
       yg_y = yg_y - 162;
     }
     if (b_sig != 0) {
-      bg_x = 151 - bg_x;
-      bg_y = bg_y - 58;
+      bg_x = 141 - bg_x;
+      bg_y = bg_y - 65;
     }
   } else {                     // 黄色ゴールをする場合
     if (y_sig != 0) {

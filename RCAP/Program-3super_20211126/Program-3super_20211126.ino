@@ -44,6 +44,7 @@ float x, y;
 float bg_x, bg_y;
 float yg_x, yg_y;
 float goal_x, goal_y;
+float another_x, another_y;
 float y_sig, b_sig, goal_sig;
 int ball_front;
 
@@ -173,6 +174,7 @@ void setup() {
 
   // Caution D29 -> Interrupt5
 
+  
   attachInterrupt(INT_29, intHandle, RISING);
 
   // LEDを初期化する
@@ -429,10 +431,14 @@ void attacker() {
     goal_sig = b_sig;
     goal_x = bg_x;
     goal_y = -bg_y;
+    another_x = -yg_x;
+    another_y = yg_y;
   } else {
     goal_sig = y_sig;
     goal_x = yg_x;
     goal_y = -yg_y;
+    another_x = -bg_x;
+    another_y = bg_y;
   }
 
   if (abs(gyro) < 20) {
@@ -472,32 +478,36 @@ void attacker() {
       }
     } else if (y <= 0) {  // 後ろにボールがあるとき
       dribbler1(0);
-      if (abs(x) < 30) {
-        if (y >= -129) {
-          motorfunction(0, 50, -gyro * 4 / 3);
-          wrap = 0;
-        } else if (y <= -150) {
-          motorfunction(PI, abs(y) / 2.4, -gyro * 4 / 3);
-          wrap = 0;
-        } else if (abs(x) < 5 + abs(y) / 5) {
+      if(another_y < 25){ 
+        motorfunction(0, 50, -gyro);
+      }else{
+        if (abs(x) < 30) {
+          if (y >= -129) {
+            motorfunction(0, 50, -gyro * 4 / 3);
+            wrap = 0;
+          } else if (y <= -150) {
+            motorfunction(PI, abs(y) / 2.4, -gyro * 4 / 3);
+            wrap = 0;
+          } else if (abs(x) < 5 + abs(y) / 5) {
           if (goal_x > 0 || wrap == 1) {
             z = atan2(x + 800, y * 3);
             motorfunction(z, sqrt(x * x + y * y) + 10, -gyro * 4 / 3);
             wrap = 1;
+            } else {
+              z = atan2(x - 800, y * 3);
+              motorfunction(z, sqrt(x * x + y * y) + 10, -gyro * 4 / 3);
+              wrap = 0;
+            }
           } else {
-            z = atan2(x - 800, y * 3);
-            motorfunction(z, sqrt(x * x + y * y) + 10, -gyro * 4 / 3);
             wrap = 0;
-          }
+            z = atan2(x, y * 3);
+            motorfunction(z, sqrt(x * x + y * y) + 10, -gyro * 4 / 3);
+          } 
         } else {
           wrap = 0;
-          z = atan2(x, y * 3);
+          z = atan2(x, y * 4);
           motorfunction(z, sqrt(x * x + y * y) + 10, -gyro * 4 / 3);
         }
-      } else {
-        wrap = 0;
-        z = atan2(x, y * 4);
-        motorfunction(z, sqrt(x * x + y * y) + 10, -gyro * 4 / 3);
       }
     } else {  // 50 < y になるとき
       dribbler1(0);
