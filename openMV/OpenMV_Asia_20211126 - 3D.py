@@ -1,6 +1,6 @@
 # Orange Ball Tracking program for RCJJ
 # Multi Color Version
-# written by H.Saeki
+# written by Shuta Higaki
 # Sep.22.2019
 #
 
@@ -9,9 +9,9 @@ from pyb import UART
 from pyb import LED
 
 # Color Tracking Thresholds (L Min, L Max, A Min, A Max, B Min, B Max)
-obj_color_orange =   [(0, 64, 27, 127, -44, 127)]      # Orange Ball
-obj_color_yellow =   [(33, 78, -12, 6, 32, 127)]      # Yellow Goal
-obj_color_blue   =   [(20, 28, -59, 11, -28, -7)]     # Blue Goal
+obj_color_orange =   [(0, 63, 20, 127, -36, 127)]      # Orange Ball
+obj_color_yellow =   [(23, 69, -21, 11, 23, 127)]      # Yellow Goal
+obj_color_blue   =   [(15, 21, -12, 4, -29, -9)]     # Blue Goal
 
 # You may pass up to 16 thresholds above. However, it's not really possible to segment any
 # scene with 16 thresholds before color thresholds start to overlap heavily.
@@ -47,7 +47,7 @@ sensor.reset()
 sensor.set_pixformat(sensor.RGB565)
 sensor.set_framesize(sensor.QVGA) #320x240
 sensor.skip_frames(time = 56)
-sensor.set_auto_gain(False, gain_db = 23) # must be turned off for color tracking
+sensor.set_auto_gain(False, gain_db = 19) # must be turned off for color tracking
 sensor.set_auto_whitebal(False, rgb_gain_db = (63.49, 60.21, 64.32)) # must be turned off for color tracking
 clock = time.clock()
 uart = UART(3, 19200, timeout_char = 1000)
